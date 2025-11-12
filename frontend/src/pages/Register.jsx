@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 
 import styles from '../css/Auth.module.css';
 
-function Register() {
+function Register({ setToken }) {
   const [ email, setEmail ] = useState('');
   const [ password, setPassword ] = useState('');
   const [ confirmPassword, setConfirmPassword ] = useState('');
@@ -21,8 +21,8 @@ function Register() {
     try {
       const response = await axios.post('http://localhost:5005/user/auth/register', { email, password, name });
       localStorage.setItem('token', response.data.token);
+      setToken(token);
       navigate('/dashboard');
-      console.log(response);
     } catch (error) {
       console.log(error);
     }

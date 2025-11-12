@@ -7,21 +7,18 @@ import Button from '@mui/material/Button';
 
 import styles from '../css/Auth.module.css';
 
-function Login() {
+function Login({ setToken }) {
   const [ email, setEmail ] = useState('');
   const [ password, setPassword ] = useState('');
-  const [ name, setName ] = useState('');
   
   const navigate = useNavigate('/dashboard');
 
   const loginUser = async () => {
-    console.log(email, password, name);
-
     try {
       const response = await axios.post('http://localhost:5005/user/auth/login', { email, password });
       localStorage.setItem('token', response.data.token);
+      setToken(response.data.token);
       navigate('/dashboard');
-      console.log(response);
     } catch (error) {
       console.log(error);
     }
@@ -29,7 +26,7 @@ function Login() {
   
   return (
     <div>
-      <h1>Login</h1><br />
+      <h1>Login</h1>
       <TextField
         id="login-email-input"
         label="Email"
@@ -54,6 +51,7 @@ function Login() {
       >
         Login
       </Button>
+      <br /><br />
       <Link to='/register'>Not a user? Register here</Link>
     </div>
   )
