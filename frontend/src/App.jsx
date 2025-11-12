@@ -21,7 +21,9 @@ function App() {
       <Routes>
         <Route path="/" element={<h1>hello world</h1>} />
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />        
+        <Route path="/register" element={<Register />} />    
+        <Route path="/createListing" element={<createListing />} />    
+
       </Routes>
     </div>
   )
