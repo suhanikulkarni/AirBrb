@@ -43,14 +43,12 @@ function App() {
                   <Button
                     variant="contained"
                     onClick={() => navigate('/')}
-                  >Home</Button>
-              </NavLeft>
-              {" "}
-              <NavLeft>
-                <Button
-                  variant="contained"
-                  onClick={() => navigate('/dashboard')}
-                >Dashboard</Button>
+                  >Listing</Button>
+                {" "}
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate('/dashboard')}
+                  >Dashboard</Button>
               </NavLeft>
               {" "}
               <NavRight>
@@ -66,7 +64,7 @@ function App() {
                 <Button
                   variant="contained"
                   onClick={() => navigate('/')}
-                >Home</Button>
+                >Listing</Button>
               </NavLeft>
               {" "}
               <NavRight>
