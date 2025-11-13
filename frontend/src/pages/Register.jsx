@@ -16,8 +16,13 @@ function Register({ setToken }) {
 
   const navigate = useNavigate();
   const setShowErrorPopup = useContext(ErrorContext);
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') registerUser();
+  };
   
   const registerUser = async () => {
+    if (password !== confirmPassword) return setShowErrorPopup("Confirmation password and password do not match");
     try {
       const response = await axios.post('http://localhost:5005/user/auth/register', { email, password, name });
       localStorage.setItem('token', response.data.token);
@@ -26,7 +31,7 @@ function Register({ setToken }) {
     } catch (error) {
       setShowErrorPopup(error.response.data.error);
     }
-  }
+  };
   
   return (
     <PageBody>
@@ -38,6 +43,7 @@ function Register({ setToken }) {
         variant="outlined"
         value={email}
         onChange={e => setEmail(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
       <br />
       <TextField
@@ -47,6 +53,7 @@ function Register({ setToken }) {
         variant="outlined"
         value={password}
         onChange={e => setPassword(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
       <br />
       <TextField
@@ -56,6 +63,7 @@ function Register({ setToken }) {
         variant="outlined"
         value={confirmPassword}
         onChange={e => setConfirmPassword(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
       <br />
       <TextField
@@ -65,6 +73,7 @@ function Register({ setToken }) {
         variant="outlined"
         value={name}
         onChange={e => setName(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
       <br />
       <Button

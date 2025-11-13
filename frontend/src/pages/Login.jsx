@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -15,6 +15,10 @@ function Login({ setToken }) {
   const navigate = useNavigate('/dashboard');
   const setShowErrorPopup = useContext(ErrorContext);
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') loginUser();
+  };
+
   const loginUser = async () => {
     try {
       const response = await axios.post('http://localhost:5005/user/auth/login', { email, password });
@@ -24,7 +28,7 @@ function Login({ setToken }) {
     } catch (error) {
       setShowErrorPopup(error.response.data.error);
     }
-  }
+  };
   
   return (
     <PageBody>
@@ -36,6 +40,7 @@ function Login({ setToken }) {
         variant="outlined"
         value={email}
         onChange={e => setEmail(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
       <br />
       <TextField
@@ -45,6 +50,7 @@ function Login({ setToken }) {
         variant="outlined"
         value={password}
         onChange={e => setPassword(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
       <br />
       <Button
