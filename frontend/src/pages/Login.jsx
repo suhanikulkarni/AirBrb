@@ -5,7 +5,7 @@ import axios from 'axios';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
-import styles from '../css/Auth.module.css';
+import { Page, PageBody } from '../styles/mainStyles';
 
 function Login({ setToken }) {
   const [ email, setEmail ] = useState('');
@@ -25,7 +25,7 @@ function Login({ setToken }) {
   }
   
   return (
-    <div>
+    <PageBody>
       <h1>Login</h1>
       <TextField
         id="login-email-input"
@@ -51,9 +51,9 @@ function Login({ setToken }) {
       >
         Login
       </Button>
-      <br /><br />
-      <Link to='/register'>Not a user? Register here</Link>
-    </div>
+      <br />
+      <span>Not a user? <Link to='/register'>Register here</Link></span>
+    </PageBody>
   )
 }
 

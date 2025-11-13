@@ -5,7 +5,8 @@ import axios from 'axios';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
-import styles from '../css/Auth.module.css';
+import { PageBody } from '../styles/mainStyles';
+
 
 function Register({ setToken }) {
   const [ email, setEmail ] = useState('');
@@ -29,8 +30,8 @@ function Register({ setToken }) {
   }
   
   return (
-    <div>
-      <h1>Register</h1><br />
+    <PageBody>
+      <h1>Register</h1>
       <TextField
         id="register-email-input"
         label="Email"
@@ -73,7 +74,7 @@ function Register({ setToken }) {
       >
         Register
       </Button>
-    </div>
+    </PageBody>
   )
 }
 
