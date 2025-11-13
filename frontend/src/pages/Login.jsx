@@ -5,13 +5,15 @@ import axios from 'axios';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
-import { Page, PageBody } from '../styles/mainStyles';
+import { PageBody } from '../styles/mainStyles';
+import { ErrorContext } from '../context';
 
 function Login({ setToken }) {
   const [ email, setEmail ] = useState('');
   const [ password, setPassword ] = useState('');
   
   const navigate = useNavigate('/dashboard');
+  const setShowErrorPopup = useContext(ErrorContext);
 
   const loginUser = async () => {
     try {
@@ -20,7 +22,7 @@ function Login({ setToken }) {
       setToken(response.data.token);
       navigate('/dashboard');
     } catch (error) {
-      console.log(error);
+      setShowErrorPopup(error.response.data.error);
     }
   }
   

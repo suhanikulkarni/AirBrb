@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
 import { PageBody } from '../styles/mainStyles';
-
+import { ErrorContext } from '../context';
 
 function Register({ setToken }) {
   const [ email, setEmail ] = useState('');
@@ -15,17 +15,16 @@ function Register({ setToken }) {
   const [ name, setName ] = useState('');
 
   const navigate = useNavigate();
+  const setShowErrorPopup = useContext(ErrorContext);
   
   const registerUser = async () => {
-    console.log(email, password, confirmPassword, name);
-
     try {
       const response = await axios.post('http://localhost:5005/user/auth/register', { email, password, name });
       localStorage.setItem('token', response.data.token);
       setToken(token);
       navigate('/dashboard');
     } catch (error) {
-      console.log(error);
+      setShowErrorPopup(error.response.data.error);
     }
   }
   

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext } from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -9,9 +9,12 @@ import { Page, NavBar, NavRight, NavLeft, PageBody } from './styles/mainStyles';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import { ErrorContext } from './context';
+import ErrorPopup from './pages/ErrorPopup';
 
 function App() {
-  const [ token, setToken ] = useState('LOADING');
+  const [token, setToken] = useState('LOADING');
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
 
   const navigate = useNavigate('/dashboard');
 
@@ -31,54 +34,64 @@ function App() {
   }
 
   return (
-    <Page>
-      <NavBar>
-        {token && token !== 'LOADING' ? (
-          <>
-            <NavLeft>
-              <Button
-                variant="contained"
-                onClick={() => navigate('/dashboard')}
-              >Dashboard</Button>
-            </NavLeft>
-            {" "}
-            <NavRight>
-              <Button
-                variant="contained"
-                onClick={() => navigate('#')}
-              >Logout</Button>
-            </NavRight>
-          </>
-        ) : (
-          <>
-            <NavLeft>
-              <Button
-                variant="contained"
-                onClick={() => navigate('/')}
-              >Home</Button>
-            </NavLeft>
-            {" "}
-            <NavRight>
-              <Button
-                variant="contained"
-                onClick={() => navigate('/login')}
-              >Login</Button>
-            </NavRight>
-          </>
-        )}
-      </NavBar>
-      <Routes>
-        {token !== 'LOADING' && (
-          <>
-            <Route path="/" element={<PageBody>hello world</PageBody>} />
-            <Route path="/login" element={<Login setToken={setToken}/>} />
-            <Route path="/register" element={<Register setToken={setToken}/>} />
-            <Route path="/dashboard" element={<Dashboard token={token} />} />
-          </>
-        )}
-      </Routes>
-    </Page>
-  )
+    <ErrorContext.Provider value={setShowErrorPopup}>
+      <Page>
+        <NavBar>
+          {token && token !== 'LOADING' ? (
+            <>
+              <NavLeft>
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate('/')}
+                  >Home</Button>
+              </NavLeft>
+              {" "}
+              <NavLeft>
+                <Button
+                  variant="contained"
+                  onClick={() => navigate('/dashboard')}
+                >Dashboard</Button>
+              </NavLeft>
+              {" "}
+              <NavRight>
+                <Button
+                  variant="contained"
+                  onClick={() => logoutUser()}
+                >Logout</Button>
+              </NavRight>
+            </>
+          ) : (
+            <>
+              <NavLeft>
+                <Button
+                  variant="contained"
+                  onClick={() => navigate('/')}
+                >Home</Button>
+              </NavLeft>
+              {" "}
+              <NavRight>
+                <Button
+                  variant="contained"
+                  onClick={() => navigate('/login')}
+                >Login</Button>
+              </NavRight>
+            </>
+          )}
+        </NavBar>
+        <ErrorPopup showErrorPopup={showErrorPopup} closeErrorPopup={() => setShowErrorPopup(false)} />
+        <Routes>
+          {token !== 'LOADING' && (
+            <>
+              <Route path="/" element={<PageBody>hello world</PageBody>} />
+              <Route path="/login" element={<Login setToken={setToken}/>} />
+              <Route path="/register" element={<Register setToken={setToken}/>} />
+              <Route path="/dashboard" element={<Dashboard token={token} />} />
+            </>
+          )}
+        </Routes>
+      </Page>
+    </ErrorContext.Provider>
+  );
 }
 
 export default App;
