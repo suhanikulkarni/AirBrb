@@ -1,32 +1,62 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
+import axios from 'axios';
 
 import styles from './css/App.module.css';
 
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
 
 function App() {
-  const [count, setCount] = useState(0);
-  
+  const [ token, setToken ] = useState('LOADING');
+
+  useEffect(() => {
+    const lsToken = localStorage.getItem('token');
+    setToken(lsToken);
+  }, []);
+
+  const logoutUser = async () => {
+    await axios.post('http://localhost:5005/user/auth/logout', {}, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    localStorage.removeItem('token');
+    setToken(null);
+  }
+
   return (
     <div>
       <header>
         <nav>
-          <Link to="/">Home</Link>
-          {" "}
-          <Link to="/login">Login</Link>
+          {token && token !== 'LOADING' ? (
+            <>
+              <Link to="/dashboard">Dashboard</Link>
+              {" "}
+              <a href="#" onClick={logoutUser}>Logout</a>
+            </>
+          ) : (
+            <>
+              <Link to="/">Home</Link>
+              {" "}
+              <Link to="/login">Login</Link>
+            </>
+          )}
         </nav>
       </header>
       <Routes>
-        <Route path="/" element={<h1>hello world</h1>} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />    
-        <Route path="/createListing" element={<createListing />} />    
-
+        {token !== 'LOADING' && (
+          <>
+            <Route path="/" element={<h1>hello world</h1>} />
+            <Route path="/login" element={<Login setToken={setToken}/>} />
+            <Route path="/register" element={<Register setToken={setToken}/>} />
+            <Route path="/dashboard" element={<Dashboard token={token} />} />
+          </>
+        )}
       </Routes>
     </div>
   )
 }
 
-export default App
+export default App;
