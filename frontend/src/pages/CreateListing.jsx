@@ -23,14 +23,21 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 const postListing = async (body, token) => {
+  
+  let response;
   try {
-    const response = await axios.post(`${API_BASE_URL}listings/new`, body, {
+    response = await axios.post(
+      `${API_BASE_URL}listings/new`, 
+      body,
+      {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       }
     );
-  } catch (error) {
+
+  }
+  catch (error) {
     console.log("in the catch, there is an error", error.message);
   }
 }

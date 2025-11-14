@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard';
 import CreateListing from './pages/CreateListing';
 import { ErrorContext } from './context';
 import ErrorPopup from './pages/ErrorPopup';
+import { API_BASE_URL } from './constants';
 
 function App() {
   const [token, setToken] = useState('LOADING');
@@ -25,7 +26,7 @@ function App() {
   }, []);
 
   const logoutUser = async () => {
-    await axios.post('http://localhost:5005/user/auth/logout', {}, {
+    await axios.post(`${API_BASE_URL}user/auth/logout`, {}, {
       headers: {
         'Authorization': `Bearer ${token}`
       }

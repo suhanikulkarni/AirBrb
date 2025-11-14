@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 
 import { PageBody } from '../styles/mainStyles';
 import { ErrorContext } from '../context';
+import { API_BASE_URL } from '../constants';
 
 function Login({ setToken }) {
   const [ email, setEmail ] = useState('');
@@ -21,7 +22,7 @@ function Login({ setToken }) {
 
   const loginUser = async () => {
     try {
-      const response = await axios.post('http://localhost:5005/user/auth/login', { email, password });
+      const response = await axios.post(`${API_BASE_URL}user/auth/login`, { email, password });
       localStorage.setItem('token', response.data.token);
       setToken(response.data.token);
       navigate('/dashboard');

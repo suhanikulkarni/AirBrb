@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 
 import { PageBody } from '../styles/mainStyles';
 import { ErrorContext } from '../context';
+import { API_BASE_URL } from '../constants';
 
 function Register({ setToken }) {
   const [ email, setEmail ] = useState('');
@@ -24,7 +25,7 @@ function Register({ setToken }) {
   const registerUser = async () => {
     if (password !== confirmPassword) return setShowErrorPopup("Confirmation password and password do not match");
     try {
-      const response = await axios.post('http://localhost:5005/user/auth/register', { email, password, name });
+      const response = await axios.post(`${API_BASE_URL}user/auth/register`, {email, password, name });
       localStorage.setItem('token', response.data.token);
       setToken(response.data.token);
       navigate('/dashboard');
