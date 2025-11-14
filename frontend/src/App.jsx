@@ -1,16 +1,23 @@
-import { useState, useEffect } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
+import { useState, useEffect, createContext } from 'react';
+import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-import styles from './css/App.module.css';
+import Button from '@mui/material/Button';
+
+import { Page, NavBar, NavRight, NavLeft, PageBody } from './styles/mainStyles';
 
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import CreateListing from './pages/createListing';
+import { ErrorContext } from './context';
+import ErrorPopup from './pages/ErrorPopup';
 
 function App() {
-  const [ token, setToken ] = useState('LOADING');
+  const [token, setToken] = useState('LOADING');
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+
+  const navigate = useNavigate('/dashboard');
 
   useEffect(() => {
     const lsToken = localStorage.getItem('token');
@@ -28,22 +35,59 @@ function App() {
   }
 
   return (
-    <div>
-      <header>
-        <nav>
+    <ErrorContext.Provider value={setShowErrorPopup}>
+      <Page>
+        <NavBar>
           {token && token !== 'LOADING' ? (
             <>
-              <Link to="/dashboard">Dashboard</Link>
+              <NavLeft>
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate('/')}
+                  >Listing</Button>
+                {" "}
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate('/dashboard')}
+                  >Dashboard</Button>
+              </NavLeft>
               {" "}
-              <a href="#" onClick={logoutUser}>Logout</a>
+              <NavRight>
+                <Button
+                  variant="contained"
+                  onClick={() => logoutUser()}
+                >Logout</Button>
+              </NavRight>
             </>
           ) : (
             <>
-              <Link to="/">Home</Link>
+              <NavLeft>
+                <Button
+                  variant="contained"
+                  onClick={() => navigate('/')}
+                >Listing</Button>
+              </NavLeft>
               {" "}
-              <Link to="/login">Login</Link>
+              <NavRight>
+                <Button
+                  variant="contained"
+                  onClick={() => navigate('/login')}
+                >Login</Button>
+              </NavRight>
             </>
           )}
+        </NavBar>
+        <ErrorPopup showErrorPopup={showErrorPopup} closeErrorPopup={() => setShowErrorPopup(false)} />
+        <Routes>
+          {token !== 'LOADING' && (
+            <>
+              <Route path="/" element={<PageBody>hello world</PageBody>} />
+              <Route path="/login" element={<Login setToken={setToken}/>} />
+              <Route path="/register" element={<Register setToken={setToken}/>} />
+              <Route path="/dashboard" element={<Dashboard token={token} />} />
+            </>
+          )}
+<<<<<<< HEAD
         </nav>
       </header>
       <Routes>
@@ -60,6 +104,12 @@ function App() {
       </Routes>
     </div>
   )
+=======
+        </Routes>
+      </Page>
+    </ErrorContext.Provider>
+  );
+>>>>>>> 6f0ab695efeb412ea10a3111af66b743ecdffa93
 }
 
 export default App;

@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
-import styles from '../css/Auth.module.css';
+import { PageBody } from '../styles/mainStyles';
+import { ErrorContext } from '../context';
 
 function Register({ setToken }) {
   const [ email, setEmail ] = useState('');
@@ -14,23 +15,27 @@ function Register({ setToken }) {
   const [ name, setName ] = useState('');
 
   const navigate = useNavigate();
+  const setShowErrorPopup = useContext(ErrorContext);
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') registerUser();
+  };
   
   const registerUser = async () => {
-    console.log(email, password, confirmPassword, name);
-
+    if (password !== confirmPassword) return setShowErrorPopup("Confirmation password and password do not match");
     try {
       const response = await axios.post('http://localhost:5005/user/auth/register', { email, password, name });
       localStorage.setItem('token', response.data.token);
       setToken(response.data.token);
       navigate('/dashboard');
     } catch (error) {
-      console.log(error);
+      setShowErrorPopup(error.response.data.error);
     }
-  }
+  };
   
   return (
-    <div>
-      <h1>Register</h1><br />
+    <PageBody>
+      <h1>Register</h1>
       <TextField
         id="register-email-input"
         label="Email"
@@ -38,6 +43,7 @@ function Register({ setToken }) {
         variant="outlined"
         value={email}
         onChange={e => setEmail(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
       <br />
       <TextField
@@ -47,6 +53,7 @@ function Register({ setToken }) {
         variant="outlined"
         value={password}
         onChange={e => setPassword(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
       <br />
       <TextField
@@ -56,6 +63,7 @@ function Register({ setToken }) {
         variant="outlined"
         value={confirmPassword}
         onChange={e => setConfirmPassword(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
       <br />
       <TextField
@@ -65,6 +73,7 @@ function Register({ setToken }) {
         variant="outlined"
         value={name}
         onChange={e => setName(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
       <br />
       <Button
@@ -73,7 +82,7 @@ function Register({ setToken }) {
       >
         Register
       </Button>
-    </div>
+    </PageBody>
   )
 }
 
