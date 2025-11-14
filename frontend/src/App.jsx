@@ -87,29 +87,10 @@ function App() {
               <Route path="/dashboard" element={<Dashboard token={token} />} />
             </>
           )}
-<<<<<<< HEAD
-        </nav>
-      </header>
-      <Routes>
-        {token !== 'LOADING' && (
-          <>
-            <Route path="/" element={<h1>hello world</h1>} />
-            <Route path="/login" element={<Login setToken={setToken}/>} />
-            <Route path="/register" element={<Register setToken={setToken}/>} />
-            <Route path="/dashboard" element={<Dashboard token={token} />} />
-            <Route path="/createListing" element={<CreateListing token={token} />} />
-
-          </>
-        )}
-      </Routes>
-    </div>
-  )
-=======
         </Routes>
       </Page>
     </ErrorContext.Provider>
   );
->>>>>>> 6f0ab695efeb412ea10a3111af66b743ecdffa93
 }
 
 export default App;
