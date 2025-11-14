@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
+import { PageBody } from '../styles/mainStyles';
 
 function Dashboard({ token }) {
   const navigate = useNavigate();
@@ -9,9 +11,9 @@ function Dashboard({ token }) {
   }, [token]);
 
   return (
-    <>
+    <PageBody>
       hehe
-    </>
+    </PageBody>
   )
 }
 
