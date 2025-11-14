@@ -7,6 +7,7 @@ import styles from './css/App.module.css';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import CreateListing from './pages/createListing';
 
 function App() {
   const [ token, setToken ] = useState('LOADING');
@@ -52,6 +53,8 @@ function App() {
             <Route path="/login" element={<Login setToken={setToken}/>} />
             <Route path="/register" element={<Register setToken={setToken}/>} />
             <Route path="/dashboard" element={<Dashboard token={token} />} />
+            <Route path="/createListing" element={<CreateListing token={token} />} />
+
           </>
         )}
       </Routes>

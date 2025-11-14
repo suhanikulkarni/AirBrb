@@ -21,7 +21,7 @@ function Register({ setToken }) {
     try {
       const response = await axios.post('http://localhost:5005/user/auth/register', { email, password, name });
       localStorage.setItem('token', response.data.token);
-      setToken(token);
+      setToken(response.data.token);
       navigate('/dashboard');
     } catch (error) {
       console.log(error);

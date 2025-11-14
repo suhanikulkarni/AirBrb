@@ -10,7 +10,7 @@ function Dashboard({ token }) {
 
   return (
     <>
-      hehe
+      <Link to='/createListing'>Create A Listing</Link>
     </>
   )
 }
