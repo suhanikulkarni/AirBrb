@@ -10,7 +10,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 
-import { PageBody } from '../styles/mainStyles';
+import { Form, PageBody } from '../styles/mainStyles';
 
 import { ErrorContext } from '../context';
 
@@ -88,6 +88,7 @@ function CreateListing({ token }) {
   }
   return (
     <PageBody>
+      <Form>
         <h1>Listing Information</h1>
 
         <TextField 
@@ -149,6 +150,7 @@ function CreateListing({ token }) {
           variant="contained"
           onClick={handleSubmission}
         >Submit</Button>
+      </Form>
     </PageBody>
   )
 }
