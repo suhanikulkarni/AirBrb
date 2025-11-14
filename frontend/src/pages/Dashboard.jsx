@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import { PageBody } from '../styles/mainStyles';
 
@@ -12,7 +12,7 @@ function Dashboard({ token }) {
 
   return (
     <PageBody>
-      hehe
+      <Link to='/createListing'>Create A Listing</Link>
     </PageBody>
   )
 }
