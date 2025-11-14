@@ -1,14 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from '../constants';
-import { Link, useNavigate } from 'react-router-dom';
-import TextField from '@mui/material/TextField';
+import { useNavigate } from 'react-router-dom';
 
+import TextField from '@mui/material/TextField';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@mui/material/InputAdornment';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
+
+import { PageBody } from '../styles/mainStyles';
+
+import { ErrorContext } from '../context';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -22,28 +26,7 @@ const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
-const postListing = async (body, token) => {
-  
-  let response;
-  try {
-    response = await axios.post(
-      `${API_BASE_URL}listings/new`, 
-      body,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    );
-
-  }
-  catch (error) {
-    console.log("in the catch, there is an error", error.message);
-  }
-}
-
 function CreateListing({ token }) {
-
   const navigate = useNavigate();
   useEffect(() => {
     if (token === 'LOADING' || !token) navigate('/login');
@@ -57,18 +40,30 @@ function CreateListing({ token }) {
     'metadata': {}
   });
 
+  const setShowErrorPopup = useContext(ErrorContext);
+
+  const postListing = async (body, token) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}listings/new`, body, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      navigate('/dashboard');
+    } catch (error) {
+      setShowErrorPopup(error.response.data.error);
+    }
+  }
 
   const handleChange = (e) => {
     const {name, value} = e.target;
-  
 
     if (name === 'address' || name === 'metadata') {
-        setListingInfo((prevData) => ({
-          ...prevData,
-          [name]: {value}
-        }))
-      }
-    else {
+      setListingInfo((prevData) => ({
+        ...prevData,
+        [name]: {value}
+      }))
+    } else {
       setListingInfo((prevData) => ({
         ...prevData,
         [name]: value
@@ -77,96 +72,84 @@ function CreateListing({ token }) {
   }
 
   const handleSubmission = async () => {
-    
-
     console.log("Listing data: ",listingInfo)
 
     if (!listingInfo.title || !listingInfo.address || !listingInfo.metadata || !listingInfo.thumbnail || !listingInfo.price) {
-      alert("Please fill out the whole form")
-      return;
+      return setShowErrorPopup("Please fill out the whole form");
     }
+
     listingInfo.price = parseInt(listingInfo.price, 10)
-    
   
     if(!(Number.isFinite(listingInfo.price))){
-      alert("PLease insert a number")
-      return
+      return setShowErrorPopup("Please insert a number");
     }
-        
-    try {
-      const response = await postListing(listingInfo, token);
-      if (response) {
-        navigate('/dashboard'); // ✅ Valid hook usage
-      }
-    } catch (error) {
-      console.log("Submission failed:", error.message);
-    }
+    
+    postListing(listingInfo, token);
   }
   return (
-    <form>
-      <h2>Listing Information</h2>
+    <PageBody>
+        <h1>Listing Information</h1>
 
-      <TextField 
-        id="outlined-search" 
-        label="Listing Title"
-        type="search"
-        onChange={handleChange}
-        name='title'
-        />
-        <br />
-        <br />
-
-      <TextField
-        id="outlined-search"
-        label="Listing Address"
-        type="search"
-        onChange={handleChange}
-        name='address'
+        <TextField 
+          id="outlined-search" 
+          label="Listing Title"
+          type="search"
+          onChange={handleChange}
+          name='title'
         />
         <br />
 
-      <InputLabel htmlFor="outlined-adornment-amount">Amount</InputLabel>
-      <OutlinedInput
-        id="outlined-adornment-amount"
-        startAdornment={<InputAdornment position="start">$</InputAdornment>}
-        label="Amount"
-        name='price'
-        onChange={handleChange}
-      />
-        <br />
+        <TextField
+          id="outlined-search"
+          label="Listing Address"
+          type="search"
+          onChange={handleChange}
+          name='address'
+        />
         <br />
 
-      
-      <label>Thumbnail&nbsp;&nbsp;</label>
-      <Button
-        component="label"
-        role={undefined}
-        variant="contained"
-        tabIndex={-1}
+        <InputLabel htmlFor="outlined-adornment-amount">Amount</InputLabel>
+        <OutlinedInput
+          id="outlined-adornment-amount"
+          startAdornment={<InputAdornment position="start">$</InputAdornment>}
+          label="Amount"
+          name='price'
+          onChange={handleChange}
+        />
+        <br />
         
-      >
-        Upload files
-      <VisuallyHiddenInput
-        type="file"
-        onChange={handleChange}
-        name='thumbnail'
-        multiple
-      />
-      </Button>
-        <br />
-        <br />
-      <label>Additional Information&nbsp;&nbsp;</label>
-      <input
-        type='text'
-        onChange={handleChange}
-        name='metadata'
-        required
-      ></input>
-        <br />
+        <label>Thumbnail&nbsp;&nbsp;</label>
+        <Button
+          component="label"
+          role={undefined}
+          variant="contained"
+          tabIndex={-1}  
+        >
+          Upload files
+          <VisuallyHiddenInput
+            type="file"
+            onChange={handleChange}
+            name='thumbnail'
+            multiple
+          />
+        </Button>
         <br />
 
-      <button type='button' onClick={handleSubmission}>Submit</button>
-    </form>
+        <TextField
+          type='text'
+          label="Additional Information"
+          multiline
+          rows={3}
+          name='metadata'
+          onChange={handleChange}
+        />
+        <br />
+
+        <Button 
+          variant="contained"
+          onClick={handleSubmission}
+        >Submit</Button>
+    </PageBody>
   )
 }
 

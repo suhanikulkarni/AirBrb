@@ -1,5 +1,5 @@
-import { useState, useEffect, createContext } from 'react';
-import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 import Button from '@mui/material/Button';
@@ -42,18 +42,16 @@ function App() {
           {token && token !== 'LOADING' ? (
             <>
               <NavLeft>
-                  <Button
-                    variant="contained"
-                    onClick={() => navigate('/')}
-                  >Listing</Button>
-                {" "}
-                  <Button
-                    variant="contained"
-                    onClick={() => navigate('/dashboard')}
-                  >Dashboard</Button>
+                <Button
+                  onClick={() => navigate('/')}
+                >Listings</Button>
               </NavLeft>
               {" "}
               <NavRight>
+                <Button
+                  onClick={() => navigate('/dashboard')}
+                >Your Listings</Button>
+                {" "}
                 <Button
                   variant="contained"
                   onClick={() => logoutUser()}
@@ -85,9 +83,10 @@ function App() {
               <Route path="/" element={<PageBody>hello world</PageBody>} />
               <Route path="/login" element={<Login setToken={setToken}/>} />
               <Route path="/register" element={<Register setToken={setToken}/>} />
-              <Route path="/dashboard" element={<Dashboard token={token} />} />
-              <Route path="/createListing" element={<CreateListing token={token} />} />
-
+              <Route path="/dashboard">
+                <Route index element={<Dashboard token={token} />} />
+                <Route path="create-listing" element={<CreateListing token={token} />} />
+              </Route>
             </>
           )}
         </Routes>
