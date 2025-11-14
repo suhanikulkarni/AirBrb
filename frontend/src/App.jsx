@@ -9,6 +9,7 @@ import { Page, NavBar, NavRight, NavLeft, PageBody } from './styles/mainStyles';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import CreateListing from './pages/CreateListing';
 import { ErrorContext } from './context';
 import ErrorPopup from './pages/ErrorPopup';
 
@@ -84,6 +85,8 @@ function App() {
               <Route path="/login" element={<Login setToken={setToken}/>} />
               <Route path="/register" element={<Register setToken={setToken}/>} />
               <Route path="/dashboard" element={<Dashboard token={token} />} />
+              <Route path="/createListing" element={<CreateListing token={token} />} />
+
             </>
           )}
         </Routes>
