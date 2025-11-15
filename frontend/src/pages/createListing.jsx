@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from '../constants';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 
 import OutlinedInput from '@mui/material/OutlinedInput';
@@ -58,21 +58,19 @@ function CreateListing({ token }) {
     'thumbnail': '',
     'metadata': {}
   });
-
-
-  const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
-
-  if (type === 'file' && files.length > 0) {
-    const file = files[0];
-    setListingInfo((prevData) => ({
-      ...prevData,
-      [name]: file,
+  const [metadata, setMetadata] = useState({});
+  
+  const handleMetadata = (e) => {
+      const {name, value} = e.target;
+      setMetadata((prev) => ({
+      ...prev,
+      [name]: value,
     }));
-    return;
-  }
 
-    if (name === 'address' || name === 'metadata') {
+  }
+  const handleChange = (e) => {
+    const {name, value} = e.target;
+    if (name === 'address') {
         setListingInfo((prevData) => ({
           ...prevData,
           [name]: {value}
@@ -87,18 +85,19 @@ function CreateListing({ token }) {
   }
 
   const handleSubmission = async () => {
-    if (!listingInfo.title || !listingInfo.address || !listingInfo.metadata || !listingInfo.thumbnail || !listingInfo.price) {
+    console.log("Listing data: ",listingInfo)
+
+    if (!listingInfo.title || !listingInfo.address || !listingInfo.thumbnail || !listingInfo.price) {
       alert("Please fill out the whole form")
       return;
     }
-    listingInfo.price = parseInt(listingInfo.price, 10)
+    listingInfo.price = parseInt(listingInfo.price, 10);
+    listingInfo.metadata = metadata;
   
     if(!(Number.isFinite(listingInfo.price))){
       alert("PLease insert a number")
       return
     }
-
-    listingInfo.thumbnail = await fileToDataUrl(listingInfo.thumbnail);
     try {
       const response = await postListing(listingInfo, token);
       if (response) {
@@ -111,14 +110,13 @@ function CreateListing({ token }) {
   return (
     <form>
       <h2>Listing Information</h2>
-
       <TextField 
         id="outlined-search" 
         label="Listing Title"
         type="search"
         onChange={handleChange}
         name='title'
-        />
+      />
         <br />
         <br />
 
@@ -128,7 +126,7 @@ function CreateListing({ token }) {
         type="search"
         onChange={handleChange}
         name='address'
-        />
+      />
         <br />
 
       <InputLabel htmlFor="outlined-adornment-amount">Amount</InputLabel>
@@ -141,8 +139,6 @@ function CreateListing({ token }) {
       />
         <br />
         <br />
-
-      
       <label>Thumbnail&nbsp;&nbsp;</label>
       <Button
         component="label"
@@ -160,13 +156,44 @@ function CreateListing({ token }) {
       </Button>
         <br />
         <br />
-      <label>Additional Information&nbsp;&nbsp;</label>
-      <input
-        type='text'
-        onChange={handleChange}
-        name='metadata'
-        required
-      ></input>
+
+      <TextField
+        id="outlined-search"
+        label="Property Type"
+        type="search"
+        onChange={handleMetadata}
+        name='type'
+        />
+        <br />
+        <br />
+
+      <TextField
+        id="outlined-search"
+        label="Number of Bedrooms"
+        type="search"
+        onChange={handleMetadata}
+        name='bedrooms'
+        />
+        <br />
+        <br />
+
+      <TextField
+        id="outlined-search"
+        label="Number of Bathrooms"
+        type="search"
+        onChange={handleMetadata}
+        name='bathrooms'
+        />
+        <br />
+        <br />
+
+      <TextField
+        id="outlined-search"
+        label="Property Amenities"
+        type="search"
+        onChange={handleMetadata}
+        name='amenities'
+        />
         <br />
         <br />
 
