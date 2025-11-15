@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard';
 import CreateListing from './pages/CreateListing';
 import { ErrorContext } from './context';
 import ErrorPopup from './pages/ErrorPopup';
+import ViewListing from './pages/ViewListing';
 
 function App() {
   const [token, setToken] = useState('LOADING');
@@ -38,14 +39,14 @@ function App() {
     <ErrorContext.Provider value={setShowErrorPopup}>
       <Page>
         <NavBar>
+          <Button
+              variant="contained"
+              onClick={() => navigate('/viewListings')}
+              >Listings</Button>&emsp;
+              {" "}
           {token && token !== 'LOADING' ? (
             <>
               <NavLeft>
-                  <Button
-                    variant="contained"
-                    onClick={() => navigate('/')}
-                  >Listing</Button>
-                {" "}
                   <Button
                     variant="contained"
                     onClick={() => navigate('/dashboard')}
@@ -86,7 +87,7 @@ function App() {
               <Route path="/register" element={<Register setToken={setToken}/>} />
               <Route path="/dashboard" element={<Dashboard token={token} />} />
               <Route path="/createListing" element={<CreateListing token={token} />} />
-
+              <Route path="/viewListings" element={<ViewListing />} />
             </>
           )}
         </Routes>

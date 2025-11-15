@@ -9,6 +9,8 @@ import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@mui/material/InputAdornment';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
+import { fileToDataUrl } from '../helper';
+
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -59,8 +61,16 @@ function CreateListing({ token }) {
 
 
   const handleChange = (e) => {
-    const {name, value} = e.target;
-  
+    const { name, value, type, files } = e.target;
+
+  if (type === 'file' && files.length > 0) {
+    const file = files[0];
+    setListingInfo((prevData) => ({
+      ...prevData,
+      [name]: file,
+    }));
+    return;
+  }
 
     if (name === 'address' || name === 'metadata') {
         setListingInfo((prevData) => ({
@@ -77,26 +87,22 @@ function CreateListing({ token }) {
   }
 
   const handleSubmission = async () => {
-    
-
-    console.log("Listing data: ",listingInfo)
-
     if (!listingInfo.title || !listingInfo.address || !listingInfo.metadata || !listingInfo.thumbnail || !listingInfo.price) {
       alert("Please fill out the whole form")
       return;
     }
     listingInfo.price = parseInt(listingInfo.price, 10)
-    
   
     if(!(Number.isFinite(listingInfo.price))){
       alert("PLease insert a number")
       return
     }
-        
+
+    listingInfo.thumbnail = await fileToDataUrl(listingInfo.thumbnail);
     try {
       const response = await postListing(listingInfo, token);
       if (response) {
-        navigate('/dashboard'); // ✅ Valid hook usage
+        navigate('/dashboard');
       }
     } catch (error) {
       console.log("Submission failed:", error.message);
@@ -143,7 +149,6 @@ function CreateListing({ token }) {
         role={undefined}
         variant="contained"
         tabIndex={-1}
-        
       >
         Upload files
       <VisuallyHiddenInput
