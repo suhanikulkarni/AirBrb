@@ -56,13 +56,19 @@ function CreateListing({ token }) {
     'thumbnail': '',
     'metadata': {}
   });
+  const [metadata, setMetadata] = useState({});
+  
+  const handleMetadata = (e) => {
+      const {name, value} = e.target;
+      setMetadata((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
 
-
+  }
   const handleChange = (e) => {
     const {name, value} = e.target;
-  
-
-    if (name === 'address' || name === 'metadata') {
+    if (name === 'address') {
         setListingInfo((prevData) => ({
           ...prevData,
           [name]: {value}
@@ -77,22 +83,19 @@ function CreateListing({ token }) {
   }
 
   const handleSubmission = async () => {
-    
-
     console.log("Listing data: ",listingInfo)
 
-    if (!listingInfo.title || !listingInfo.address || !listingInfo.metadata || !listingInfo.thumbnail || !listingInfo.price) {
+    if (!listingInfo.title || !listingInfo.address || !listingInfo.thumbnail || !listingInfo.price) {
       alert("Please fill out the whole form")
       return;
     }
-    listingInfo.price = parseInt(listingInfo.price, 10)
-    
+    listingInfo.price = parseInt(listingInfo.price, 10);
+    listingInfo.metadata = metadata;
   
     if(!(Number.isFinite(listingInfo.price))){
       alert("PLease insert a number")
       return
     }
-        
     try {
       const response = await postListing(listingInfo, token);
       if (response) {
@@ -156,7 +159,7 @@ function CreateListing({ token }) {
         id="outlined-search"
         label="Property Type"
         type="search"
-        onChange={handleChange}
+        onChange={handleMetadata}
         name='type'
         />
         <br />
@@ -166,7 +169,7 @@ function CreateListing({ token }) {
         id="outlined-search"
         label="Number of Bedrooms"
         type="search"
-        onChange={handleChange}
+        onChange={handleMetadata}
         name='bedrooms'
         />
         <br />
@@ -176,7 +179,7 @@ function CreateListing({ token }) {
         id="outlined-search"
         label="Number of Bathrooms"
         type="search"
-        onChange={handleChange}
+        onChange={handleMetadata}
         name='bathrooms'
         />
         <br />
@@ -186,7 +189,7 @@ function CreateListing({ token }) {
         id="outlined-search"
         label="Property Amenities"
         type="search"
-        onChange={handleChange}
+        onChange={handleMetadata}
         name='amenities'
         />
         <br />
