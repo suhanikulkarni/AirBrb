@@ -34,7 +34,6 @@ function Login({ setToken }) {
   return (
     <PageBody>
       <Form>
-
         <h1>Login</h1>
         <TextField
           id="login-email-input"
