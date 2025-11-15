@@ -96,7 +96,7 @@ function CreateListing({ token }) {
     try {
       const response = await postListing(listingInfo, token);
       if (response) {
-        navigate('/dashboard'); // ✅ Valid hook usage
+        navigate('/dashboard');
       }
     } catch (error) {
       console.log("Submission failed:", error.message);
@@ -105,14 +105,13 @@ function CreateListing({ token }) {
   return (
     <form>
       <h2>Listing Information</h2>
-
       <TextField 
         id="outlined-search" 
         label="Listing Title"
         type="search"
         onChange={handleChange}
         name='title'
-        />
+      />
         <br />
         <br />
 
@@ -122,7 +121,7 @@ function CreateListing({ token }) {
         type="search"
         onChange={handleChange}
         name='address'
-        />
+      />
         <br />
 
       <InputLabel htmlFor="outlined-adornment-amount">Amount</InputLabel>
@@ -135,15 +134,12 @@ function CreateListing({ token }) {
       />
         <br />
         <br />
-
-      
       <label>Thumbnail&nbsp;&nbsp;</label>
       <Button
         component="label"
         role={undefined}
         variant="contained"
         tabIndex={-1}
-        
       >
         Upload files
       <VisuallyHiddenInput
@@ -155,13 +151,44 @@ function CreateListing({ token }) {
       </Button>
         <br />
         <br />
-      <label>Additional Information&nbsp;&nbsp;</label>
-      <input
-        type='text'
+
+      <TextField
+        id="outlined-search"
+        label="Property Type"
+        type="search"
         onChange={handleChange}
-        name='metadata'
-        required
-      ></input>
+        name='type'
+        />
+        <br />
+        <br />
+
+      <TextField
+        id="outlined-search"
+        label="Number of Bedrooms"
+        type="search"
+        onChange={handleChange}
+        name='bedrooms'
+        />
+        <br />
+        <br />
+
+      <TextField
+        id="outlined-search"
+        label="Number of Bathrooms"
+        type="search"
+        onChange={handleChange}
+        name='bathrooms'
+        />
+        <br />
+        <br />
+
+      <TextField
+        id="outlined-search"
+        label="Property Amenities"
+        type="search"
+        onChange={handleChange}
+        name='amenities'
+        />
         <br />
         <br />
 
