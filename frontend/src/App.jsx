@@ -86,7 +86,6 @@ function App() {
               <Route path="/register" element={<Register setToken={setToken}/>} />
               <Route path="/dashboard" element={<Dashboard token={token} />} />
               <Route path="/createListing" element={<CreateListing token={token} />} />
-
             </>
           )}
         </Routes>
