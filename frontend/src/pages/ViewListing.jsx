@@ -2,14 +2,15 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from '../constants';
 import { styles } from '../styles/ListingStyles';
-
+import { useNavigate } from 'react-router-dom'; 
+import ListingInfo from './ListingInfo';
 
 const getListings = async () => {
   try {
     const response = await axios.get(
       `${API_BASE_URL}listings`)
     console.log(response)
-    if (response.data?.listings) {
+    if (response) {
       console.log(response.data.listings)
       return response.data.listings;
     }
@@ -19,6 +20,7 @@ const getListings = async () => {
   }
 }
 function ViewListing () {
+  const navigate = useNavigate();
   const [list, setLists] = useState([]);
   
   useEffect(() => {
@@ -33,9 +35,9 @@ function ViewListing () {
       {list.length === 0 ? (
         <p style={styles.loadingText}>Loading listings...</p>
       ) : (
-        <div style={styles.grid}>
+        <div style={styles.grid} >
           {list.map((listing, index) => (
-            <div key={index} style={styles.card}>
+            <div key={index} style={styles.card} onClick={() => navigate(`/viewListings/${listing.id}`)}>
               <img src={listing.thumbnail} alt={listing.title} style={styles.thumbnail} />
               <h3 style={styles.title}>{listing.title}</h3>
               <p style={styles.address}>{listing.address?.value}</p>

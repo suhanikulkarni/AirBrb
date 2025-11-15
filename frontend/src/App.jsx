@@ -13,9 +13,10 @@ import CreateListing from './pages/CreateListing';
 import { ErrorContext } from './context';
 import ErrorPopup from './pages/ErrorPopup';
 import ViewListing from './pages/ViewListing';
+import ListingInfo from './pages/ListingInfo';
 
 function App() {
-  const [token, setToken] = useState('LOADING');
+  const [token, setToken] = useState();
   const [showErrorPopup, setShowErrorPopup] = useState(false);
 
   const navigate = useNavigate('/dashboard');
@@ -39,12 +40,7 @@ function App() {
     <ErrorContext.Provider value={setShowErrorPopup}>
       <Page>
         <NavBar>
-          <Button
-              variant="contained"
-              onClick={() => navigate('/viewListings')}
-              >Listings</Button>&emsp;
-              {" "}
-          {token && token !== 'LOADING' ? (
+          {token ? (
             <>
               <NavLeft>
                   <Button
@@ -65,7 +61,7 @@ function App() {
               <NavLeft>
                 <Button
                   variant="contained"
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate('/viewListings')}
                 >Listing</Button>
               </NavLeft>
               {" "}
@@ -80,16 +76,13 @@ function App() {
         </NavBar>
         <ErrorPopup showErrorPopup={showErrorPopup} closeErrorPopup={() => setShowErrorPopup(false)} />
         <Routes>
-          {token !== 'LOADING' && (
-            <>
-              <Route path="/" element={<PageBody>hello world</PageBody>} />
-              <Route path="/login" element={<Login setToken={setToken}/>} />
-              <Route path="/register" element={<Register setToken={setToken}/>} />
-              <Route path="/dashboard" element={<Dashboard token={token} />} />
-              <Route path="/createListing" element={<CreateListing token={token} />} />
-              <Route path="/viewListings" element={<ViewListing />} />
-            </>
-          )}
+          <Route path="/" element={<div>hello world</div>} />
+          <Route path="/login" element={<Login setToken={setToken} />} />
+          <Route path="/register" element={<Register setToken={setToken} />} />
+          <Route path="/viewListings" element={<ViewListing />} />
+          <Route path="/viewListings/:id" element={<ListingInfo />} />
+          {token && <Route path="/dashboard" element={<Dashboard token={token} />} />}
+          {token && <Route path="/createListing" element={<CreateListing token={token} />} />}
         </Routes>
       </Page>
     </ErrorContext.Provider>
