@@ -93,14 +93,8 @@ function CreateListing({ token }) {
     }));
   }
 
-  // useEffect(() => {
-  //     console.log("Updated address:", listingAddress);
-  //   }, [listingAddress]);
-
   const handleMetadataInfo = (e) => {
     const {name, value} = e.target;
-    console.log("name and vakue", name, value)
-
     setListingMetadata((prevData) => ({
       ...prevData,
       [name]: value
@@ -110,11 +104,6 @@ function CreateListing({ token }) {
       renderBedroomForm();
     }
   }
-
-    // useEffect(() => {
-    //   console.log("Updated metadata:", listingMetadata);
-    // }, [listingMetadata]);
-
   const updateBedroomMetadata = (bedroomNumber, bedroomInfo) => {
     setListingMetadata(prev => {
       const updated = [...prev.bedrooms];
@@ -135,7 +124,6 @@ function CreateListing({ token }) {
           />
       )
     }
-
     return array;
   }
 
@@ -146,9 +134,21 @@ function CreateListing({ token }) {
       return setShowErrorPopup("Please fill out the whole form");
     }
 
+    if (!listingAddress.country || !listingAddress.postcode || !listingAddress.state || !listingAddress.streetAddress || ! listingAddress.suburb) {
+      return setShowErrorPopup("Please enter all the address information");
+    }
+
+    if (!listingMetadata.bathroomCount || !listingMetadata.propertyType || !listingMetadata.bedroomCount) {
+      return setShowErrorPopup("Please enter all the information about the property");
+    }
+
+    if(parseInt(listingMetadata.bedroomCount, 10) > 0 && listingMetadata.bedrooms.length != parseInt(listingMetadata.bedroomCount, 10)) {
+      return setShowErrorPopup("Please enter the bedroom information");
+    }
+
     listingInfo.price = parseInt(listingInfo.price, 10)
   
-    if(!(Number.isFinite(listingInfo.price))){
+    if(!(Number.isFinite(listingInfo.price)) ||!(Number.isFinite(listingMetadata.bathroomCount)) || !(Number.isFinite(listingMetadata.bedroomCount))){
       return setShowErrorPopup("Please insert a number");
     }
 
@@ -163,12 +163,6 @@ function CreateListing({ token }) {
 
     postListing(listingInfo, token);
   }
-
-  // useEffect(() => {
-  //     console.log("Updated all info:", listingInfo);
-  //   }, [listingInfo]);
-
-
   return (
     <PageBody>
       <Form>
@@ -279,7 +273,7 @@ function CreateListing({ token }) {
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            name="property-type"
+            name="propertyType"
             value={listingMetadata.propertyType}
             label="Property Type"
             onChange={handleMetadataInfo}
