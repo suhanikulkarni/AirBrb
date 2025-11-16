@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from '../constants';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 
 import OutlinedInput from '@mui/material/OutlinedInput';
@@ -23,10 +23,9 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 const postListing = async (body, token) => {
-  
-  let response;
+
   try {
-    response = await axios.post(
+    await axios.post(
       `${API_BASE_URL}listings/new`, 
       body,
       {
@@ -59,8 +58,8 @@ function CreateListing({ token }) {
   const [metadata, setMetadata] = useState({});
   
   const handleMetadata = (e) => {
-      const {name, value} = e.target;
-      setMetadata((prev) => ({
+    const {name, value} = e.target;
+    setMetadata((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -69,11 +68,11 @@ function CreateListing({ token }) {
   const handleChange = (e) => {
     const {name, value} = e.target;
     if (name === 'address') {
-        setListingInfo((prevData) => ({
-          ...prevData,
-          [name]: {value}
-        }))
-      }
+      setListingInfo((prevData) => ({
+        ...prevData,
+        [name]: {value}
+      }))
+    }
     else {
       setListingInfo((prevData) => ({
         ...prevData,
@@ -115,8 +114,8 @@ function CreateListing({ token }) {
         onChange={handleChange}
         name='title'
       />
-        <br />
-        <br />
+      <br />
+      <br />
 
       <TextField
         id="outlined-search"
@@ -125,7 +124,7 @@ function CreateListing({ token }) {
         onChange={handleChange}
         name='address'
       />
-        <br />
+      <br />
 
       <InputLabel htmlFor="outlined-adornment-amount">Amount</InputLabel>
       <OutlinedInput
@@ -135,8 +134,8 @@ function CreateListing({ token }) {
         name='price'
         onChange={handleChange}
       />
-        <br />
-        <br />
+      <br />
+      <br />
       <label>Thumbnail&nbsp;&nbsp;</label>
       <Button
         component="label"
@@ -145,15 +144,15 @@ function CreateListing({ token }) {
         tabIndex={-1}
       >
         Upload files
-      <VisuallyHiddenInput
-        type="file"
-        onChange={handleChange}
-        name='thumbnail'
-        multiple
-      />
+        <VisuallyHiddenInput
+          type="file"
+          onChange={handleChange}
+          name='thumbnail'
+          multiple
+        />
       </Button>
-        <br />
-        <br />
+      <br />
+      <br />
 
       <TextField
         id="outlined-search"
@@ -161,9 +160,9 @@ function CreateListing({ token }) {
         type="search"
         onChange={handleMetadata}
         name='type'
-        />
-        <br />
-        <br />
+      />
+      <br />
+      <br />
 
       <TextField
         id="outlined-search"
@@ -171,9 +170,9 @@ function CreateListing({ token }) {
         type="search"
         onChange={handleMetadata}
         name='bedrooms'
-        />
-        <br />
-        <br />
+      />
+      <br />
+      <br />
 
       <TextField
         id="outlined-search"
@@ -181,9 +180,9 @@ function CreateListing({ token }) {
         type="search"
         onChange={handleMetadata}
         name='bathrooms'
-        />
-        <br />
-        <br />
+      />
+      <br />
+      <br />
 
       <TextField
         id="outlined-search"
@@ -191,9 +190,9 @@ function CreateListing({ token }) {
         type="search"
         onChange={handleMetadata}
         name='amenities'
-        />
-        <br />
-        <br />
+      />
+      <br />
+      <br />
 
       <button type='button' onClick={handleSubmission}>Submit</button>
     </form>
