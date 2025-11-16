@@ -6,7 +6,7 @@ import * as React from 'react';
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import DatePicker, { DateObject } from "react-multi-date-picker";
+import DatePicker from "react-multi-date-picker";
 
 const getAllListings = async (owner) => {
   let hostedListings = [];
@@ -41,12 +41,14 @@ const getListingInfo = async (id) => {
 
 function viewHostedListings({ owner }) {
   const [listings, setListings] = useState([]);
-  
-  useEffect (() => {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [activeListing, setActiveListing] = useState(null);
+  const [currentRange, setCurrentRange] = useState([]);
+  const [allRanges, setAllRanges] = useState({});
 
+  useEffect(() => {
     const getFetch = async () => {
       try {
-
         const listingIds = await getAllListings(owner);
         if (!listingIds || listingIds.length === 0) {
           setListings([]);
@@ -54,7 +56,13 @@ function viewHostedListings({ owner }) {
         }
 
         const detailedListings = await Promise.all(
-          listingIds.map(id => getListingInfo(id))
+          listingIds.map(async (id) => {
+            const listing = await getListingInfo(id);
+            if (listing) {
+              return { ...listing, id }; // Ensure id is attached to listing
+            }
+            return null;
+          })
         );
         setListings(detailedListings.filter(Boolean));
 
@@ -63,53 +71,64 @@ function viewHostedListings({ owner }) {
         console.error("Error fetching listings:", error);
       }
     } 
-    getFetch(owner)
-        
-
-  }, []);
-
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [activeListing, setActiveListing] = useState(null);
-  const [dates, setDates] = useState([])
-
-  // const setAvailability = (value) => {
-    
-  //     setDates((prevData) => ({
-  //         ...prevData,
-  //         value
-  //     }))
-  //     console.log(dates)
-  // }
-  console.log("dates", dates)
+    getFetch();
+  }, [owner]);
 
   const handleClick = (event, listing) => {
-    console.log("clicked")
+    console.log("clicked", listing.id);
     setAnchorEl(event.currentTarget);
     setActiveListing(listing);
+    setCurrentRange([]);
+  };
+
+  const addingRanges = () => {
+    if (!currentRange || currentRange.length !== 2) {
+      alert("Please select a full date range (start and end date)");
+      return;
+    }
+
+    const listingId = activeListing?.id;
+    
+    setAllRanges(prev => {
+      const updatedRanges = {
+        ...prev,
+        [listingId]: [
+          ...(prev[listingId] || []),
+          currentRange
+        ]
+      };
+      console.log("Updated allRanges:", updatedRanges);
+      return updatedRanges;
+    });
+    
+    setCurrentRange([]);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
     setActiveListing(null);
+    setCurrentRange([]);
   };
   const open = Boolean(anchorEl);
-  console.log("listigns", listings)
+  
   return (
     <div>
       <h2>Hosted Listings</h2>
       {listings.length === 0 ? (
-        <p></p>
+        <p>No hosted listings found</p>
       ) : (
         listings.map((listing) => (
-          <div key={listing.title}>
+          <div key={listing.id} >
             <h3>{listing.title}</h3>
             <p>${listing.price}</p>
-            <p>Number of Bedrooms: Need to change to beds: {listing.metadata.bedrooms}</p>
-            <p>{listings.price}</p>
-            <Button aria-describedby={listing.id} variant="contained" onClick={handleClick}>
-                Publish Listing
-              </Button>
-              
+            <p>Number of Bedrooms: {listing.metadata?.bedrooms}</p>
+            <Button 
+              aria-describedby={listing.id} 
+              variant="contained" 
+              onClick={(e) => handleClick(e, listing)}
+            >
+              Manage Availability
+            </Button>
           </div>
         ))
       )}
@@ -123,11 +142,58 @@ function viewHostedListings({ owner }) {
           vertical: 'bottom',
           horizontal: 'left',
         }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
       >
-        <Typography sx={{ p: 10 }}>
-          <DatePicker range value={dates} onChange={dateObjects => {
-      setDates(dateObjects)}} />;
-        </Typography>
+        {activeListing && (
+          <>
+            <Typography variant="h6" gutterBottom>
+              Set Availability for: {activeListing.title}
+            </Typography>
+
+            <DatePicker 
+              range 
+              value={currentRange} 
+              onChange={setCurrentRange} 
+              placeholder="Select availability date range"
+            />
+            
+            <Button
+              variant="outlined"
+              onClick={addingRanges}
+              fullWidth
+              
+            >
+              Add Availability
+            </Button>
+
+            <div >
+              <strong>Current Availability:</strong>
+
+              {(allRanges[activeListing.id] || []).length === 0 ? (
+                <p>No ranges added yet.</p>
+              ) : (
+                <div>
+                  {(allRanges[activeListing.id] || []).map((range, index) => (
+                    <p key={index} >
+                      {range[0].format("YYYY-MM-DD")} → {range[1].format("YYYY-MM-DD")}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <Button
+              variant="contained"
+              onClick={publishListing}
+              fullWidth
+            >
+              Publish Listing
+            </Button>
+          </>
+        )}
       </Popover>
     </div>
   );
