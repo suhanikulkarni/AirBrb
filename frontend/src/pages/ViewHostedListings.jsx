@@ -1,8 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL } from "../constants";
 import { useEffect, useState } from "react";
-import * as React from 'react';
-
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -39,7 +37,7 @@ const getListingInfo = async (id) => {
   }
 }
 
-function viewHostedListings({ owner }) {
+function ViewHostedListings({ owner }) {
   const [listings, setListings] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [activeListing, setActiveListing] = useState(null);
@@ -198,4 +196,4 @@ function viewHostedListings({ owner }) {
   );
 }
 
-export default viewHostedListings;
+export default ViewHostedListings;
