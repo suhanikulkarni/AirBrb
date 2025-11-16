@@ -41,7 +41,7 @@ const getListingInfo = async (id) => {
 
 function viewHostedListings({ owner }) {
   const [listings, setListings] = useState([]);
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const [activeListing, setActiveListing] = useState(null);
   const [currentRange, setCurrentRange] = useState([]);
   const [allRanges, setAllRanges] = useState({});
@@ -59,7 +59,7 @@ function viewHostedListings({ owner }) {
           listingIds.map(async (id) => {
             const listing = await getListingInfo(id);
             if (listing) {
-              return { ...listing, id }; // Ensure id is attached to listing
+              return { ...listing, id };
             }
             return null;
           })
@@ -178,7 +178,7 @@ function viewHostedListings({ owner }) {
                 <div>
                   {(allRanges[activeListing.id] || []).map((range, index) => (
                     <p key={index} >
-                      {range[0].format("YYYY-MM-DD")} → {range[1].format("YYYY-MM-DD")}
+                      {range[0].format("DD/MM/YYYY")} to {range[1].format("DD/MM/YYYY")}
                     </p>
                   ))}
                 </div>
@@ -187,7 +187,6 @@ function viewHostedListings({ owner }) {
 
             <Button
               variant="contained"
-              onClick={publishListing}
               fullWidth
             >
               Publish Listing
