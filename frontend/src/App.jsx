@@ -101,6 +101,8 @@ function App() {
               <Route path="/dashboard" element={<Dashboard token={token} />} />
               <Route path="/createListing" element={<CreateListing token={token} />} />
               <Route path="/viewHostedListings" element={<ViewHostedListings owner ={owner} token={token} />} />
+              <Route path="/viewListings" element={<ViewListing />} />
+
               <Route path="/viewListings/:id" element={<ListingInfo />} />
 
             </>

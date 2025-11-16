@@ -10,7 +10,7 @@ const getListings = async () => {
     const response = await axios.get(
       `${API_BASE_URL}listings`)
     console.log(response)
-    if (response) {
+    if (response.data?.listings) {
       console.log(response.data.listings)
       return response.data.listings;
     }
