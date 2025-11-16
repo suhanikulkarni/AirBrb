@@ -10,11 +10,14 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import CreateListing from './pages/CreateListing';
+import ViewHostedListings from './pages/ViewHostedListings';
 import { ErrorContext } from './context';
 import ErrorPopup from './pages/ErrorPopup';
 
 function App() {
   const [token, setToken] = useState('LOADING');
+  const [owner, setOwner] = useState('');
+
   const [showErrorPopup, setShowErrorPopup] = useState(false);
 
   const navigate = useNavigate('/dashboard');
@@ -22,6 +25,9 @@ function App() {
   useEffect(() => {
     const lsToken = localStorage.getItem('token');
     setToken(lsToken);
+
+    const owner = localStorage.getItem('owner');
+    setOwner(owner);
   }, []);
 
   const logoutUser = async () => {
@@ -82,10 +88,12 @@ function App() {
           {token !== 'LOADING' && (
             <>
               <Route path="/" element={<PageBody>hello world</PageBody>} />
-              <Route path="/login" element={<Login setToken={setToken}/>} />
-              <Route path="/register" element={<Register setToken={setToken}/>} />
+              <Route path="/login" element={<Login setToken={setToken} setOwner={setOwner}/>} />
+              <Route path="/register" element={<Register setToken={setToken} setOwner={setOwner} />} />
               <Route path="/dashboard" element={<Dashboard token={token} />} />
               <Route path="/createListing" element={<CreateListing token={token} />} />
+              <Route path="/viewHostedListings" element={<ViewHostedListings token={token} />} />
+
             </>
           )}
         </Routes>

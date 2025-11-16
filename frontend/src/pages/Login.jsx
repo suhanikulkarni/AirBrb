@@ -8,7 +8,7 @@ import Button from '@mui/material/Button';
 import { PageBody } from '../styles/mainStyles';
 import { ErrorContext } from '../context';
 
-function Login({ setToken }) {
+function Login({ setToken, setOwner }) {
   const [ email, setEmail ] = useState('');
   const [ password, setPassword ] = useState('');
   
@@ -24,6 +24,8 @@ function Login({ setToken }) {
       const response = await axios.post('http://localhost:5005/user/auth/login', { email, password });
       localStorage.setItem('token', response.data.token);
       setToken(response.data.token);
+      setToken(email);
+
       navigate('/dashboard');
     } catch (error) {
       setShowErrorPopup(error.response.data.error);
