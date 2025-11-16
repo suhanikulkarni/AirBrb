@@ -37,7 +37,7 @@ const getListingInfo = async (id) => {
   }
 }
 
-function ViewHostedListings({ owner }) {
+function ViewHostedListings({ owner, token }) {
   const [listings, setListings] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [activeListing, setActiveListing] = useState(null);
@@ -72,6 +72,8 @@ function ViewHostedListings({ owner }) {
     getFetch();
   }, [owner]);
 
+  
+
   const handleClick = (event, listing) => {
     console.log("clicked", listing.id);
     setAnchorEl(event.currentTarget);
@@ -79,13 +81,57 @@ function ViewHostedListings({ owner }) {
     setCurrentRange([]);
   };
 
+  const publishDates = async () => {
+    if (!activeListing) return;
+
+    const listingId = activeListing.id;
+    const ranges = allRanges[listingId] || [];
+
+    if (ranges.length === 0) {
+      alert("Please add at least one availability range before publishing");
+      return;
+    }
+    const availability = ranges.map(range => ({
+      start: range[0].format("DD-MM-YYYY"),
+      end: range[1].format("DD-MM-YYYY")
+    }));
+
+    const body = { availability };
+
+    console.log("Publishing listing with body:", body);
+
+
+    try {
+      const res = await axios.put(
+        `${API_BASE_URL}listings/publish/${listingId}`,
+        body,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      
+      );
+
+      if (res) {
+        console.log("this si resdata",res)
+      }
+    }
+    catch {
+      console.log("EROROROROORORORORO");
+      return;
+    } 
+
+  }
+
+
   const addingRanges = () => {
+    const listingId = activeListing?.id;
     if (!currentRange || currentRange.length !== 2) {
       alert("Please select a full date range (start and end date)");
       return;
     }
 
-    const listingId = activeListing?.id;
     
     setAllRanges(prev => {
       const updatedRanges = {
@@ -186,6 +232,7 @@ function ViewHostedListings({ owner }) {
             <Button
               variant="contained"
               fullWidth
+              onClick={publishDates}
             >
               Publish Listing
             </Button>
