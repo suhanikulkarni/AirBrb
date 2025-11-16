@@ -16,6 +16,8 @@ import Select from '@mui/material/Select';
 import { Form, PageBody } from '../styles/mainStyles';
 
 import { ErrorContext } from '../context';
+import { Box } from '@mui/material';
+import BedroomForm from './BedroomForm';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -51,15 +53,11 @@ function CreateListing({ token }) {
     'postcode': ''
   })
 
-  const [metadata, setMetadata] = useState({
+  const [listingMetadata, setListingMetadata] = useState({
     'propertyType': '',
     'bathroomCount': '',
-    'bedroom': [
-      {
-        'bedCount': '',
-        'bedroomType': ''
-      }
-    ],
+    'bedroomCount': '',
+    'bedrooms': [],
     'amenities': []
   });
 
@@ -78,28 +76,53 @@ function CreateListing({ token }) {
     }
   }
 
-  const handleChange = (e) => {
+  const handleInfo = (e) => {
     const {name, value} = e.target;
 
-    // TODO: handle metadata/address structure
+    setListingInfo((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  }
 
-    if (name === 'address' || name === 'metadata') {
-      setListingInfo((prevData) => ({
-        ...prevData,
-        [name]: {value}
-      }))
-    } else {
-      setListingInfo((prevData) => ({
-        ...prevData,
-        [name]: value
-      }))
+  const handleAddressInfo = (e) => {
+    const {name, value} = e.target;
+
+    setListingAddress((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  }
+
+  const handleMetadataInfo = (e) => {
+    const {name, value} = e.target;
+
+    setListingMetadata((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+
+    if (name === 'bedroomCount') {
+      renderBedroomForm();
     }
+  }
+
+  const renderBedroomForm = () => {
+    const array = [];
+
+    for (let i = 1; i <= listingMetadata.bedroomCount; i++) {
+      array.push(
+        <BedroomForm bedroomNumber={i} setListingInfo={setListingInfo}/>
+      )
+    }
+
+    return array;
   }
 
   const handleSubmission = async () => {
     console.log("Listing data: ",listingInfo)
 
-    if (!listingInfo.title || !listingInfo.address || !listingInfo.metadata || !listingInfo.thumbnail || !listingInfo.price) {
+    if (!listingInfo.title || !listingInfo.address || !listingInfo.listingMetadata || !listingInfo.thumbnail || !listingInfo.price) {
       // TODO: usability -> instead of popup -> highlight empty field with error
       return setShowErrorPopup("Please fill out the whole form");
     }
@@ -111,7 +134,13 @@ function CreateListing({ token }) {
     }
 
     // TODO: default thumbnail
-    
+
+    await setListingInfo((prevData) => ({
+      ...prevData,
+      'address': listingAddress,
+      'metadata': listingMetadata
+    }));
+
     postListing(listingInfo, token);
   }
 
@@ -121,89 +150,97 @@ function CreateListing({ token }) {
         <h1>Listing Information</h1>
 
         <TextField 
-          id="outlined-search" 
+          id="listing-title-input" 
           label="Property Name"
-          type="search"
-          onChange={handleChange}
+          type="text"
+          onChange={handleInfo}
           name="title"
           required
         />
         <br />
 
-        <div>
+        <InputLabel htmlFor="listing-amount-input">Amount *</InputLabel>
+        <OutlinedInput
+          id="listing-price-input"
+          startAdornment={<InputAdornment position="start">$</InputAdornment>}
+          label="Amount"
+          name="price"
+          onChange={handleInfo}
+          required
+        />
+        <br />
+
+        <h2>Listing Address</h2>
+        <Box
+          sx={{
+            borderRadius: 3,
+            bgcolor: '#f3f3f3ff',
+            padding: '15px'
+          }}
+        >
           <TextField
-            id="outlined-search"
+            id="listing-street-address-input"
             label="Street Address"
-            type="search"
-            onChange={handleChange}
+            type="text"
+            onChange={handleAddressInfo}
             name="street"
             required
           />
           <br /><br />
 
           <TextField
-            id="outlined-search"
+            id="listing-suburb-input"
             label="Suburb"
-            type="search"
-            onChange={handleChange}
+            type="text"
+            onChange={handleAddressInfo}
             name="suburb"
             required
           />
 
           <TextField
-            id="outlined-search"
+            id="listing-state-input"
             label="State"
-            type="search"
-            onChange={handleChange}
+            type="text"
+            onChange={handleAddressInfo}
             name="state"
             required
           />
           <br /><br />
 
           <TextField
-            id="outlined-search"
+            id="listing-country-input"
             label="Country"
-            type="search"
-            onChange={handleChange}
+            type="text"
+            onChange={handleAddressInfo}
             name="country"
             required
           />
 
           <TextField
-            id="outlined-search"
+            id="listing-postcode-input"
             label="Postcode"
-            type="search"
-            onChange={handleChange}
+            type="text"
+            onChange={handleAddressInfo}
             name="postcode"
             required
           />
-        </div>
+        </Box>
         <br />
 
-        <InputLabel htmlFor="outlined-adornment-amount">Amount *</InputLabel>
-        <OutlinedInput
-          id="outlined-adornment-amount"
-          startAdornment={<InputAdornment position="start">$</InputAdornment>}
-          label="Amount"
-          name="price"
-          onChange={handleChange}
-          required
-        />
-        <br />
         
         {/* TODO: upload files into a directory */}
         {/* TODO: clear file upload */}
-        <label>Thumbnail&nbsp;&nbsp;</label>
+        <h2>Listing Thumbnail</h2>
         <Button
           component="label"
           role={undefined}
           variant="contained"
           tabIndex={-1}  
         >
-          Upload files
+          Upload file
           <VisuallyHiddenInput
             type="file"
-            onChange={handleChange}
+            onChange={handleInfo}
             name="thumbnail"
             multiple
           />
@@ -211,36 +248,75 @@ function CreateListing({ token }) {
         <br />
 
         {/* TODO: create form elements for additional information */}
-        <div>
-          <FormControl fullWidth>
-            <InputLabel id="property-type-label">Property Type</InputLabel>
-            <Select
-              labelId="property-type-label"
-              id="property-type-select"
-              value={metadata.propertyType}
-              label="Property Type"
-              onChange={handleChange}
-            >
-              <MenuItem value={"apartment"}>Apartment</MenuItem>
-              <MenuItem value={"house"}>House</MenuItem>
-              <MenuItem value={"guesthouse"}>Guesthouse</MenuItem>
-              <MenuItem value={"hotelroom"}>Hotel Room</MenuItem>
-              <MenuItem value={"cabin"}>Cabin</MenuItem>
-              <MenuItem value={"other"}>Other</MenuItem>
-            </Select>
-          </FormControl>
-          <br /><br />
+        <h2>Listing Details</h2>
+        <FormControl fullWidth>
+          <InputLabel id="property-type-label">Property Type</InputLabel>
+          <Select
+            labelId="property-type-label"
+            name="property-type"
+            value={listingMetadata.propertyType}
+            label="Property Type"
+            onChange={handleMetadataInfo}
+          >
+            <MenuItem value={"apartment"}>Apartment</MenuItem>
+            <MenuItem value={"house"}>House</MenuItem>
+            <MenuItem value={"guesthouse"}>Guesthouse</MenuItem>
+            <MenuItem value={"hotelroom"}>Hotel Room</MenuItem>
+            <MenuItem value={"cabin"}>Cabin</MenuItem>
+            <MenuItem value={"other"}>Other</MenuItem>
+          </Select>
+        </FormControl>
+        <br />
 
-          <TextField
-            type="text"
-            label="Amenities"
-            multiline
-            rows={3}
-            name="amenities"
-            onChange={handleChange}
-          />
-          <br /><br />
-        </div>
+        <TextField
+          type="text"
+          label="Amenities"
+          multiline
+          rows={3}
+          name="amenities"
+          onChange={handleMetadataInfo}
+        />
+        <br />
+
+        {/* TODO: prevent no. from decreasing beyond 0 */}
+        <TextField
+          id="bathroom-count-input"
+          label="Number of Bathrooms"
+          type="number"
+          onChange={handleMetadataInfo}
+          name="bathroomCount"
+          slotProps={{ input: { min: 0 } }}
+          required
+        />
+        <br />
+
+        <h3>Bedrooms</h3>
+        {/* TODO: ability to add multiple bedroom */}
+        <TextField
+          label="Number of Bedrooms"
+          type="number"
+          onBlurCapture={handleMetadataInfo}
+          name="bedroomCount"
+          slotProps={{ input: { min: 0 } }}
+        />
+        <br />
+
+        <Box
+          sx={{
+            borderRadius: 3,
+            bgcolor: '#f3f3f3ff',
+            padding: '15px'
+          }}
+        >          
+          <Box
+            sx={{
+              margin: '0 10px 15px 10px'
+            }}
+          >
+            {renderBedroomForm()}
+          </Box>
+        </Box>
+        <br />
 
         <Button 
           variant="contained"
