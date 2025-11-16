@@ -1,6 +1,12 @@
 import axios from "axios";
 import { API_BASE_URL } from "../constants";
 import { useEffect, useState } from "react";
+import * as React from 'react';
+
+import Popover from '@mui/material/Popover';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import DatePicker, { DateObject } from "react-multi-date-picker";
 
 const getAllListings = async (owner) => {
   let hostedListings = [];
@@ -62,6 +68,31 @@ function viewHostedListings({ owner }) {
 
   }, []);
 
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [activeListing, setActiveListing] = useState(null);
+  const [dates, setDates] = useState([])
+
+  // const setAvailability = (value) => {
+    
+  //     setDates((prevData) => ({
+  //         ...prevData,
+  //         value
+  //     }))
+  //     console.log(dates)
+  // }
+  console.log("dates", dates)
+
+  const handleClick = (event, listing) => {
+    console.log("clicked")
+    setAnchorEl(event.currentTarget);
+    setActiveListing(listing);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+    setActiveListing(null);
+  };
+  const open = Boolean(anchorEl);
   console.log("listigns", listings)
   return (
     <div>
@@ -75,9 +106,29 @@ function viewHostedListings({ owner }) {
             <p>${listing.price}</p>
             <p>Number of Bedrooms: Need to change to beds: {listing.metadata.bedrooms}</p>
             <p>{listings.price}</p>
+            <Button aria-describedby={listing.id} variant="contained" onClick={handleClick}>
+                Publish Listing
+              </Button>
+              
           </div>
         ))
       )}
+
+      <Popover
+        id={activeListing?.id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+      >
+        <Typography sx={{ p: 10 }}>
+          <DatePicker range value={dates} onChange={dateObjects => {
+      setDates(dateObjects)}} />;
+        </Typography>
+      </Popover>
     </div>
   );
 }
