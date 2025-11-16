@@ -23,9 +23,9 @@ function Login({ setToken, setOwner }) {
     try {
       const response = await axios.post('http://localhost:5005/user/auth/login', { email, password });
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('owner', email);
       setToken(response.data.token);
       setToken(email);
-
       navigate('/dashboard');
     } catch (error) {
       setShowErrorPopup(error.response.data.error);

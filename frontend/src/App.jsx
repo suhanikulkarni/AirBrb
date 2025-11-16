@@ -26,8 +26,8 @@ function App() {
     const lsToken = localStorage.getItem('token');
     setToken(lsToken);
 
-    const owner = localStorage.getItem('owner');
-    setOwner(owner);
+    const owner1 = localStorage.getItem('owner');
+    setOwner(owner1);
   }, []);
 
   const logoutUser = async () => {
@@ -92,7 +92,7 @@ function App() {
               <Route path="/register" element={<Register setToken={setToken} setOwner={setOwner} />} />
               <Route path="/dashboard" element={<Dashboard token={token} />} />
               <Route path="/createListing" element={<CreateListing token={token} />} />
-              <Route path="/viewHostedListings" element={<ViewHostedListings token={token} />} />
+              <Route path="/viewHostedListings" element={<ViewHostedListings owner ={owner} />} />
 
             </>
           )}
