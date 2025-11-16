@@ -13,6 +13,7 @@ function Dashboard({ token }) {
   return (
     <PageBody>
       <Link to='/createListing'>Create A Listing</Link>
+      <Link to='/viewHostedListings'>View All Listings</Link>
     </PageBody>
   )
 }

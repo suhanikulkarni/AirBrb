@@ -10,13 +10,16 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import CreateListing from './pages/CreateListing';
+import ViewHostedListings from './pages/ViewHostedListings';
 import { ErrorContext } from './context';
 import ErrorPopup from './pages/ErrorPopup';
 import ViewListing from './pages/ViewListing';
 import ListingInfo from './pages/ListingInfo';
 
 function App() {
-  const [token, setToken] = useState();
+  const [token, setToken] = useState('LOADING');
+  const [owner, setOwner] = useState('');
+
   const [showErrorPopup, setShowErrorPopup] = useState(false);
 
   const navigate = useNavigate('/dashboard');
@@ -24,6 +27,9 @@ function App() {
   useEffect(() => {
     const lsToken = localStorage.getItem('token');
     setToken(lsToken);
+
+    const owner1 = localStorage.getItem('owner');
+    setOwner(owner1);
   }, []);
 
   const logoutUser = async () => {
@@ -43,10 +49,15 @@ function App() {
           {token ? (
             <>
               <NavLeft>
-                  <Button
-                    variant="contained"
-                    onClick={() => navigate('/dashboard')}
-                  >Dashboard</Button>
+                <Button
+                  variant="contained"
+                  onClick={() => navigate('/')}
+                >Listing</Button>
+                {" "}
+                <Button
+                  variant="contained"
+                  onClick={() => navigate('/dashboard')}
+                >Dashboard</Button>
               </NavLeft>
               <NavLeft>
                 <Button
@@ -82,14 +93,18 @@ function App() {
         </NavBar>
         <ErrorPopup showErrorPopup={showErrorPopup} closeErrorPopup={() => setShowErrorPopup(false)} />
         <Routes>
-          <Route path="/" element={<div>hello world</div>} />
-          <Route path="/login" element={<Login setToken={setToken} />} />
-          <Route path="/register" element={<Register setToken={setToken} />} />
-          <Route path="/viewListings" element={<ViewListing />} />
-          <Route path="/viewListings/:id" element={<ListingInfo />} />
-          {token && <Route path="/dashboard" element={<Dashboard token={token} />} />}
-          {token && <Route path="/createListing" element={<CreateListing token={token} />} />}
+          {token !== 'LOADING' && (
+            <>
+              <Route path="/" element={<PageBody>hello world</PageBody>} />
+              <Route path="/login" element={<Login setToken={setToken} setOwner={setOwner}/>} />
+              <Route path="/register" element={<Register setToken={setToken} setOwner={setOwner} />} />
+              <Route path="/dashboard" element={<Dashboard token={token} />} />
+              <Route path="/createListing" element={<CreateListing token={token} />} />
+              <Route path="/viewHostedListings" element={<ViewHostedListings owner ={owner} token={token} />} />
+              <Route path="/viewListings/:id" element={<ListingInfo />} />
 
+            </>
+          )}
         </Routes>
       </Page>
     </ErrorContext.Provider>

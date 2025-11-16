@@ -26,7 +26,7 @@ const VisuallyHiddenInput = styled('input')({
 const postListing = async (body, token) => {
 
   try {
-    const response = await axios.post(
+    await axios.post(
       `${API_BASE_URL}listings/new`, 
       body,
       {
@@ -64,21 +64,9 @@ function CreateListing({ token }) {
       [name]: value,
     }));
   }
-  const handleChange = async (e) => {
-    const { name, value, files, type } = e.target;
-
-    if (type === 'file' && files.length > 0) {
-      const file = files[0];
-      console.log("Selected file name:", file.name);
-      const dataUrl = await fileToDataUrl(file);
-
-      setListingInfo((prevData) => ({
-        ...prevData,
-        [name]: dataUrl,
-      }));
-    }
-
-    else if (name === 'address') {
+  const handleChange = (e) => {
+    const {name, value} = e.target;
+    if (name === 'address') {
       setListingInfo((prevData) => ({
         ...prevData,
         [name]: {value}
