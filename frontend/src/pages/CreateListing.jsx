@@ -87,15 +87,19 @@ function CreateListing({ token }) {
 
   const handleAddressInfo = (e) => {
     const {name, value} = e.target;
-
     setListingAddress((prevData) => ({
       ...prevData,
       [name]: value
     }));
   }
 
+  // useEffect(() => {
+  //     console.log("Updated address:", listingAddress);
+  //   }, [listingAddress]);
+
   const handleMetadataInfo = (e) => {
     const {name, value} = e.target;
+    console.log("name and vakue", name, value)
 
     setListingMetadata((prevData) => ({
       ...prevData,
@@ -107,12 +111,28 @@ function CreateListing({ token }) {
     }
   }
 
+    // useEffect(() => {
+    //   console.log("Updated metadata:", listingMetadata);
+    // }, [listingMetadata]);
+
+  const updateBedroomMetadata = (bedroomNumber, bedroomInfo) => {
+    setListingMetadata(prev => {
+      const updated = [...prev.bedrooms];
+      updated[bedroomNumber - 1] = bedroomInfo;
+      return { ...prev, bedrooms: updated };
+    });
+  };
+
   const renderBedroomForm = () => {
     const array = [];
 
     for (let i = 1; i <= listingMetadata.bedroomCount; i++) {
       array.push(
-        <BedroomForm bedroomNumber={i} setListingInfo={setListingInfo}/>
+        <BedroomForm
+          key={i}
+          bedroomNumber={i}
+          updateBedroomMetadata={updateBedroomMetadata}
+          />
       )
     }
 
@@ -120,9 +140,8 @@ function CreateListing({ token }) {
   }
 
   const handleSubmission = async () => {
-    console.log("Listing data: ",listingInfo)
 
-    if (!listingInfo.title || !listingInfo.address || !listingInfo.listingMetadata || !listingInfo.thumbnail || !listingInfo.price) {
+    if (!listingInfo.title || !listingInfo.price) {
       // TODO: usability -> instead of popup -> highlight empty field with error
       return setShowErrorPopup("Please fill out the whole form");
     }
@@ -135,14 +154,20 @@ function CreateListing({ token }) {
 
     // TODO: default thumbnail
 
-    await setListingInfo((prevData) => ({
+    setListingInfo((prevData) => ({
       ...prevData,
       'address': listingAddress,
       'metadata': listingMetadata
     }));
+    console.log("Listing data: ",listingInfo)
 
     postListing(listingInfo, token);
   }
+
+  // useEffect(() => {
+  //     console.log("Updated all info:", listingInfo);
+  //   }, [listingInfo]);
+
 
   return (
     <PageBody>
@@ -183,7 +208,7 @@ function CreateListing({ token }) {
             label="Street Address"
             type="text"
             onChange={handleAddressInfo}
-            name="street"
+            name="streetAddress"
             required
           />
           <br /><br />
@@ -250,9 +275,10 @@ function CreateListing({ token }) {
         {/* TODO: create form elements for additional information */}
         <h2>Listing Details</h2>
         <FormControl fullWidth>
-          <InputLabel id="property-type-label">Property Type</InputLabel>
+          <InputLabel id="demo-simple-select-label">Property Type</InputLabel>
           <Select
-            labelId="property-type-label"
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
             name="property-type"
             value={listingMetadata.propertyType}
             label="Property Type"
@@ -295,7 +321,7 @@ function CreateListing({ token }) {
         <TextField
           label="Number of Bedrooms"
           type="number"
-          onBlurCapture={handleMetadataInfo}
+          onChange={handleMetadataInfo}
           name="bedroomCount"
           slotProps={{ input: { min: 0 } }}
         />

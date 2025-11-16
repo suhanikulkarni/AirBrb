@@ -3,34 +3,46 @@ import { useState } from 'react';
 import { Box } from '@mui/material';
 import TextField from '@mui/material/TextField';
 
-function BedroomForm({ bedroomNumber, setListingInfo }) {
+function BedroomForm({ bedroomNumber, updateBedroomMetadata }) {
   const [bedroomInfo, setBedroomInfo] = useState({
     'bedroomNumber': bedroomNumber,
     'bedCount': '',
-    'bedTypes': {}
-  });
-
-  const [bedroomBedInfo, setBedroomBedInfo] = useState({
-    'singleBed': '',
-    'doubleBed': '',
-    'queenBed': '',
-    'kingBed': '',
-    'sofaBed': ''
+    'bedTypes': {
+      'singleBed': '',
+      'doubleBed': '',
+      'queenBed': '',
+      'kingBed': '',
+      'sofaBed': ''
+    }
   });
 
   const handleBedroomBedInfo = (e) => {
     const {name, value} = e.target;
 
-    setBedroomBedInfo((prevData) => ({
-      ...prevData,
-      [name]: value
-    }));
+    setBedroomInfo(prev => {
+      const updateBeds = {
+        ...prev,
+        bedTypes: {
+          ...prev.bedTypes,
+          [name]: Number(value)
+        }
+      };
 
-    setBedroomInfo((prevData) => ({
-      ...prevData,
-      'bedTypes': bedroomInfo
-    }));
+      const totalBeds = Object.values(updateBeds)
+      .filter(v => typeof v === 'number' && !isNaN(v))
+      .reduce((sum, count) => sum + count, 0);
 
+    console.log(totalBeds);
+      const update = {
+        ...prev,
+        bedTypes: updateBeds,
+        bedCount: totalBeds 
+      };
+
+      updateBedroomMetadata(bedroomNumber, update);
+
+      return update;
+    });
     // TODO: set bed info into listing info
   }
 
