@@ -11,7 +11,6 @@ import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import { fileToDataUrl } from '../helper';
 
-
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
   clipPath: 'inset(50%)',
@@ -25,10 +24,9 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 const postListing = async (body, token) => {
-  
-  let response;
+
   try {
-    response = await axios.post(
+    const response = await axios.post(
       `${API_BASE_URL}listings/new`, 
       body,
       {
@@ -60,33 +58,32 @@ function CreateListing({ token }) {
   const [metadata, setMetadata] = useState({});
   
   const handleMetadata = (e) => {
-      const {name, value} = e.target;
-      setMetadata((prev) => ({
+    const {name, value} = e.target;
+    setMetadata((prev) => ({
       ...prev,
       [name]: value,
     }));
-
   }
   const handleChange = async (e) => {
     const { name, value, files, type } = e.target;
 
-  if (type === 'file' && files.length > 0) {
-    const file = files[0];
-    console.log("Selected file name:", file.name);
-    const dataUrl = await fileToDataUrl(file);
+    if (type === 'file' && files.length > 0) {
+      const file = files[0];
+      console.log("Selected file name:", file.name);
+      const dataUrl = await fileToDataUrl(file);
 
-    setListingInfo((prevData) => ({
+      setListingInfo((prevData) => ({
         ...prevData,
         [name]: dataUrl,
       }));
     }
 
     else if (name === 'address') {
-        setListingInfo((prevData) => ({
-          ...prevData,
-          [name]: {value}
-        }))
-      }
+      setListingInfo((prevData) => ({
+        ...prevData,
+        [name]: {value}
+      }))
+    }
     else {
       setListingInfo((prevData) => ({
         ...prevData,
@@ -128,8 +125,8 @@ function CreateListing({ token }) {
         onChange={handleChange}
         name='title'
       />
-        <br />
-        <br />
+      <br />
+      <br />
 
       <TextField
         id="outlined-search"
@@ -138,7 +135,7 @@ function CreateListing({ token }) {
         onChange={handleChange}
         name='address'
       />
-        <br />
+      <br />
 
       <InputLabel htmlFor="outlined-adornment-amount">Amount</InputLabel>
       <OutlinedInput
@@ -148,8 +145,8 @@ function CreateListing({ token }) {
         name='price'
         onChange={handleChange}
       />
-        <br />
-        <br />
+      <br />
+      <br />
       <label>Thumbnail&nbsp;&nbsp;</label>
       <Button
         component="label"
@@ -158,15 +155,15 @@ function CreateListing({ token }) {
         tabIndex={-1}
       >
         Upload files
-      <VisuallyHiddenInput
-        type="file"
-        onChange={handleChange}
-        name='thumbnail'
-        multiple
-      />
+        <VisuallyHiddenInput
+          type="file"
+          onChange={handleChange}
+          name='thumbnail'
+          multiple
+        />
       </Button>
-        <br />
-        <br />
+      <br />
+      <br />
 
       <TextField
         id="outlined-search"
@@ -174,9 +171,9 @@ function CreateListing({ token }) {
         type="search"
         onChange={handleMetadata}
         name='type'
-        />
-        <br />
-        <br />
+      />
+      <br />
+      <br />
 
       <TextField
         id="outlined-search"
@@ -184,9 +181,9 @@ function CreateListing({ token }) {
         type="search"
         onChange={handleMetadata}
         name='bedrooms'
-        />
-        <br />
-        <br />
+      />
+      <br />
+      <br />
 
       <TextField
         id="outlined-search"
@@ -194,9 +191,9 @@ function CreateListing({ token }) {
         type="search"
         onChange={handleMetadata}
         name='bathrooms'
-        />
-        <br />
-        <br />
+      />
+      <br />
+      <br />
 
       <TextField
         id="outlined-search"
@@ -204,9 +201,9 @@ function CreateListing({ token }) {
         type="search"
         onChange={handleMetadata}
         name='amenities'
-        />
-        <br />
-        <br />
+      />
+      <br />
+      <br />
 
       <button type='button' onClick={handleSubmission}>Submit</button>
     </form>
