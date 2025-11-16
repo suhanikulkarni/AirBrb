@@ -37,7 +37,6 @@ const postListing = async (body, token) => {
         }
       }
     );
-
   }
   catch (error) {
     console.log("in the catch, there is an error", error.message);
@@ -68,9 +67,21 @@ function CreateListing({ token }) {
     }));
 
   }
-  const handleChange = (e) => {
-    const {name, value} = e.target;
-    if (name === 'address') {
+  const handleChange = async (e) => {
+    const { name, value, files, type } = e.target;
+
+  if (type === 'file' && files.length > 0) {
+    const file = files[0];
+    console.log("Selected file name:", file.name);
+    const dataUrl = await fileToDataUrl(file);
+
+    setListingInfo((prevData) => ({
+        ...prevData,
+        [name]: dataUrl,
+      }));
+    }
+
+    else if (name === 'address') {
         setListingInfo((prevData) => ({
           ...prevData,
           [name]: {value}
