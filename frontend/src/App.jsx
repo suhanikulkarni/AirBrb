@@ -10,7 +10,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import CreateListing from './pages/CreateListing';
-import ViewListing from './pages/ViewListing';
+import ViewHostedListings from './pages/ViewHostedListings';
 import { ErrorContext } from './context';
 import ErrorPopup from './pages/ErrorPopup';
 import { API_BASE_URL } from './constants';
@@ -55,8 +55,20 @@ function App() {
             <>
               <NavLeft>
                 <Button
+                  variant="contained"
                   onClick={() => navigate('/')}
-                >Home</Button>
+                >Listing</Button>
+                {" "}
+                <Button
+                  variant="contained"
+                  onClick={() => navigate('/dashboard')}
+                >Dashboard</Button>
+              </NavLeft>
+              <NavLeft>
+                <Button
+                  variant="contained"
+                  onClick={() => navigate('/viewListings')}
+                >Listing</Button>
               </NavLeft>
               {" "}
               <NavRight>
@@ -74,6 +86,7 @@ function App() {
             <>
               <NavLeft>
                 <Button
+                  variant="contained"
                   onClick={() => navigate('/viewListings')}
                 >Listing</Button>
               </NavLeft>
@@ -91,12 +104,13 @@ function App() {
         <Routes>
           {token !== 'LOADING' && (
             <>
-              <Route path="/" element={<ViewListing />} />
+              <Route path="/" element={<PageBody>hello world</PageBody>} />
               <Route path="/login" element={<Login setToken={setToken} setOwner={setOwner}/>} />
               <Route path="/register" element={<Register setToken={setToken} setOwner={setOwner} />} />
               <Route path="/dashboard">
-                <Route index element={<Dashboard token={token} owner={owner} />} />
+                <Route index element={<Dashboard token={token} />} />
                 <Route path="create-listing" element={<CreateListing token={token} />} />
+                <Route path="view-hosted-listings" element={<ViewHostedListings owner ={owner} token={token} />} />
               </Route>
             </>
           )}
