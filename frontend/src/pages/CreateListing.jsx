@@ -145,23 +145,37 @@ function CreateListing({ token }) {
       // TODO: usability -> instead of popup -> highlight empty field with error
       return setShowErrorPopup("Please fill out the whole form");
     }
-
-    listingInfo.price = parseInt(listingInfo.price, 10)
-  
-    if(!(Number.isFinite(listingInfo.price))){
-      return setShowErrorPopup("Please insert a number");
+    if (!listingAddress.country||!listingAddress.postcode||!listingAddress.state||!listingAddress.streetAddress||! listingAddress.suburb) {
+      return setShowErrorPopup("Please enter all the address information");
     }
 
-    // TODO: default thumbnail
+    if (!listingMetadata.bathroomCount||!listingMetadata.propertyType||!listingMetadata.bedroomCount) {
+      return setShowErrorPopup("Please enter all the information about the property");
+    }
+    const bedNum   = Number(listingMetadata.bedroomCount);
+    if(bedNum > 0 && listingMetadata.bedrooms.length != bedNum) {
+      return setShowErrorPopup("Please enter the bedroom information");
+    }
+    
+    const priceNum = Number(listingInfo.price);
+    const bathNum  = Number(listingMetadata.bathroomCount);
+    
 
-    setListingInfo((prevData) => ({
-      ...prevData,
-      'address': listingAddress,
-      'metadata': listingMetadata
-    }));
-    console.log("Listing data: ",listingInfo)
+    if (![priceNum, bathNum, bedNum].every(Number.isFinite)) {
+      console.log({ priceNum, bathNum, bedNum });
+      return setShowErrorPopup("Please insert a number");
+    }
+        // TODO: default thumbnail
 
-    postListing(listingInfo, token);
+    const body = {
+      ...listingInfo,
+      address: listingAddress,
+      metadata: listingMetadata,
+      price: parseInt(listingInfo.price, 10)
+    }
+    console.log("Listing data: ",body)
+
+    postListing(body, token);
   }
 
   useEffect(() => {
@@ -279,7 +293,7 @@ function CreateListing({ token }) {
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            name="property-type"
+            name="propertyType"
             value={listingMetadata.propertyType}
             label="Property Type"
             onChange={handleMetadataInfo}
