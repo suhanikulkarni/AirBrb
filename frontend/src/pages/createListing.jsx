@@ -183,6 +183,188 @@ function CreateListing({ token }) {
     }, [listingInfo]);
 
 
+  return (
+    <PageBody>
+      <Form>
+        <h1>Listing Information</h1>
+
+        <TextField 
+          id="listing-title-input" 
+          label="Property Name"
+          type="text"
+          onChange={handleInfo}
+          name="title"
+          required
+        />
+        <br />
+
+        <InputLabel htmlFor="listing-amount-input">Amount *</InputLabel>
+        <OutlinedInput
+          id="listing-price-input"
+          startAdornment={<InputAdornment position="start">$</InputAdornment>}
+          label="Amount"
+          name="price"
+          onChange={handleInfo}
+          required
+        />
+        <br />
+
+        <h2>Listing Address</h2>
+        <Box
+          sx={{
+            borderRadius: 3,
+            bgcolor: '#f3f3f3ff',
+            padding: '15px'
+          }}
+        >
+          <TextField
+            id="listing-street-address-input"
+            label="Street Address"
+            type="text"
+            onChange={handleAddressInfo}
+            name="streetAddress"
+            required
+          />
+          <br /><br />
+
+          <TextField
+            id="listing-suburb-input"
+            label="Suburb"
+            type="text"
+            onChange={handleAddressInfo}
+            name="suburb"
+            required
+          />
+
+          <TextField
+            id="listing-state-input"
+            label="State"
+            type="text"
+            onChange={handleAddressInfo}
+            name="state"
+            required
+          />
+          <br /><br />
+
+          <TextField
+            id="listing-country-input"
+            label="Country"
+            type="text"
+            onChange={handleAddressInfo}
+            name="country"
+            required
+          />
+
+          <TextField
+            id="listing-postcode-input"
+            label="Postcode"
+            type="text"
+            onChange={handleAddressInfo}
+            name="postcode"
+            required
+          />
+        </Box>
+        <br />
+
+        
+        {/* TODO: upload files into a directory */}
+        {/* TODO: clear file upload */}
+        <h2>Listing Thumbnail</h2>
+        <Button
+          component="label"
+          role={undefined}
+          variant="contained"
+          tabIndex={-1}  
+        >
+          Upload file
+          <VisuallyHiddenInput
+            type="file"
+            onChange={handleInfo}
+            name="thumbnail"
+            multiple
+          />
+        </Button>
+        <br />
+
+        {/* TODO: create form elements for additional information */}
+        <h2>Listing Details</h2>
+        <FormControl fullWidth>
+          <InputLabel id="demo-simple-select-label">Property Type</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            name="propertyType"
+            value={listingMetadata.propertyType}
+            label="Property Type"
+            onChange={handleMetadataInfo}
+          >
+            <MenuItem value={"apartment"}>Apartment</MenuItem>
+            <MenuItem value={"house"}>House</MenuItem>
+            <MenuItem value={"guesthouse"}>Guesthouse</MenuItem>
+            <MenuItem value={"hotelroom"}>Hotel Room</MenuItem>
+            <MenuItem value={"cabin"}>Cabin</MenuItem>
+            <MenuItem value={"other"}>Other</MenuItem>
+          </Select>
+        </FormControl>
+        <br />
+
+        <TextField
+          type="text"
+          label="Amenities"
+          multiline
+          rows={3}
+          name="amenities"
+          onChange={handleMetadataInfo}
+        />
+        <br />
+
+        {/* TODO: prevent no. from decreasing beyond 0 */}
+        <TextField
+          id="bathroom-count-input"
+          label="Number of Bathrooms"
+          type="number"
+          onChange={handleMetadataInfo}
+          name="bathroomCount"
+          slotProps={{ input: { min: 0 } }}
+          required
+        />
+        <br />
+
+        <h3>Bedrooms</h3>
+        {/* TODO: ability to add multiple bedroom */}
+        <TextField
+          label="Number of Bedrooms"
+          type="number"
+          onChange={handleMetadataInfo}
+          name="bedroomCount"
+          slotProps={{ input: { min: 0 } }}
+        />
+        <br />
+
+        <Box
+          sx={{
+            borderRadius: 3,
+            bgcolor: '#f3f3f3ff',
+            padding: '15px'
+          }}
+        >          
+          <Box
+            sx={{
+              margin: '0 10px 15px 10px'
+            }}
+          >
+            {renderBedroomForm()}
+          </Box>
+        </Box>
+        <br />
+
+        <Button 
+          variant="contained"
+          onClick={handleSubmission}
+        >Submit</Button>
+      </Form>
+    </PageBody>
+  )
 }
 
 export default CreateListing
