@@ -11,7 +11,6 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import CreateListing from './pages/CreateListing';
 import ViewHostedListings from './pages/ViewHostedListings';
-import ViewHostedListings from './pages/ViewHostedListings';
 import { ErrorContext } from './context';
 import ErrorPopup from './pages/ErrorPopup';
 import { API_BASE_URL } from './constants';
@@ -30,7 +29,7 @@ function App() {
 
     const owner1 = localStorage.getItem('owner');
     setOwner(owner1);
-  })
+  }, []);
 
   const logoutUser = async () => {
     await axios.post(`${API_BASE_URL}user/auth/logout`, {}, {
@@ -53,15 +52,7 @@ function App() {
                   variant="contained"
                   onClick={() => navigate('/')}
                 >Listing</Button>
-                <Button
-                  variant="contained"
-                  onClick={() => navigate('/')}
-                >Listing</Button>
                 {" "}
-                <Button
-                  variant="contained"
-                  onClick={() => navigate('/dashboard')}
-                >Dashboard</Button>
                 <Button
                   variant="contained"
                   onClick={() => navigate('/dashboard')}
