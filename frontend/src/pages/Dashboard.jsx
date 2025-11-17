@@ -5,7 +5,9 @@ import Button from '@mui/material/Button';
 
 import { PageBody } from '../styles/mainStyles';
 
-function Dashboard({ token }) {
+import ViewHostedListings from './ViewHostedListings';
+
+function Dashboard({ token, owner }) {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,8 +19,8 @@ function Dashboard({ token }) {
       <Button
         variant="contained"
         onClick={() => navigate('create-listing')}
-      >Create A Listing</Button>
-      <Link to='view-hosted-listings'>View All Listings</Link>
+      >Create A New Listing</Button>
+      <ViewHostedListings owner={owner} token={token} />
     </PageBody>
   )
 }
