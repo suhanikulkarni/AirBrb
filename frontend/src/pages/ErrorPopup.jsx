@@ -7,10 +7,10 @@ function ErrorPopup({ showErrorPopup, closeErrorPopup }) {
       {showErrorPopup && (
         <DimBackground>
           <Popup>
-              <Heading>Error:</Heading>
-              <CloseButton onClick={closeErrorPopup}>✖</CloseButton>
-              <hr />
-              {showErrorPopup}
+            <Heading>Error:</Heading>
+            <CloseButton onClick={closeErrorPopup}>✖</CloseButton>
+            <hr />
+            {showErrorPopup}
           </Popup>
         </DimBackground>
       )}

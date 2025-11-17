@@ -18,6 +18,8 @@ function Dashboard({ token }) {
         variant="contained"
         onClick={() => navigate('create-listing')}
       >Create A Listing</Button>
+      <Link to='/createListing'>Create A Listing</Link>
+      <Link to='/viewHostedListings'>View All Listings</Link>
     </PageBody>
   )
 }
