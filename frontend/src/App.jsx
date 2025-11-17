@@ -29,6 +29,8 @@ function App() {
 
     const owner1 = localStorage.getItem('owner');
     setOwner(owner1);
+
+
   }, []);
 
   const logoutUser = async () => {
@@ -45,11 +47,23 @@ function App() {
     <ErrorContext.Provider value={setShowErrorPopup}>
       <Page>
         <NavBar>
-          {token && token !== 'LOADING' ? (
+          {token ? (
             <>
               <NavLeft>
                 <Button
+                  variant="contained"
                   onClick={() => navigate('/')}
+                >Listing</Button>
+                {" "}
+                <Button
+                  variant="contained"
+                  onClick={() => navigate('/dashboard')}
+                >Dashboard</Button>
+              </NavLeft>
+              <NavLeft>
+                <Button
+                  variant="contained"
+                  onClick={() => navigate('/viewListings')}
                 >Listing</Button>
               </NavLeft>
               {" "}
@@ -69,7 +83,7 @@ function App() {
               <NavLeft>
                 <Button
                   variant="contained"
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate('/viewListings')}
                 >Listing</Button>
               </NavLeft>
               {" "}
