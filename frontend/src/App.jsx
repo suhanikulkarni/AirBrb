@@ -40,7 +40,11 @@ function App() {
       }
     });
     localStorage.removeItem('token');
+    localStorage.removeItem('email');
+
     setToken(null);
+    setOwner(null);
+
   }
 
   return (
