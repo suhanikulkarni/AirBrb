@@ -1,10 +1,10 @@
 import { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Form, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import { Form } from '../styles/mainStyles';
+
 import { PageBody } from '../styles/mainStyles';
 import { ErrorContext } from '../context';
 import { API_BASE_URL } from '../constants';
