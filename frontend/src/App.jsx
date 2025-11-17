@@ -49,14 +49,8 @@ function App() {
             <>
               <NavLeft>
                 <Button
-                  variant="contained"
                   onClick={() => navigate('/')}
                 >Listing</Button>
-                {" "}
-                <Button
-                  variant="contained"
-                  onClick={() => navigate('/dashboard')}
-                >Dashboard</Button>
               </NavLeft>
               {" "}
               <NavRight>
@@ -98,7 +92,7 @@ function App() {
               <Route path="/dashboard">
                 <Route index element={<Dashboard token={token} />} />
                 <Route path="create-listing" element={<CreateListing token={token} />} />
-              <Route path="/viewHostedListings" element={<ViewHostedListings owner ={owner} token={token} />} />
+                <Route path="view-hosted-listings" element={<ViewHostedListings owner ={owner} token={token} />} />
               </Route>
             </>
           )}

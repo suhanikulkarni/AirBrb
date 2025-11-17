@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import Button from '@mui/material/Button';
 
@@ -18,8 +18,7 @@ function Dashboard({ token }) {
         variant="contained"
         onClick={() => navigate('create-listing')}
       >Create A Listing</Button>
-      <Link to='/createListing'>Create A Listing</Link>
-      <Link to='/viewHostedListings'>View All Listings</Link>
+      <Link to='view-hosted-listings'>View All Listings</Link>
     </PageBody>
   )
 }
