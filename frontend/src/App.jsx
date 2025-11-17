@@ -1,5 +1,5 @@
-import { useState, useEffect, createContext } from 'react';
-import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 import Button from '@mui/material/Button';
@@ -13,8 +13,7 @@ import CreateListing from './pages/CreateListing';
 import ViewHostedListings from './pages/ViewHostedListings';
 import { ErrorContext } from './context';
 import ErrorPopup from './pages/ErrorPopup';
-import ViewListing from './pages/ViewListing';
-import ListingInfo from './pages/ListingInfo';
+import { API_BASE_URL } from './constants';
 
 function App() {
   const [token, setToken] = useState('LOADING');
@@ -30,10 +29,12 @@ function App() {
 
     const owner1 = localStorage.getItem('owner');
     setOwner(owner1);
+
+
   }, []);
 
   const logoutUser = async () => {
-    await axios.post('http://localhost:5005/user/auth/logout', {}, {
+    await axios.post(`${API_BASE_URL}user/auth/logout`, {}, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -68,6 +69,10 @@ function App() {
               {" "}
               <NavRight>
                 <Button
+                  onClick={() => navigate('/dashboard')}
+                >Your Listings</Button>
+                {" "}
+                <Button
                   variant="contained"
                   onClick={() => logoutUser()}
                 >Logout</Button>
@@ -98,13 +103,11 @@ function App() {
               <Route path="/" element={<PageBody>hello world</PageBody>} />
               <Route path="/login" element={<Login setToken={setToken} setOwner={setOwner}/>} />
               <Route path="/register" element={<Register setToken={setToken} setOwner={setOwner} />} />
-              <Route path="/dashboard" element={<Dashboard token={token} />} />
-              <Route path="/createListing" element={<CreateListing token={token} />} />
-              <Route path="/viewHostedListings" element={<ViewHostedListings owner ={owner} token={token} />} />
-              <Route path="/viewListings" element={<ViewListing />} />
-
-              <Route path="/viewListings/:id" element={<ListingInfo />} />
-
+              <Route path="/dashboard">
+                <Route index element={<Dashboard token={token} />} />
+                <Route path="create-listing" element={<CreateListing token={token} />} />
+                <Route path="view-hosted-listings" element={<ViewHostedListings owner ={owner} token={token} />} />
+              </Route>
             </>
           )}
         </Routes>
