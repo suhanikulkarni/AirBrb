@@ -1,14 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from '../constants';
 import { useNavigate } from 'react-router-dom';
-import TextField from '@mui/material/TextField';
 
+import TextField from '@mui/material/TextField';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@mui/material/InputAdornment';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+
+import { Form, PageBody } from '../styles/mainStyles';
+
+import { ErrorContext } from '../context';
+import { Box } from '@mui/material';
+import BedroomForm from './BedroomForm';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -22,30 +31,7 @@ const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
-const postListing = async (body, token) => {
-<<<<<<< HEAD
-  try {
-    const response = await axios.post(`${API_BASE_URL}listings/new`, body, {
-=======
-
-  try {
-    await axios.post(
-      `${API_BASE_URL}listings/new`, 
-      body,
-      {
->>>>>>> 61bf2b0c7bec66a06edffadc55d9827f375b403d
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    );
-  } catch (error) {
-    console.log("in the catch, there is an error", error.message);
-  }
-}
-
 function CreateListing({ token }) {
-
   const navigate = useNavigate();
   useEffect(() => {
     if (token === 'LOADING' || !token) navigate('/login');
@@ -58,147 +44,326 @@ function CreateListing({ token }) {
     'thumbnail': '',
     'metadata': {}
   });
-  const [metadata, setMetadata] = useState({});
-  
-  const handleMetadata = (e) => {
+
+  const [listingAddress, setListingAddress] = useState({
+    'streetAddress': '',
+    'suburb': '',
+    'state': '',
+    'country': '',
+    'postcode': ''
+  })
+
+  const [listingMetadata, setListingMetadata] = useState({
+    'propertyType': '',
+    'bathroomCount': '',
+    'bedroomCount': '',
+    'bedrooms': [],
+    'amenities': []
+  });
+
+  const setShowErrorPopup = useContext(ErrorContext);
+
+  const postListing = async (body, token) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}listings/new`, body, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      navigate('/dashboard');
+    } catch (error) {
+      setShowErrorPopup(error.response.data.error);
+    }
+  }
+
+  const handleInfo = (e) => {
     const {name, value} = e.target;
-    setMetadata((prev) => ({
-      ...prev,
-      [name]: value,
+
+    setListingInfo((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  }
+
+  const handleAddressInfo = (e) => {
+    const {name, value} = e.target;
+    setListingAddress((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  }
+
+  useEffect(() => {
+      console.log("Updated address:", listingAddress);
+    }, [listingAddress]);
+
+  const handleMetadataInfo = (e) => {
+    const {name, value} = e.target;
+    console.log("name and vakue", name, value)
+
+    setListingMetadata((prevData) => ({
+      ...prevData,
+      [name]: value
     }));
 
+    if (name === 'bedroomCount') {
+      renderBedroomForm();
+    }
   }
-  const handleChange = (e) => {
-    const {name, value} = e.target;
-    if (name === 'address') {
-      setListingInfo((prevData) => ({
-        ...prevData,
-        [name]: {value}
-      }))
+
+    useEffect(() => {
+      console.log("Updated metadata:", listingMetadata);
+    }, [listingMetadata]);
+
+  const updateBedroomMetadata = (bedroomNumber, bedroomInfo) => {
+    setListingMetadata(prev => {
+      const updated = [...prev.bedrooms];
+      updated[bedroomNumber - 1] = bedroomInfo;
+      return { ...prev, bedrooms: updated };
+    });
+  };
+
+  const renderBedroomForm = () => {
+    const array = [];
+
+    for (let i = 1; i <= listingMetadata.bedroomCount; i++) {
+      array.push(
+        <BedroomForm
+          key={i}
+          bedroomNumber={i}
+          updateBedroomMetadata={updateBedroomMetadata}
+          />
+      )
     }
-    else {
-      setListingInfo((prevData) => ({
-        ...prevData,
-        [name]: value
-      }))
-    }
+
+    return array;
   }
 
   const handleSubmission = async () => {
-    console.log("Listing data: ",listingInfo)
 
-    if (!listingInfo.title || !listingInfo.address || !listingInfo.thumbnail || !listingInfo.price) {
-      alert("Please fill out the whole form")
-      return;
+    if (!listingInfo.title || !listingInfo.price) {
+      // TODO: usability -> instead of popup -> highlight empty field with error
+      return setShowErrorPopup("Please fill out the whole form");
     }
-    listingInfo.price = parseInt(listingInfo.price, 10);
-    listingInfo.metadata = metadata;
-  
-    if(!(Number.isFinite(listingInfo.price))){
-      alert("PLease insert a number")
-      return
+    if (!listingAddress.country||!listingAddress.postcode||!listingAddress.state||!listingAddress.streetAddress||! listingAddress.suburb) {
+      return setShowErrorPopup("Please enter all the address information");
     }
-    try {
-      const response = await postListing(listingInfo, token);
-      if (response) {
-        navigate('/dashboard');
-      }
-    } catch (error) {
-      console.log("Submission failed:", error.message);
+
+    if (!listingMetadata.bathroomCount||!listingMetadata.propertyType||!listingMetadata.bedroomCount) {
+      return setShowErrorPopup("Please enter all the information about the property");
     }
+    const bedNum   = Number(listingMetadata.bedroomCount);
+    if(bedNum > 0 && listingMetadata.bedrooms.length != bedNum) {
+      return setShowErrorPopup("Please enter the bedroom information");
+    }
+    
+    const priceNum = Number(listingInfo.price);
+    const bathNum  = Number(listingMetadata.bathroomCount);
+    
+
+    if (![priceNum, bathNum, bedNum].every(Number.isFinite)) {
+      console.log({ priceNum, bathNum, bedNum });
+      return setShowErrorPopup("Please insert a number");
+    }
+        // TODO: default thumbnail
+
+    const body = {
+      ...listingInfo,
+      address: listingAddress,
+      metadata: listingMetadata,
+      price: parseInt(listingInfo.price, 10)
+    }
+    console.log("Listing data: ",body)
+
+    postListing(body, token);
   }
+
+  useEffect(() => {
+      console.log("Updated all info:", listingInfo);
+    }, [listingInfo]);
+
+
   return (
-    <form>
-      <h2>Listing Information</h2>
-      <TextField 
-        id="outlined-search" 
-        label="Listing Title"
-        type="search"
-        onChange={handleChange}
-        name='title'
-      />
-      <br />
-      <br />
+    <PageBody>
+      <Form>
+        <h1>Listing Information</h1>
 
-      <TextField
-        id="outlined-search"
-        label="Listing Address"
-        type="search"
-        onChange={handleChange}
-        name='address'
-      />
-      <br />
-
-      <InputLabel htmlFor="outlined-adornment-amount">Amount</InputLabel>
-      <OutlinedInput
-        id="outlined-adornment-amount"
-        startAdornment={<InputAdornment position="start">$</InputAdornment>}
-        label="Amount"
-        name='price'
-        onChange={handleChange}
-      />
-      <br />
-      <br />
-      <label>Thumbnail&nbsp;&nbsp;</label>
-      <Button
-        component="label"
-        role={undefined}
-        variant="contained"
-        tabIndex={-1}
-      >
-        Upload files
-        <VisuallyHiddenInput
-          type="file"
-          onChange={handleChange}
-          name='thumbnail'
-          multiple
+        <TextField 
+          id="listing-title-input" 
+          label="Property Name"
+          type="text"
+          onChange={handleInfo}
+          name="title"
+          required
         />
-      </Button>
-      <br />
-      <br />
+        <br />
 
-      <TextField
-        id="outlined-search"
-        label="Property Type"
-        type="search"
-        onChange={handleMetadata}
-        name='type'
-      />
-      <br />
-      <br />
+        <InputLabel htmlFor="listing-amount-input">Amount *</InputLabel>
+        <OutlinedInput
+          id="listing-price-input"
+          startAdornment={<InputAdornment position="start">$</InputAdornment>}
+          label="Amount"
+          name="price"
+          onChange={handleInfo}
+          required
+        />
+        <br />
 
-      <TextField
-        id="outlined-search"
-        label="Number of Bedrooms"
-        type="search"
-        onChange={handleMetadata}
-        name='bedrooms'
-      />
-      <br />
-      <br />
+        <h2>Listing Address</h2>
+        <Box
+          sx={{
+            borderRadius: 3,
+            bgcolor: '#f3f3f3ff',
+            padding: '15px'
+          }}
+        >
+          <TextField
+            id="listing-street-address-input"
+            label="Street Address"
+            type="text"
+            onChange={handleAddressInfo}
+            name="streetAddress"
+            required
+          />
+          <br /><br />
 
-      <TextField
-        id="outlined-search"
-        label="Number of Bathrooms"
-        type="search"
-        onChange={handleMetadata}
-        name='bathrooms'
-      />
-      <br />
-      <br />
+          <TextField
+            id="listing-suburb-input"
+            label="Suburb"
+            type="text"
+            onChange={handleAddressInfo}
+            name="suburb"
+            required
+          />
 
-      <TextField
-        id="outlined-search"
-        label="Property Amenities"
-        type="search"
-        onChange={handleMetadata}
-        name='amenities'
-      />
-      <br />
-      <br />
+          <TextField
+            id="listing-state-input"
+            label="State"
+            type="text"
+            onChange={handleAddressInfo}
+            name="state"
+            required
+          />
+          <br /><br />
 
-      <button type='button' onClick={handleSubmission}>Submit</button>
-    </form>
+          <TextField
+            id="listing-country-input"
+            label="Country"
+            type="text"
+            onChange={handleAddressInfo}
+            name="country"
+            required
+          />
+
+          <TextField
+            id="listing-postcode-input"
+            label="Postcode"
+            type="text"
+            onChange={handleAddressInfo}
+            name="postcode"
+            required
+          />
+        </Box>
+        <br />
+
+        
+        {/* TODO: upload files into a directory */}
+        {/* TODO: clear file upload */}
+        <h2>Listing Thumbnail</h2>
+        <Button
+          component="label"
+          role={undefined}
+          variant="contained"
+          tabIndex={-1}  
+        >
+          Upload file
+          <VisuallyHiddenInput
+            type="file"
+            onChange={handleInfo}
+            name="thumbnail"
+            multiple
+          />
+        </Button>
+        <br />
+
+        {/* TODO: create form elements for additional information */}
+        <h2>Listing Details</h2>
+        <FormControl fullWidth>
+          <InputLabel id="demo-simple-select-label">Property Type</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            name="propertyType"
+            value={listingMetadata.propertyType}
+            label="Property Type"
+            onChange={handleMetadataInfo}
+          >
+            <MenuItem value={"apartment"}>Apartment</MenuItem>
+            <MenuItem value={"house"}>House</MenuItem>
+            <MenuItem value={"guesthouse"}>Guesthouse</MenuItem>
+            <MenuItem value={"hotelroom"}>Hotel Room</MenuItem>
+            <MenuItem value={"cabin"}>Cabin</MenuItem>
+            <MenuItem value={"other"}>Other</MenuItem>
+          </Select>
+        </FormControl>
+        <br />
+
+        <TextField
+          type="text"
+          label="Amenities"
+          multiline
+          rows={3}
+          name="amenities"
+          onChange={handleMetadataInfo}
+        />
+        <br />
+
+        {/* TODO: prevent no. from decreasing beyond 0 */}
+        <TextField
+          id="bathroom-count-input"
+          label="Number of Bathrooms"
+          type="number"
+          onChange={handleMetadataInfo}
+          name="bathroomCount"
+          slotProps={{ input: { min: 0 } }}
+          required
+        />
+        <br />
+
+        <h3>Bedrooms</h3>
+        {/* TODO: ability to add multiple bedroom */}
+        <TextField
+          label="Number of Bedrooms"
+          type="number"
+          onChange={handleMetadataInfo}
+          name="bedroomCount"
+          slotProps={{ input: { min: 0 } }}
+        />
+        <br />
+
+        <Box
+          sx={{
+            borderRadius: 3,
+            bgcolor: '#f3f3f3ff',
+            padding: '15px'
+          }}
+        >          
+          <Box
+            sx={{
+              margin: '0 10px 15px 10px'
+            }}
+          >
+            {renderBedroomForm()}
+          </Box>
+        </Box>
+        <br />
+
+        <Button 
+          variant="contained"
+          onClick={handleSubmission}
+        >Submit</Button>
+      </Form>
+    </PageBody>
   )
 }
 

@@ -38,6 +38,13 @@ export const NavRight = styled.div(() => ({
   order: '2',
 }));
 
+export const Form = styled.div(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  maxWidth: '800px',
+  minWidth: '400px',
+}));
+
 // export const BigButton = styled(Button)(() => ({
 //   fontSize: '2em',
 // }));

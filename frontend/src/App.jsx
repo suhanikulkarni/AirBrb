@@ -1,5 +1,5 @@
-import { useState, useEffect, createContext } from 'react';
-import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 import Button from '@mui/material/Button';
@@ -61,6 +61,10 @@ function App() {
               {" "}
               <NavRight>
                 <Button
+                  onClick={() => navigate('/dashboard')}
+                >Your Listings</Button>
+                {" "}
+                <Button
                   variant="contained"
                   onClick={() => logoutUser()}
                 >Logout</Button>
@@ -91,10 +95,11 @@ function App() {
               <Route path="/" element={<PageBody>hello world</PageBody>} />
               <Route path="/login" element={<Login setToken={setToken} setOwner={setOwner}/>} />
               <Route path="/register" element={<Register setToken={setToken} setOwner={setOwner} />} />
-              <Route path="/dashboard" element={<Dashboard token={token} />} />
-              <Route path="/createListing" element={<CreateListing token={token} />} />
+              <Route path="/dashboard">
+                <Route index element={<Dashboard token={token} />} />
+                <Route path="create-listing" element={<CreateListing token={token} />} />
               <Route path="/viewHostedListings" element={<ViewHostedListings owner ={owner} token={token} />} />
-
+              </Route>
             </>
           )}
         </Routes>
