@@ -9,7 +9,7 @@ import { PageBody } from '../styles/mainStyles';
 import { ErrorContext } from '../context';
 import { API_BASE_URL } from '../constants';
 
-function Register({ setToken }) {
+function Register({ setToken, setOwner }) {
   const [ email, setEmail ] = useState('');
   const [ password, setPassword ] = useState('');
   const [ confirmPassword, setConfirmPassword ] = useState('');
@@ -27,7 +27,12 @@ function Register({ setToken }) {
     try {
       const response = await axios.post(`${API_BASE_URL}user/auth/register`, {email, password, name });
       localStorage.setItem('token', response.data.token);
+      
+      localStorage.setItem('owner', email);
+
       setToken(response.data.token);
+      setOwner(email);
+
       navigate('/dashboard');
     } catch (error) {
       setShowErrorPopup(error.response.data.error);
