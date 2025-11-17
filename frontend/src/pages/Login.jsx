@@ -6,6 +6,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
 import { PageBody } from '../styles/mainStyles';
+import { Form } from '../styles/mainStyles';
 import { ErrorContext } from '../context';
 import { API_BASE_URL } from '../constants';
 
@@ -26,7 +27,7 @@ function Login({ setToken, setOwner }) {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('owner', email);
       setToken(response.data.token);
-      setToken(email);
+      setOwner(email);
       navigate('/dashboard');
     } catch (error) {
       setShowErrorPopup(error.response.data.error);
