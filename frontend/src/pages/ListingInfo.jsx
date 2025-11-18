@@ -63,7 +63,11 @@ function ListingInfo({ token }) {
     )}
 
     {listingDetails && token && token !== 'LOADING' && (
-      <UsersBookingForm price={listingDetails.price}/>
+      <UsersBookingForm 
+        price={listingDetails.price} 
+        listingId={id}
+        token={token}
+      />
     )}
     </>
   );
