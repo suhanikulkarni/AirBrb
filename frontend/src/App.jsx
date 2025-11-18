@@ -15,6 +15,7 @@ import { ErrorContext } from './context';
 import ErrorPopup from './pages/ErrorPopup';
 import { API_BASE_URL } from './constants';
 import ListingInfo from './pages/ListingInfo';
+import TemporaryConfirmation from './pages/TemporaryConnfirmation';
 
 function App() {
   const [token, setToken] = useState('LOADING');
@@ -91,7 +92,7 @@ function App() {
               <Route path="/" element={<ViewListing />} />
               <Route path="/login" element={<Login setToken={setToken} setOwner={setOwner}/>} />
               <Route path="/viewListings/:id" element={<ListingInfo token={token}/>} />
-
+              <Route path="/temporaryConfirmation" element={<TemporaryConfirmation token={token}/>} />
               <Route path="/register" element={<Register setToken={setToken} setOwner={setOwner} />} />
               <Route path="/dashboard">
                 <Route index element={<Dashboard token={token} owner={owner} />} />

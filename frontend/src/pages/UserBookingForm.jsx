@@ -7,10 +7,12 @@ import DatePicker from 'react-multi-date-picker';
 import { ErrorContext } from '../context';
 import axios from 'axios';
 import { API_BASE_URL } from '../constants';
+import { useNavigate } from 'react-router-dom';
 
 function UsersBookingForm({price, listingId, token}) {
   const [bookingDates, setBookingDates] = useState();
   const [totalPrice, setTotalPrice] = useState();
+  const navigate = useNavigate()
   // console.log("now im here@@@")
   const setShowErrorPopup = useContext(ErrorContext); 
   useEffect(() => {
@@ -39,10 +41,10 @@ function UsersBookingForm({price, listingId, token}) {
   }
 
   const submitBooking = async () => {
-
+    // if this sudednnly stops working make it y-m-d
     const dates = {
-      start: bookingDates[0].format("YYYY-MM-DD"),
-      end: bookingDates[1].format("YYYY-MM-DD")
+      start: bookingDates[0].format("DD-MM-YYYY"),
+      end: bookingDates[1].format("DD-MM-YYYY")
     };
 
     const body = {
@@ -60,6 +62,8 @@ function UsersBookingForm({price, listingId, token}) {
       );
 
       console.log("Booking success:", response.data);
+
+      navigate('/temporaryConfirmation')
     } catch (error) {
       console.log("Booking ERROR:", error);
       setShowErrorPopup(error.response?.data?.error || "Booking failed.");
