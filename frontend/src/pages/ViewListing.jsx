@@ -9,20 +9,17 @@ import { ErrorContext } from '../context';
 import { Modal } from '@mui/material';
 
 
+
 const getListings = async () => {
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}listings`)
-    //console.log(response)
-    if (response.data?.listings) {
-      //console.log(response.data.listings)
-      return response.data.listings;
-    }
-  }
-  catch (error) {
-    //console.log("in the catch, there is an error", error.message);
+    const response = await axios.get(`${API_BASE_URL}listings`);
+    if (response.data?.listings) return response.data.listings;
+  } catch (error) {
+    setShowErrorPopup(error.response.data.error);
   }
 }
+
+
 function ViewListing ({token}) {
   const setShowErrorPopup = useContext(ErrorContext); 
   const [acceptedBookings, setAcceptedBookings] = useState([]);
@@ -73,14 +70,6 @@ function ViewListing ({token}) {
     fetchListings();
   }, []);
 
-  const getListings = async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}listings`);
-      if (response.data?.listings) return response.data.listings;
-    } catch (error) {
-      setShowErrorPopup(error.response.data.error);
-    }
-  }
 
   const getListingInfo = async (listingId) => {
     try {
@@ -210,7 +199,7 @@ const getBookingRequests = async () => {
           (listing) => String(listing.id) === String(booking.listingId)
         );
         console.log(listings)
-        return accepted && listings;
+        return accepted && listings.length > 0;
       });
 
       const uniqueAcceptedBookings = Object.values(
