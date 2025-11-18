@@ -39,8 +39,21 @@ function ViewListing () {
           {list.map((listing, index) => (
             <div key={index} style={styles.card} onClick={() => navigate(`/viewListings/${listing.id}`)}>
               <img src={listing.thumbnail} alt={listing.title} style={styles.thumbnail} />
+              <h4 style={styles.address}>
+                {`
+                  ${listing.address?.state},
+                  ${listing.address?.country}
+                `}
+              </h4>
               <h3 style={styles.title}>{listing.title}</h3>
-              <p style={styles.address}>{listing.address?.value}</p>
+              <p style={styles.address}>
+                {`
+                  ${listing.address?.streetAddress},
+                  ${listing.address?.suburb},
+                  ${listing.address?.postcode}
+                `}
+              </p>
+              <p style={styles.address}>{`reviews [${listing.reviews.length}]`}</p>
               <p style={styles.price}>${listing.price}</p>
             </div>
           ))}
