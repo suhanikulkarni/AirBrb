@@ -39,12 +39,12 @@ function ViewListing ({token}) {
   const [open, setOpen] = useState(false);
 
   const handleClose = () => {
-        setOpen(false);
-    };
+    setOpen(false);
+  };
 
-    const handleOpen = () => {
-        setOpen(true);
-    };
+  const handleOpen = () => {
+    setOpen(true);
+  };
 
 
   useEffect(() => {
@@ -175,50 +175,50 @@ function ViewListing ({token}) {
   }
 
 
-const getBookingRequests = async () => {
-  if (!token) {
-    setShowErrorPopup("You need to be logged in the view booking requests");
-    return;
-  }
+  const getBookingRequests = async () => {
+    if (!token) {
+      setShowErrorPopup("You need to be logged in the view booking requests");
+      return;
+    }
 
-  const publishedListings = await getListings();
-  console.log("published listings", publishedListings)
+    const publishedListings = await getListings();
+    console.log("published listings", publishedListings)
 
-  try {
-    const res = await axios.get(`${API_BASE_URL}bookings`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    if (res) {
-      const requests = res.data.bookings;
-
-      console.log("All bookings:", requests);
-      const acceptedBookings = requests.filter((booking) => {
-        const accepted = booking.status === "accepted";
-        const listings = publishedListings.filter(
-          (listing) => String(listing.id) === String(booking.listingId)
-        );
-        console.log(listings)
-        return accepted && listings.length > 0;
+    try {
+      const res = await axios.get(`${API_BASE_URL}bookings`, {
+        headers: { Authorization: `Bearer ${token}` }
       });
 
-      const uniqueAcceptedBookings = Object.values(
-        acceptedBookings.reduce((acc, booking) => {
-          acc[booking.listingId] = booking; 
-          return acc;
-        }, {})
-      );
+      if (res) {
+        const requests = res.data.bookings;
 
-      console.log("Unique bookings:", uniqueAcceptedBookings);
+        console.log("All bookings:", requests);
+        const acceptedBookings = requests.filter((booking) => {
+          const accepted = booking.status === "accepted";
+          const listings = publishedListings.filter(
+            (listing) => String(listing.id) === String(booking.listingId)
+          );
+          console.log(listings)
+          return accepted && listings.length > 0;
+        });
 
-      setAcceptedBookings(uniqueAcceptedBookings);
+        const uniqueAcceptedBookings = Object.values(
+          acceptedBookings.reduce((acc, booking) => {
+            acc[booking.listingId] = booking; 
+            return acc;
+          }, {})
+        );
+
+        console.log("Unique bookings:", uniqueAcceptedBookings);
+
+        setAcceptedBookings(uniqueAcceptedBookings);
+      }
+    } catch (error) {
+      console.log("ERROR123 FULL:", error.toJSON?.() || error);
+      console.log("ERROR123", error.response);
+      setShowErrorPopup(error.response?.data?.error || "Requests Failed To Show.");
     }
-  } catch (error) {
-    console.log("ERROR123 FULL:", error.toJSON?.() || error);
-    console.log("ERROR123", error.response);
-    setShowErrorPopup(error.response?.data?.error || "Requests Failed To Show.");
-  }
-};
+  };
 
 
   useEffect (() => {

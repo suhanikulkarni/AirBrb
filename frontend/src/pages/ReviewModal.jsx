@@ -5,9 +5,9 @@ function ReviewModal() {
   
   return(
   
-  <Modal>
-    <p>hehe this is the modal that will appear on the users screen when the booking has been accepted</p>
-  </Modal>)
+    <Modal>
+      <p>hehe this is the modal that will appear on the users screen when the booking has been accepted</p>
+    </Modal>)
 
 }   
 
