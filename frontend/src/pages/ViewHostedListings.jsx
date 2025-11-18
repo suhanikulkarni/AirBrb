@@ -248,9 +248,8 @@ function ViewHostedListings({ owner, token }) {
                 </Button>
 
                 <Button
-                  onClick = {() => {declineRequest(request.id)}}>
-
-          Decline
+                  onClick = {() => {declineRequest(request.id)}}
+                >Decline
                 </Button>
 
               </div>
