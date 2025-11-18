@@ -288,10 +288,10 @@ function CreateListing({ token }) {
 
         <h2>Listing Details</h2>
         <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Property Type</InputLabel>
+          <InputLabel id="property-type-select-label">Property Type</InputLabel>
           <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
+            labelId="property-type-select-label"
+            id="property-type-select"
             name="propertyType"
             value={listingMetadata.propertyType}
             label="Property Type"

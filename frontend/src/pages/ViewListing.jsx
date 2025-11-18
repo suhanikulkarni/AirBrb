@@ -11,6 +11,10 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Button from '@mui/material/Button';
 import { Box } from '@mui/material';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 function ViewListing () {
   const navigate = useNavigate();
@@ -20,12 +24,13 @@ function ViewListing () {
   const [filteredList, setFilteredList] = useState([]);
   const [sortOrder, setSortOrder] = useState('ascending');
   const [filter, setFilter] = useState({
-      'searchFilter': '',
-      'minBedroomFilter': '',
-      'maxBedroomFilter': '',
-      'minPriceFilter': '',
-      'maxPriceFilter': ''
-    });
+    'searchFilter': '',
+    'minBedroomFilter': '',
+    'maxBedroomFilter': '',
+    'minPriceFilter': '',
+    'maxPriceFilter': '',
+    'reviewFilter': ''
+  });
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -40,7 +45,7 @@ function ViewListing () {
         }
         
         console.log(fetchedList);
-        
+        // TODO: sort list based on booked listing
         // TODO: set only published listing
         setList(fetchedList);
         setFilteredList([...fetchedList]);
@@ -101,6 +106,23 @@ function ViewListing () {
       listing = listing.filter(l => l.price <= filter.maxPriceFilter);
     }
 
+    // review filter
+    if (filter.reviewFilter !== '') {
+      listing = listing.filter(l => {
+        if (!l.reviews.length) return false;
+        
+        const average = l.reviews.reduce((a, b) => a + b) / l.length;
+        if (average >= filter.reviewFilter) return true;
+
+        return false;
+      });
+    }
+
+    // sort listing alphabetically
+    listing.sort((a, b) => a.title.localeCompare(b.title));
+
+    // TODO: sort based on individual filter
+
     setFilteredList(listing);
   };
 
@@ -114,7 +136,8 @@ function ViewListing () {
       'minBedroomFilter': '',
       'maxBedroomFilter': '',
       'minPriceFilter': '',
-      'maxPriceFilter': ''
+      'maxPriceFilter': '',
+      'reviewFilter': ''
     });
     setFilteredList([...list]);
   };
@@ -202,6 +225,26 @@ function ViewListing () {
             />
             <br />
 
+            <h2>Review Filter</h2>
+            <FormControl fullWidth>
+              <InputLabel id="review-filter-select-label">Review</InputLabel>
+              <Select
+                labelId="review-filter-select-label"
+                id="review-filter-select"
+                name="reviewFilter"
+                value={filter.reviewFilter}
+                onChange={handleFilter}
+              >
+                <MenuItem value={'5'}>5</MenuItem>
+                <MenuItem value={'4'}>4+</MenuItem>
+                <MenuItem value={'3'}>3+</MenuItem>
+                <MenuItem value={'2'}>2+</MenuItem>
+                <MenuItem value={'1'}>1+</MenuItem>
+                <MenuItem value={'0'}>0+</MenuItem>
+              </Select>
+            </FormControl>
+            <br />
+
             <Button
               onClick={clearFilter}
             >Clear Filter</Button>
@@ -230,7 +273,7 @@ function ViewListing () {
             </ToggleButton>
           </ToggleButtonGroup>
           <br />
-          {filteredList.length === 0 ? (
+          {!filteredList.length ? (
             <p>No listings found</p>
           ) : (
             <div style={styles.grid} >
