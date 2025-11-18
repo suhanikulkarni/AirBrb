@@ -39,36 +39,36 @@ function ListingInfo({ token }) {
 
   return (
     <>
-    {listingDetails && (
-      <div>
-        <h2>Listing Info</h2>
-        <p>Title: {listingDetails?.title}</p>
-        <p>
+      {listingDetails && (
+        <div>
+          <h2>Listing Info</h2>
+          <p>Title: {listingDetails?.title}</p>
+          <p>
           Address: 
-          {listingDetails?.address?.streetAddress}, 
-          {listingDetails?.address?.suburb}, 
-          {listingDetails?.address?.postcode}, 
-          {listingDetails?.address?.state}, 
-          {listingDetails?.address?.country}
-        </p>
+            {listingDetails?.address?.streetAddress}, 
+            {listingDetails?.address?.suburb}, 
+            {listingDetails?.address?.postcode}, 
+            {listingDetails?.address?.state}, 
+            {listingDetails?.address?.country}
+          </p>
           
-        <p>Amenities: {listingDetails?.metadata?.amenities}</p>
-        <p>Price: ${listingDetails?.price} per night</p>
-        <p>Property Type: {listingDetails?.metadata?.propertyType}</p>
-        <p>Reviews: {listingDetails?.reviews}</p>
-        <p>Number of Beds: {listingDetails?.metadata?.bedroomCount}</p>
-        <p>Number of Bathrooms: {listingDetails?.metadata?.bathroomCount}</p>
-        <p>Number of Beds: {sum}</p>
-      </div>
-    )}
+          <p>Amenities: {listingDetails?.metadata?.amenities}</p>
+          <p>Price: ${listingDetails?.price} per night</p>
+          <p>Property Type: {listingDetails?.metadata?.propertyType}</p>
+          <p>Reviews: {listingDetails?.reviews}</p>
+          <p>Number of Beds: {listingDetails?.metadata?.bedroomCount}</p>
+          <p>Number of Bathrooms: {listingDetails?.metadata?.bathroomCount}</p>
+          <p>Number of Beds: {sum}</p>
+        </div>
+      )}
 
-    {listingDetails && token && token !== 'LOADING' && (
-      <UsersBookingForm 
-        price={listingDetails.price} 
-        listingId={id}
-        token={token}
-      />
-    )}
+      {listingDetails && token && token !== 'LOADING' && (
+        <UsersBookingForm 
+          price={listingDetails.price} 
+          listingId={id}
+          token={token}
+        />
+      )}
     </>
   );
 }

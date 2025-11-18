@@ -40,31 +40,31 @@ function UsersBookingForm({price, listingId, token}) {
 
   const submitBooking = async () => {
 
-  const dates = {
-    start: bookingDates[0].format("YYYY-MM-DD"),
-    end: bookingDates[1].format("YYYY-MM-DD")
+    const dates = {
+      start: bookingDates[0].format("YYYY-MM-DD"),
+      end: bookingDates[1].format("YYYY-MM-DD")
+    };
+
+    const body = {
+      dateRange: dates,
+      totalPrice: totalPrice
+    };
+
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}bookings/new/${listingId}`,
+        body,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      console.log("Booking success:", response.data);
+    } catch (error) {
+      console.log("Booking ERROR:", error);
+      setShowErrorPopup(error.response?.data?.error || "Booking failed.");
+    }
   };
-
-  const body = {
-    dateRange: dates,
-    totalPrice: totalPrice
-  };
-
-  try {
-    const response = await axios.post(
-      `${API_BASE_URL}bookings/new/${listingId}`,
-      body,
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
-    );
-
-    console.log("Booking success:", response.data);
-  } catch (error) {
-    console.log("Booking ERROR:", error);
-    setShowErrorPopup(error.response?.data?.error || "Booking failed.");
-  }
-};
 
 
   return (
