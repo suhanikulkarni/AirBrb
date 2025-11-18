@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import DatePicker from "react-multi-date-picker";
 import { ErrorContext } from '../context';
 
+
 const getAllListings = async (owner) => {
   let hostedListings = [];
   try {
@@ -155,8 +156,6 @@ function ViewHostedListings({ owner, token }) {
 
   const getBookingRequests = async () => {
     let bookingRequests = [];
-
-    //console.log("TOKEN", token);
     try {
       const res = await axios.get(`${API_BASE_URL}bookings`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -183,8 +182,6 @@ function ViewHostedListings({ owner, token }) {
 
   const acceptRequest = async (bookingId) => {
     console.log("accepted");
-
-
     try{
       console.log("accepted!!!!!!!!!");
 
@@ -196,11 +193,9 @@ function ViewHostedListings({ owner, token }) {
       );
       if (response) {console.log(response);getBookingRequests();}
     }
-
     catch(error){
       setShowErrorPopup(error.response?.data?.error || "Failed to Accept Bookng Request");
     }
-
   }
 
   const declineRequest = async (bookingId) => {
@@ -213,20 +208,14 @@ function ViewHostedListings({ owner, token }) {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-
       console.log("Decline response:", response);
-      // Refresh booking requests after declining
       getBookingRequests();
-
-
-
     }
 
     catch(error){
       setShowErrorPopup(error.response?.data?.error || "Failed to Decline Bookng Request");
     }
   }
-
 
   return (
     <div>
@@ -254,10 +243,8 @@ function ViewHostedListings({ owner, token }) {
 
               </div>
             )}
-
           </>
         ))
-
       )}
       {listings.length === 0 ? (
         <p>No hosted listings found</p>

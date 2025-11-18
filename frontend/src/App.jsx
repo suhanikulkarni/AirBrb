@@ -89,7 +89,7 @@ function App() {
         <Routes>
           {token !== 'LOADING' && (
             <>
-              <Route path="/" element={<ViewListing />} />
+              <Route path="/" element={<ViewListing token = {token}/>} />
               <Route path="/login" element={<Login setToken={setToken} setOwner={setOwner}/>} />
               <Route path="/viewListings/:id" element={<ListingInfo token={token}/>} />
               <Route path="/temporaryConfirmation" element={<TemporaryConfirmation token={token}/>} />
