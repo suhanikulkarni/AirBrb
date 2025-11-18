@@ -16,6 +16,8 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
+import DatePicker from "react-multi-date-picker";
+
 function ViewListing () {
   const navigate = useNavigate();
   const setShowErrorPopup = useContext(ErrorContext);
@@ -41,12 +43,12 @@ function ViewListing () {
 
         for (const listing of data) {
           const listingInfo = await getListingInfo(listing.id);
-          fetchedList.push({ ...listing, ...listingInfo });
+          if (listingInfo.published) {
+            fetchedList.push({ ...listing, ...listingInfo });
+          }
         }
         
-        console.log(fetchedList);
         // TODO: sort list based on booked listing
-        // TODO: set only published listing
         setList(fetchedList);
         setFilteredList([...fetchedList]);
       }      
@@ -118,6 +120,25 @@ function ViewListing () {
       });
     }
 
+    // date filter
+    listing = listing.filter(l => {
+      const [filterStart, filterEnd] = filter.dateFilter;
+      const [listingAvailability] = l.availability;
+
+      const filterStartEpoch = new Date(filterStart).getTime() / 1000;
+      const filterEndEpoch = new Date(filterEnd).getTime() / 1000;
+      
+      const listingStartParts = listingAvailability.start.split('-');
+      const listingEndParts = listingAvailability.end.split('-');
+      
+      const listingStartEpoch = new Date(listingStartParts[2], listingStartParts[1] - 1, listingStartParts[0]).getTime() / 1000;
+      const listingEndEpoch = new Date(listingEndParts[2], listingEndParts[1] - 1, listingEndParts[0]).getTime() / 1000;
+
+      if (filterStartEpoch < listingStartEpoch) return false;
+      if (filterEndEpoch > listingEndEpoch) return false;
+      return true;
+    });
+
     // sort listing alphabetically
     listing.sort((a, b) => a.title.localeCompare(b.title));
 
@@ -137,7 +158,8 @@ function ViewListing () {
       'maxBedroomFilter': '',
       'minPriceFilter': '',
       'maxPriceFilter': '',
-      'reviewFilter': ''
+      'reviewFilter': '',
+      'dateFilter': ''
     });
     setFilteredList([...list]);
   };
@@ -244,6 +266,19 @@ function ViewListing () {
               </Select>
             </FormControl>
             <br />
+
+            <h2>Date Filter</h2>
+            <DatePicker 
+              range 
+              value={filter.dateFilter} 
+              onChange={(e, dateRange) => {
+                setFilter((prevData) => ({
+                  ...prevData,
+                  'dateFilter': dateRange.validatedValue
+                }));
+              }}
+              placeholder="Filter available dates"
+            />
 
             <Button
               onClick={clearFilter}
