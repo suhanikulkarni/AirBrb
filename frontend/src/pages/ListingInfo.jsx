@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { API_BASE_URL } from '../constants';
 import axios from 'axios';
+import UsersBookingForm from './UserBookingForm';
+import { Box, TextField } from '@mui/material';
 
 const getListingInfo = async (id) => {
   try {
@@ -18,7 +20,7 @@ const getListingInfo = async (id) => {
   }
 }
 
-function ListingInfo() {
+function ListingInfo({ token }) {
   const { id } = useParams();
   const [listingDetails, setListingDetails] = useState(null);
 
@@ -51,13 +53,17 @@ function ListingInfo() {
         </p>
           
         <p>Amenities: {listingDetails?.metadata?.amenities}</p>
-        <p>Price: ${listingDetails?.price}</p>
+        <p>Price: ${listingDetails?.price} per night</p>
         <p>Property Type: {listingDetails?.metadata?.propertyType}</p>
         <p>Reviews: {listingDetails?.reviews}</p>
         <p>Number of Beds: {listingDetails?.metadata?.bedroomCount}</p>
         <p>Number of Bathrooms: {listingDetails?.metadata?.bathroomCount}</p>
         <p>Number of Beds: {sum}</p>
       </div>
+    )}
+
+    {listingDetails && token && token !== 'LOADING' && (
+      <UsersBookingForm price={listingDetails.price}/>
     )}
     </>
   );
