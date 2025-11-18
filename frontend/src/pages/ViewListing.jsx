@@ -4,8 +4,12 @@ import { API_BASE_URL } from '../constants';
 import { styles } from '../styles/ListingStyles';
 import { useNavigate } from 'react-router-dom';
 import { PageBody } from '../styles/mainStyles';
+
+import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Button from '@mui/material/Button';
+import InputAdornment from '@mui/material/InputAdornment';
 
 const getListings = async () => {
   try {
@@ -25,27 +29,38 @@ function ViewListing () {
   const navigate = useNavigate();
 
   const [list, setList] = useState([]);
-  const [listOrder, setListOrder] = useState('ascending');
-  
+  const [filteredList, setFilteredList] = useState([]);
+  const [sortOrder, setSortOrder] = useState('ascending');
+  const [filterSearchTerm, setFilterSearchTerm] = useState('');
+
   useEffect(() => {
     const fetchListings = async () => {
       const data = await getListings();
-      if (data) setList(data);
+      if (data) {
+        setList(data);
+        setFilteredList([...data]);
+      }
     };
     fetchListings();
   }, []);
-  
-  const handleListOrder = (event, newListOrder) => {
-    if (newListOrder !== null) {
-      setListOrder(newListOrder);
-    }
 
-    const sortedList = list.sort((a, b) => a.title.localeCompare(b.title));
-    
-    if (newListOrder === 'descending') {
-      setList(sortedList.reverse());
-    }
+  const searchListing = () => {
+    setFilteredList([...list].filter(l => l.title.includes(filterSearchTerm)));
   };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') searchListing();
+  };
+
+  const clearFilter = () => {
+    setFilterSearchTerm('');
+    setFilteredList([...list]);
+  };
+
+  const orderList = () => {
+    if (sortOrder === 'descending') return filteredList.toReversed();
+    return filteredList;
+  }
 
   return (
     <div style={styles.container}>
@@ -54,9 +69,11 @@ function ViewListing () {
       ) : (
         <PageBody>
           <ToggleButtonGroup
-            value={listOrder}
+            value={sortOrder}
             exclusive
-            onChange={handleListOrder}
+            onChange={(e, newSortOrder) => {
+              if (newSortOrder !== null) setSortOrder(newSortOrder); 
+            }}
             aria-label="list order"
           >
             <ToggleButton value="ascending" aria-label="ascending order">
@@ -66,10 +83,38 @@ function ViewListing () {
               <p>Descending</p>
             </ToggleButton>
           </ToggleButtonGroup>
-
           <br />
+
+          <TextField
+            id="filter-search-input"
+            placeholder="Search Listing"
+            type="search"
+            variant="outlined"
+            value={filterSearchTerm}
+            onChange={e => setFilterSearchTerm(e.target.value)}
+            onKeyDown={handleKeyDown}
+            slotProps={{
+              input: {
+                endAdornment: 
+                  <InputAdornment position="end">
+                    <Button
+                      variant="contained"
+                      onClick={searchListing}
+                    >Search</Button>
+                  </InputAdornment>,
+              },
+            }}
+          />
+          <br />
+
+          <Button
+            variant="contained"
+            onClick={clearFilter}
+          >Clear Filter</Button>
+          <br />
+
           <div style={styles.grid} >
-            {list.map((listing, index) => (
+            {orderList().map((listing, index) => (
               <div key={index} style={styles.card} onClick={() => navigate(`/viewListings/${listing.id}`)}>
                 <img src={listing.thumbnail} alt={listing.title} style={styles.thumbnail} />
                 <h4 style={styles.address}>
