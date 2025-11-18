@@ -1,33 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from '../constants';
 import { styles } from '../styles/ListingStyles';
 import { useNavigate } from 'react-router-dom';
 import { PageBody } from '../styles/mainStyles';
+import { ErrorContext } from '../context';
 
 import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Button from '@mui/material/Button';
-import InputAdornment from '@mui/material/InputAdornment';
 import { Box } from '@mui/material';
 
-const getListings = async () => {
-  try {
-    const response = await axios.get(
-      `${API_BASE_URL}listings`)
-    console.log(response)
-    if (response.data?.listings) {
-      console.log(response.data.listings)
-      return response.data.listings;
-    }
-  }
-  catch (error) {
-    console.log("in the catch, there is an error", error.message);
-  }
-}
 function ViewListing () {
   const navigate = useNavigate();
+  const setShowErrorPopup = useContext(ErrorContext);
 
   const [list, setList] = useState("LOADING");
   const [filteredList, setFilteredList] = useState([]);
@@ -37,13 +24,43 @@ function ViewListing () {
   useEffect(() => {
     const fetchListings = async () => {
       const data = await getListings();
+
       if (data) {
-        setList(data);
-        setFilteredList([...data]);
-      }
-    };
+        const fetchedList = [];
+
+        for (const listing of data) {
+          const listingInfo = await getListingInfo(listing.id);
+          fetchedList.push({ ...listing, ...listingInfo });
+        }
+        
+        console.log(fetchedList);
+        
+        // TODO: set only published listing
+        setList(fetchedList);
+        setFilteredList([...fetchedList]);
+      }      
+    }
+
     fetchListings();
   }, []);
+
+  const getListings = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}listings`);
+      if (response.data?.listings) return response.data.listings;
+    } catch (error) {
+      setShowErrorPopup(error.response.data.error);
+    }
+  }
+
+  const getListingInfo = async (listingId) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}listings/${listingId}`);
+      if (response.data?.listing) return response.data?.listing;
+    } catch (error) {
+      setShowErrorPopup(error.response.data.error);
+    }
+  }
 
   const filterListing = (e) => {
     let listing = [...list];
@@ -78,23 +95,6 @@ function ViewListing () {
             <p>No listings found</p>
           ) : (
             <>
-              <ToggleButtonGroup
-                value={sortOrder}
-                exclusive
-                onChange={(e, newSortOrder) => {
-                  if (newSortOrder !== null) setSortOrder(newSortOrder); 
-                }}
-                aria-label="list order"
-              >
-                <ToggleButton value="ascending" aria-label="ascending order">
-                  <p>Ascending</p>
-                </ToggleButton>
-                <ToggleButton value="descending" aria-label="descending order">
-                  <p>Descending</p>
-                </ToggleButton>
-              </ToggleButtonGroup>
-              <br />
-
               <Box
                 sx={{
                   borderRadius: 3,
@@ -104,6 +104,7 @@ function ViewListing () {
                   flexDirection: 'column'
                 }}
               >
+                <h2>Search Filter</h2>
                 <TextField
                   id="filter-search-input"
                   placeholder="Search Listing"
@@ -112,20 +113,10 @@ function ViewListing () {
                   value={filterSearchTerm}
                   onChange={e => setFilterSearchTerm(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  slotProps={{
-                    input: {
-                      endAdornment: 
-                        <InputAdornment position="end">
-                          <Button
-                            variant="contained"
-                            onClick={filterListing}
-                          >Search</Button>
-                        </InputAdornment>,
-                    },
-                  }}
                 />
                 <br />
 
+                <h2>Bedroom Filter (Min-Max)</h2>
                 {/* TODO: prevent no. from decreasing beyond 0 */}
                 <TextField
                   id="min-bedroom-filter-input"
@@ -148,6 +139,7 @@ function ViewListing () {
                 />
                 <br />
 
+                <h2>Price Filter (Min-Max)</h2>
                 {/* TODO: prevent no. from decreasing beyond 0 */}
                 <TextField
                   id="min-price-filter-input"
@@ -171,10 +163,32 @@ function ViewListing () {
                 <br />
 
                 <Button
-                  variant="contained"
                   onClick={clearFilter}
                 >Clear Filter</Button>
+                <br />
+
+                <Button
+                  variant="contained"
+                  onClick={filterListing}
+                >Search</Button>
               </Box>
+              <br />
+
+              <ToggleButtonGroup
+                value={sortOrder}
+                exclusive
+                onChange={(e, newSortOrder) => {
+                  if (newSortOrder !== null) setSortOrder(newSortOrder); 
+                }}
+                aria-label="list order"
+              >
+                <ToggleButton value="ascending" aria-label="ascending order">
+                  <p>Ascending</p>
+                </ToggleButton>
+                <ToggleButton value="descending" aria-label="descending order">
+                  <p>Descending</p>
+                </ToggleButton>
+              </ToggleButtonGroup>
               <br />
 
               <div style={styles.grid} >
@@ -188,14 +202,9 @@ function ViewListing () {
                       `}
                     </h4>
                     <h3 style={styles.title}>{listing.title}</h3>
-                    <p style={styles.address}>
-                      {`
-                        ${listing.address?.streetAddress},
-                        ${listing.address?.suburb},
-                        ${listing.address?.postcode}
-                      `}
-                    </p>
-                    <p style={styles.address}>{`reviews [${listing.reviews.length}]`}</p>
+                    <p style={styles.address}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
+                    <p style={styles.address}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>                    
+                    <p style={styles.address}>{`${listing.reviews.length} reviews`}</p>
                     <p style={styles.price}>${listing.price}</p>
                   </div>
                 ))}
