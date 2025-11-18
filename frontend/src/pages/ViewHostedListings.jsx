@@ -215,8 +215,8 @@ function ViewHostedListings({ owner, token }) {
       );
 
       console.log("Decline response:", response);
-    // Refresh booking requests after declining
-    getBookingRequests();
+      // Refresh booking requests after declining
+      getBookingRequests();
 
 
 
@@ -235,29 +235,29 @@ function ViewHostedListings({ owner, token }) {
       {bookingRequests.length === 0 ? (
         <p>No booking requests </p>
       ) :(
-      bookingRequests.map((request) => (
-        <>
-        {request.status === "pending" && (
-          <div key={request.id}>
-          <h3>Request Id: {request.id}</h3>
-          <p>Start Date: {request.dateRange.start}</p>
-          <p>End Date: {request.dateRange.end}</p>
-          <Button
-            onClick = {() => {acceptRequest(request.id)}}
-          >Accept
-          </Button>
+        bookingRequests.map((request) => (
+          <>
+            {request.status === "pending" && (
+              <div key={request.id}>
+                <h3>Request Id: {request.id}</h3>
+                <p>Start Date: {request.dateRange.start}</p>
+                <p>End Date: {request.dateRange.end}</p>
+                <Button
+                  onClick = {() => {acceptRequest(request.id)}}
+                >Accept
+                </Button>
 
-          <Button
-            onClick = {() => {declineRequest(request.id)}}>
+                <Button
+                  onClick = {() => {declineRequest(request.id)}}>
 
           Decline
-          </Button>
+                </Button>
 
-        </div>
-        )}
+              </div>
+            )}
 
-        </>
-      ))
+          </>
+        ))
 
       )}
       {listings.length === 0 ? (
