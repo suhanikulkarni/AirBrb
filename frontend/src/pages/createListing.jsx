@@ -286,7 +286,6 @@ function CreateListing({ token }) {
         </Button>
         <br />
 
-        {/* TODO: create form elements for additional information */}
         <h2>Listing Details</h2>
         <FormControl fullWidth>
           <InputLabel id="demo-simple-select-label">Property Type</InputLabel>

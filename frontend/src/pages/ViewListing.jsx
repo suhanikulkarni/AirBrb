@@ -19,7 +19,13 @@ function ViewListing () {
   const [list, setList] = useState("LOADING");
   const [filteredList, setFilteredList] = useState([]);
   const [sortOrder, setSortOrder] = useState('ascending');
-  const [filterSearchTerm, setFilterSearchTerm] = useState('');
+  const [filter, setFilter] = useState({
+      'searchFilter': '',
+      'minBedroomFilter': '',
+      'maxBedroomFilter': '',
+      'minPriceFilter': '',
+      'maxPriceFilter': ''
+    });
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -62,11 +68,38 @@ function ViewListing () {
     }
   }
 
+  const handleFilter = (e) => {
+    const {name, value} = e.target;
+
+    setFilter((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  }
+
   const filterListing = (e) => {
     let listing = [...list];
 
     // search filter
-    listing = listing.filter(l => l.title.includes(filterSearchTerm));
+    listing = listing.filter(l => l.title.includes(filter.searchFilter));
+
+    // bedroom filter
+    if (filter.minBedroomFilter !== '') {
+      listing = listing.filter(l => l.metadata?.bedrooms.length >= filter.minBedroomFilter);
+    }
+
+    if (filter.maxBedroomFilter !== '') {
+      listing = listing.filter(l => l.metadata?.bedrooms.length <= filter.maxBedroomFilter);
+    }
+
+    // price filter
+    if (filter.minPriceFilter !== '') {
+      listing = listing.filter(l => l.price >= filter.minPriceFilter);
+    }
+
+    if (filter.maxPriceFilter !== '') {
+      listing = listing.filter(l => l.price <= filter.maxPriceFilter);
+    }
 
     setFilteredList(listing);
   };
@@ -76,7 +109,13 @@ function ViewListing () {
   };
 
   const clearFilter = () => {
-    setFilterSearchTerm('');
+    setFilter({
+      'searchFilter': '',
+      'minBedroomFilter': '',
+      'maxBedroomFilter': '',
+      'minPriceFilter': '',
+      'maxPriceFilter': ''
+    });
     setFilteredList([...list]);
   };
 
@@ -91,125 +130,127 @@ function ViewListing () {
         <p style={styles.loadingText}>Loading listings...</p>
       ) : (
         <>
+          <Box
+            sx={{
+              borderRadius: 3,
+              bgcolor: '#f3f3f3ff',
+              padding: '15px',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            <h2>Search Filter</h2>
+            <TextField
+              id="filter-search-input"
+              placeholder="Search Listing"
+              type="search"
+              variant="outlined"
+              value={filter.searchFilter}
+              name='searchFilter'
+              onChange={handleFilter}
+              onKeyDown={handleKeyDown}
+            />
+            <br />
+
+            <h2>Bedroom Filter (Min-Max)</h2>
+            {/* TODO: prevent no. from decreasing beyond 0 */}
+            <TextField
+              id="min-bedroom-filter-input"
+              label="Minimum Bedroom"
+              type="number"
+              value={filter.minBedroomFilter}
+              onChange={handleFilter}
+              name="minBedroomFilter"
+              slotProps={{ input: { min: 0 } }}
+            />
+            <br />
+
+            {/* TODO: prevent no. from decreasing beyond 0 */}
+            <TextField
+              id="max-bedroom-filter-input"
+              label="Maximum Bedroom"
+              type="number"
+              value={filter.maxBedroomFilter}
+              onChange={handleFilter}
+              name="maxBedroomFilter"
+              slotProps={{ input: { min: 0 } }}
+            />
+            <br />
+
+            <h2>Price Filter (Min-Max)</h2>
+            {/* TODO: prevent no. from decreasing beyond 0 */}
+            <TextField
+              id="min-price-filter-input"
+              label="Minimum Price"
+              type="number"
+              value={filter.minPriceFilter}
+              onChange={handleFilter}
+              name="minPriceFilter"
+              slotProps={{ input: { min: 0 } }}
+            />
+            <br />
+
+            {/* TODO: prevent no. from decreasing beyond 0 */}
+            <TextField
+              id="max-price-filter-input"
+              label="Maximum Price"
+              type="number"
+              value={filter.maxPriceFilter}
+              onChange={handleFilter}
+              name="maxPriceFilter"
+              slotProps={{ input: { min: 0 } }}
+            />
+            <br />
+
+            <Button
+              onClick={clearFilter}
+            >Clear Filter</Button>
+            <br />
+
+            <Button
+              variant="contained"
+              onClick={filterListing}
+            >Search</Button>
+          </Box>
+          <br />
+
+          <ToggleButtonGroup
+            value={sortOrder}
+            exclusive
+            onChange={(e, newSortOrder) => {
+              if (newSortOrder !== null) setSortOrder(newSortOrder); 
+            }}
+            aria-label="list order"
+          >
+            <ToggleButton value="ascending" aria-label="ascending order">
+              <p>Ascending</p>
+            </ToggleButton>
+            <ToggleButton value="descending" aria-label="descending order">
+              <p>Descending</p>
+            </ToggleButton>
+          </ToggleButtonGroup>
+          <br />
           {filteredList.length === 0 ? (
             <p>No listings found</p>
           ) : (
-            <>
-              <Box
-                sx={{
-                  borderRadius: 3,
-                  bgcolor: '#f3f3f3ff',
-                  padding: '15px',
-                  display: 'flex',
-                  flexDirection: 'column'
-                }}
-              >
-                <h2>Search Filter</h2>
-                <TextField
-                  id="filter-search-input"
-                  placeholder="Search Listing"
-                  type="search"
-                  variant="outlined"
-                  value={filterSearchTerm}
-                  onChange={e => setFilterSearchTerm(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />
-                <br />
-
-                <h2>Bedroom Filter (Min-Max)</h2>
-                {/* TODO: prevent no. from decreasing beyond 0 */}
-                <TextField
-                  id="min-bedroom-filter-input"
-                  label="Minimum Bedroom"
-                  type="number"
-                  onChange={filterListing}
-                  name="minBedroomFilter"
-                  slotProps={{ input: { min: 0 } }}
-                />
-                <br />
-
-                {/* TODO: prevent no. from decreasing beyond 0 */}
-                <TextField
-                  id="max-bedroom-filter-input"
-                  label="Maximum Bedroom"
-                  type="number"
-                  onChange={filterListing}
-                  name="maxBedroomFilter"
-                  slotProps={{ input: { min: 0 } }}
-                />
-                <br />
-
-                <h2>Price Filter (Min-Max)</h2>
-                {/* TODO: prevent no. from decreasing beyond 0 */}
-                <TextField
-                  id="min-price-filter-input"
-                  label="Minimum Price"
-                  type="number"
-                  onChange={filterListing}
-                  name="minPriceFilter"
-                  slotProps={{ input: { min: 0 } }}
-                />
-                <br />
-
-                {/* TODO: prevent no. from decreasing beyond 0 */}
-                <TextField
-                  id="max-price-filter-input"
-                  label="Maximum Price"
-                  type="number"
-                  onChange={filterListing}
-                  name="maxPriceFilter"
-                  slotProps={{ input: { min: 0 } }}
-                />
-                <br />
-
-                <Button
-                  onClick={clearFilter}
-                >Clear Filter</Button>
-                <br />
-
-                <Button
-                  variant="contained"
-                  onClick={filterListing}
-                >Search</Button>
-              </Box>
-              <br />
-
-              <ToggleButtonGroup
-                value={sortOrder}
-                exclusive
-                onChange={(e, newSortOrder) => {
-                  if (newSortOrder !== null) setSortOrder(newSortOrder); 
-                }}
-                aria-label="list order"
-              >
-                <ToggleButton value="ascending" aria-label="ascending order">
-                  <p>Ascending</p>
-                </ToggleButton>
-                <ToggleButton value="descending" aria-label="descending order">
-                  <p>Descending</p>
-                </ToggleButton>
-              </ToggleButtonGroup>
-              <br />
-
-              <div style={styles.grid} >
-                {orderList().map((listing, index) => (
-                  <div key={index} style={styles.card} onClick={() => navigate(`/viewListings/${listing.id}`)}>
-                    <img src={listing.thumbnail} alt={listing.title} style={styles.thumbnail} />
-                    <h4 style={styles.address}>
-                      {`
-                        ${listing.address?.state},
-                        ${listing.address?.country}
-                      `}
-                    </h4>
-                    <h3 style={styles.title}>{listing.title}</h3>
-                    <p style={styles.address}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
-                    <p style={styles.address}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>                    
-                    <p style={styles.address}>{`${listing.reviews.length} reviews`}</p>
-                    <p style={styles.price}>${listing.price}</p>
-                  </div>
-                ))}
-              </div>
-            </>
+            <div style={styles.grid} >
+              {orderList().map((listing, index) => (
+                <div key={index} style={styles.card} onClick={() => navigate(`/viewListings/${listing.id}`)}>
+                  <img src={listing.thumbnail} alt={listing.title} style={styles.thumbnail} />
+                  <h4 style={styles.address}>
+                    {`
+                      ${listing.address?.state},
+                      ${listing.address?.country}
+                    `}
+                  </h4>
+                  <h3 style={styles.title}>{listing.title}</h3>
+                  <p style={styles.address}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
+                  <p style={styles.address}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>                    
+                  <p style={styles.address}>{`${listing.reviews.length} reviews`}</p>
+                  <p style={styles.price}>${listing.price}</p>
+                </div>
+              ))}
+            </div>
           )}
         </>
       )}
