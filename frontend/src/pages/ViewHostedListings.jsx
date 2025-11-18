@@ -165,7 +165,7 @@ function ViewHostedListings({ owner, token }) {
           <div key={listing.id} >
             <h3>{listing.title}</h3>
             <p>${listing.price}</p>
-            <p>Number of Bedrooms: {listing.metadata?.bedrooms}</p>
+            <p>Number of Bedrooms: {listing.metadata?.bedroomCount}</p>
             <Button 
               aria-describedby={listing.id} 
               variant="contained" 
