@@ -10,7 +10,7 @@ import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Button from '@mui/material/Button';
-import { Box } from '@mui/material';
+import { Box, Modal, Rating } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -19,11 +19,11 @@ import Select from '@mui/material/Select';
 import DatePicker from "react-multi-date-picker";
 import Thumbnail from './Thumbnail';
 
-function ViewListing () {
+function ViewListing ( {token, owner}) {
   const navigate = useNavigate();
   const setShowErrorPopup = useContext(ErrorContext);
 
-  const [list, setList] = useState("LOADING");
+  const [list, setList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
   const [sortOrder, setSortOrder] = useState('ascending');
   const [filter, setFilter] = useState({
@@ -35,6 +35,80 @@ function ViewListing () {
     'reviewFilter': '',
     'dateFilter': ''
   });
+
+
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [acceptedBookings, setAcceptedBookings] = useState([]);
+
+  const [open, setOpen] = useState(false);
+  const [selectedListingId, setSelectedListingId] = useState(null);
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedListingId(null);
+    setSelectedBookingId(null);
+    setReviewRating(null);
+    setReviewRating(0);
+    setReviewComment('');
+  };
+
+  const handleOpen = (listingId, bookingId) => {
+    console.log("Opennign")
+    setSelectedListingId(listingId);
+    setSelectedBookingId(bookingId);
+    setOpen(true);
+  };
+
+
+  const uploadReview = async () => {
+    console.log("Uploading review:", reviewComment, reviewRating);
+    const review = {
+      rating: reviewRating,
+      comment: reviewComment
+    }
+    const body = { review }
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}listings/${selectedListingId}/review/${selectedBookingId}`, 
+        body, 
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      if (response) {
+        console.log("Review uploaded successfully");
+        handleClose();
+      }
+    } catch (error) {
+      setShowErrorPopup(error.response.data.error);
+    }
+  }
+
+  const fetchAcceptedBookings = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await axios.get(`${API_BASE_URL}bookings`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.data?.bookings) {
+        const accepted = response.data.bookings.filter(
+          booking => booking.status === 'accepted' && booking.owner === owner
+        );
+        setAcceptedBookings(accepted);
+      }
+    } catch (error) {
+      setShowErrorPopup(error.response.data.error);
+
+    }
+  };
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -57,7 +131,8 @@ function ViewListing () {
     }
 
     fetchListings();
-  }, []);
+    fetchAcceptedBookings();
+  }, [reviewComment, reviewRating]);
 
   const getListings = async () => {
     try {
@@ -115,7 +190,7 @@ function ViewListing () {
       listing = listing.filter(l => {
         if (!l.reviews.length) return false;
         
-        const average = l.reviews.reduce((a, b) => a + b) / l.length;
+        const average = l.reviews.reduce((a, b) => a + b.rating) / l.reviews.length;
         if (average >= filter.reviewFilter) return true;
 
         return false;
@@ -173,8 +248,41 @@ function ViewListing () {
 
   return (
     <PageBody>
-      {list === "LOADING" ? (
-        <p style={styles.loadingText}>Loading listings...</p>
+      <Modal 
+        open={open} 
+        onClose={handleClose} 
+        style={{
+          position: "absolute",
+          border: "2px solid #000",
+          backgroundColor: "pink",
+          height: 200,
+          width: 240,
+          margin: "auto",
+          padding: "2%",
+          color: "white",
+        }}
+      >
+        <div>
+          <div>Review</div>
+          <Rating
+            value={reviewRating}
+            onChange={(event, newValue) => setReviewRating(newValue)}
+          />
+          <TextField
+            value={reviewComment}
+            onChange={(e) => setReviewComment(e.target.value)}
+          />
+          <Button 
+            onClick={uploadReview} 
+            variant='contained'
+          >
+            Submit Review
+          </Button>
+        </div>
+      </Modal>
+
+      {list.length === 0 ? (
+        <div>No listings available</div>
       ) : (
         <>
           <Box
@@ -314,27 +422,43 @@ function ViewListing () {
             <p>No listings found</p>
           ) : (
             <div style={styles.grid} >
-              {orderList().map((listing, index) => (
-                <div key={index} style={styles.card} onClick={() => navigate(`/viewListings/${listing.id}`)}>
-                  <Thumbnail thumbnail={listing.thumbnail} listingTitle={listing.title} />
-                  <h4 style={styles.address}>
-                    {`
-                      ${listing.address?.state},
-                      ${listing.address?.country}
-                    `}
-                  </h4>
-                  <h3 style={styles.title}>{listing.title}</h3>
-                  <p style={styles.address}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
-                  <p style={styles.address}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>                    
-                  <p style={styles.address}>{`${listing.reviews.length} reviews`}</p>
-                  <p style={styles.price}>${listing.price}</p>
-                </div>
-              ))}
+              {orderList().map((listing, index) => {
+                const booking = acceptedBookings.find(
+                  b => Number(b.listingId) === Number(listing.id)
+                );
+                
+                return (
+                  <div key={index} style={styles.card}>
+                    <div  onClick={() => navigate(`/viewListings/${listing.id}`)}>
+                      <Thumbnail thumbnail={listing.thumbnail} listingTitle={listing.title} />
+                      <h4 style={styles.address}>
+                        {`
+                          ${listing.address?.suburb},
+                          ${listing.address?.state},
+                          ${listing.address?.country}
+                        `}
+                      </h4>
+                      <h3 style={styles.title}>{listing.title}</h3>
+                      <p style={styles.address}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
+                      <p style={styles.address}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>                    
+                      <p style={styles.address}>{`${listing.reviews.length} reviews`}</p>
+                      <p style={styles.price}>${listing.price}</p>
+                    </div>
+                    {booking && (
+                      <Button variant="contained"onClick={() => handleOpen(listing.id, booking.id)}>
+                        Leave a Review
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </>
       )}
     </PageBody>
   );
+
 }
+
 export default ViewListing;
