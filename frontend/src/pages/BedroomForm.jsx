@@ -29,10 +29,10 @@ function BedroomForm({ bedroomNumber, updateBedroomMetadata }) {
       };
 
       const totalBeds = Object.values(updateBeds)
-      .filter(v => typeof v === 'number' && !isNaN(v))
-      .reduce((sum, count) => sum + count, 0);
+        .filter(v => typeof v === 'number' && !isNaN(v))
+        .reduce((sum, count) => sum + count, 0);
 
-    console.log(totalBeds);
+      console.log(totalBeds);
       const update = {
         ...prev,
         bedTypes: updateBeds,

@@ -1,48 +1,55 @@
 import axios from "axios";
 import { API_BASE_URL } from "../constants";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import DatePicker from "react-multi-date-picker";
+import { ErrorContext } from '../context';
+import { useNavigate } from "react-router-dom";
 
-const getAllListings = async (owner) => {
-  let hostedListings = [];
-  try {
-    const res = await axios.get(`${API_BASE_URL}listings`);
-    if (res) {
-      const listingData = res.data.listings;
-      listingData.forEach(element => {
-        if (element.owner === owner) {
-          hostedListings.push(element.id)
-        }
-      });
-      return hostedListings;
-    } 
-  }
-  catch {
-    console.log("ERROR")
-  }
-}
-
-const getListingInfo = async (id) => {
-  try {
-    const res = await axios.get(`${API_BASE_URL}listings/${id}`);
-    if (res) return res.data.listing;
-    
-  }
-  catch {
-    console.log("ERRORROR");
-    return;
-  }
-}
 
 function ViewHostedListings({ owner, token }) {
+  const setShowErrorPopup = useContext(ErrorContext); 
+
   const [listings, setListings] = useState([]);
+  const [bookingRequests, setBookingRequests] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [activeListing, setActiveListing] = useState(null);
   const [currentRange, setCurrentRange] = useState([]);
   const [allRanges, setAllRanges] = useState({});
+  const navigate = useNavigate();
+
+  const getAllListings = async (owner) => {
+    let hostedListings = [];
+    try {
+      const res = await axios.get(`${API_BASE_URL}listings`);
+      if (res) {
+        const listingData = res.data.listings;
+        listingData.forEach(element => {
+          if (element.owner === owner) {
+            hostedListings.push(element.id)
+          }
+        });
+        return hostedListings;
+      } 
+    }
+    catch (error){
+      setShowErrorPopup(error.response.data.error);
+      return [];
+    }
+  }
+
+  const getListingInfo = async (id) => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}listings/${id}`);
+      if (res) return res.data.listing;
+    }
+    catch (error){
+      setShowErrorPopup(error.response.data.error);
+    }
+  }
+
 
   useEffect(() => {
     const getFetch = async () => {
@@ -52,7 +59,6 @@ function ViewHostedListings({ owner, token }) {
           setListings([]);
           return;
         }
-
         const detailedListings = await Promise.all(
           listingIds.map(async (id) => {
             const listing = await getListingInfo(id);
@@ -63,16 +69,20 @@ function ViewHostedListings({ owner, token }) {
           })
         );
         setListings(detailedListings.filter(Boolean));
-
       }
       catch (error) {
-        console.error("Error fetching listings:", error);
+        setShowErrorPopup(error.response.data.error);
+
       }
     } 
     getFetch();
   }, [owner]);
 
-  
+  useEffect(() => {
+    if (listings.length > 0) {
+      getBookingRequests();
+    }
+  }, [listings]);
 
   const handleClick = (event, listing) => {
     console.log("clicked", listing.id);
@@ -97,10 +107,6 @@ function ViewHostedListings({ owner, token }) {
     }));
 
     const body = { availability };
-
-    console.log("Publishing listing with body:", body);
-
-
     try {
       const res = await axios.put(
         `${API_BASE_URL}listings/publish/${listingId}`,
@@ -110,29 +116,24 @@ function ViewHostedListings({ owner, token }) {
             'Authorization': `Bearer ${token}`
           }
         }
-      
       );
 
       if (res) {
-        console.log("this si resdata",res)
+        console.log("this si resdata",res);
+        navigate('/')
       }
     }
-    catch {
-      console.log("EROROROROORORORORO");
-      return;
+    catch (error){
+      setShowErrorPopup(error.response.data.error);
+
     } 
-
   }
-
-
   const addingRanges = () => {
     const listingId = activeListing?.id;
     if (!currentRange || currentRange.length !== 2) {
       alert("Please select a full date range (start and end date)");
       return;
     }
-
-    
     setAllRanges(prev => {
       const updatedRanges = {
         ...prev,
@@ -154,10 +155,98 @@ function ViewHostedListings({ owner, token }) {
     setCurrentRange([]);
   };
   const open = Boolean(anchorEl);
-  
+
+  const getBookingRequests = async () => {
+    let bookingRequests = [];
+    try {
+      const res = await axios.get(`${API_BASE_URL}bookings`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (res) {
+        const requestData = res.data.bookings;
+        const listingIds = listings.map(listing => String(listing.id));
+        //console.log("Listing IDs:", listingIds);
+        bookingRequests = requestData.filter(booking => {
+          const match = listingIds.includes(String(booking.listingId));
+          //console.log(`Comparing ${booking.listingId} with myListingIds:`, match);
+          return match;
+        });
+
+        console.log("Filtered Booking Requests:", bookingRequests);
+        setBookingRequests(bookingRequests);
+      }
+    } catch (error) {
+      setShowErrorPopup(error.response?.data?.error || "Requests Failed To Show.");
+    }
+  }
+
+  const acceptRequest = async (bookingId) => {
+    console.log("accepted");
+    try{
+      console.log("accepted!!!!!!!!!");
+
+      const response = await axios.put(
+        `${API_BASE_URL}bookings/accept/${bookingId}`, {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      if (response) {console.log(response);getBookingRequests();}
+    }
+    catch(error){
+      setShowErrorPopup(error.response?.data?.error || "Failed to Accept Bookng Request");
+    }
+  }
+
+  const declineRequest = async (bookingId) => {
+    console.log("decline");
+
+    try{
+      const response = await axios.put(
+        `${API_BASE_URL}bookings/decline/${bookingId}`, {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      console.log("Decline response:", response);
+      getBookingRequests();
+    }
+
+    catch(error){
+      setShowErrorPopup(error.response?.data?.error || "Failed to Decline Bookng Request");
+    }
+  }
+
   return (
     <div>
       <h2>Hosted Listings</h2>
+      <h3>Booking Requests</h3>
+      {bookingRequests.length === 0 ? (
+        <p>No booking requests </p>
+      ) :(
+        bookingRequests.map((request) => (
+          <>
+            {request.status === "pending" && (
+              <div key={request.id}>
+                <h3>Request Id: {request.id}</h3>
+                <p>Start Date: {request.dateRange.start}</p>
+                <p>End Date: {request.dateRange.end}</p>
+                <Button
+                  onClick = {() => {acceptRequest(request.id)}}
+                >Accept
+                </Button>
+
+                <Button
+                  onClick = {() => {declineRequest(request.id)}}
+                >Decline
+                </Button>
+
+              </div>
+            )}
+          </>
+        ))
+      )}
       {listings.length === 0 ? (
         <p>No hosted listings found</p>
       ) : (
@@ -176,7 +265,6 @@ function ViewHostedListings({ owner, token }) {
           </div>
         ))
       )}
-
       <Popover
         id={activeListing?.id}
         open={open}
