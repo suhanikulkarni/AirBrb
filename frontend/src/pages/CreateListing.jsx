@@ -69,7 +69,6 @@ function CreateListing({ token }) {
   const [thumbnailType, setThumbnailType] = useState('image');
 
   const setShowErrorPopup = useContext(ErrorContext);
-
   const postListing = async (body, token) => {
     try {
       const response = await axios.post(`${API_BASE_URL}listings/new`, body, {
