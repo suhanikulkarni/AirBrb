@@ -42,8 +42,7 @@ function CreateListing({ token }) {
     'address': {},
     'price': 0,
     'thumbnail': '',
-    'metadata': {},
-    'review': {}
+    'metadata': {}
   });
 
   const [listingAddress, setListingAddress] = useState({

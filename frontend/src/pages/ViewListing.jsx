@@ -19,16 +19,13 @@ const getListings = async () => {
   }
 }
 
-
-
-
 function ViewListing ({token}) {
   const setShowErrorPopup = useContext(ErrorContext); 
   const [acceptedBookings, setAcceptedBookings] = useState([]);
   const navigate = useNavigate();
 
-  const [reviewRating, setReviewRating] = useState();
-  const [reviewComment, setReviewComment] = useState();
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
 
 
   const [list, setList] = useState([]);
@@ -43,38 +40,52 @@ function ViewListing ({token}) {
     'reviewFilter': ''
   });
   const [open, setOpen] = useState(false);
+  const [selectedListingId, setSelectedListingId] = useState(null);
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
 
   const handleClose = () => {
     setOpen(false);
+    setSelectedListingId(null);
+    setSelectedBookingId(null);
+    setReviewRating(null);
+    setReviewRating(0);
+    setReviewComment('');
   };
 
-  const handleOpen = () => {
+  const handleOpen = (listingId, bookingId) => {
     console.log("Opennign")
+    setSelectedListingId(listingId);
+    setSelectedBookingId(bookingId);
     setOpen(true);
   };
 
 
-  const uploadReview = async (listingId, bookingId) => {
-    console.log("fbdrgndrjkgndfjkgndjkfgnfjkgnfdjgnkfgnfjgndfj",reviewComment, reviewRating)
-    const body = {
-      reviewRating: reviewRating,
-      reviewComment: reviewComment
+  const uploadReview = async () => {
+    console.log("Uploading review:", reviewComment, reviewRating);
+    const review = {
+      rating: reviewRating,
+      comment: reviewComment
     }
-    console.log("bofy", body)
+    const body = { review }
     try {
-      const response = await axios.put(`${API_BASE_URL}listings/${listingId}/review/${bookingId}`, body,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
+      const response = await axios.put(
+        `${API_BASE_URL}listings/${selectedListingId}/review/${selectedBookingId}`, 
+        body, 
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
       if (response) {
-        console.log("Yay, thjis is working, remeber to display something meaningful")
-      };
+        console.log("Review uploaded successfully");
+        handleClose();
+      }
     } catch (error) {
+      console.log(error.response)
       setShowErrorPopup(error.response.data.error);
     }
-}
+  }
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -249,9 +260,6 @@ function ViewListing ({token}) {
     }
   };
 
-  const renderReviewButton = () => {
-
-  }
 
   useEffect (() => {
     if (list.length > 0) {
@@ -260,88 +268,66 @@ function ViewListing ({token}) {
     console.log("fgdf",acceptedBookings)
   }, [list])
 
-  useEffect(() => {
-    if (acceptedBookings.length > 0) {
-      renderReviewButton();
-    }
-  }, [acceptedBookings]);
 
-  
-return (
-  <PageBody>
-    {list.length === 0 ? (
-      <p>No listings available</p>
-    ) : (
-      list.map((listing, index) => {
-        const booking = acceptedBookings.find(
-          b => Number(b.listingId) === Number(listing.id)
-        );
+  return (
+    <PageBody>
+      <Modal 
+        open={open} 
+        onClose={handleClose} 
+        style={{
+          position: "absolute",
+          border: "2px solid #000",
+          backgroundColor: "pink",
+          height: 200,
+          width: 240,
+          margin: "auto",
+          padding: "2%",
+          color: "white",
+        }}
+      >
+        <div>
+          <div>Review</div>
+          <Rating
+            value={reviewRating}
+            onChange={(event, newValue) => setReviewRating(newValue)}
+          />
+          <TextField
+            value={reviewComment}
+            onChange={(e) => setReviewComment(e.target.value)}
+          />
+          <Button 
+            onClick={uploadReview} 
+            variant='contained'
+          >
+            Submit Review
+          </Button>
+        </div>
+      </Modal>
 
-        return (
-          <div key={index} style={styles.card}>
-            <div onClick={() => navigate(`/viewListings/${listing.id}`)}>
-              <img src={listing.thumbnail} alt={listing.title} style={styles.thumbnail} />
-              <h3 style={styles.title}>{listing.title}</h3>
-              <p style={styles.price}>${listing.price}</p>
+      {list.length === 0 ? (
+        <div>No listings available</div>
+      ) : (
+        list.map((listing, index) => {
+          const booking = acceptedBookings.find(
+            b => Number(b.listingId) === Number(listing.id)
+          );
+          return (
+            <div key={index}>
+              <div onClick={() => navigate(`/viewListings/${listing.id}`)}>
+                <div>{listing.title}</div>
+                <div>${listing.price}</div>
+              </div>
+              {booking && (
+                <Button onClick={() => handleOpen(listing.id, booking.id)}>
+                  Leave a Review
+                </Button>
+              )}
             </div>
-
-            <Modal 
-              open={open} 
-              onClose={handleClose} 
-              style={{
-                position: "absolute",
-                border: "2px solid #000",
-                backgroundColor: "pink",
-                
-                height: 200,
-                width: 240,
-                margin: "auto",
-                padding: "2%",
-                color: "white",
-              }}>
-                <>
-                  <h1> Review</h1>
-                  <Rating 
-                    name="half-rating" 
-                    defaultValue={2.5} 
-                    precision={0.5} 
-                    onChange={(event, newValue) => setReviewRating(newValue)}
-                ></Rating>
-                  <TextField
-                    placeholder="Add A Comment!"
-                    value={reviewComment}
-                    onChange={(e) => setReviewComment(e.target.value)}
-                    ></TextField>
-                  <Button
-                    onClick={() => uploadReview(listing.listingId, listing.id)}
-                    variant='contained'>Submit Review
-                  </Button>
-                </>
-              </Modal>
-            {booking && (
-              <Button
-                variant="contained"
-                color="primary"
-                style={{ marginTop: "10px" }}
-                onClick={handleOpen}
-              >
-                Leave a Review
-              </Button>
-            )}
-          </div>
-        );
-
-        
-      })
-    )
-    
-    
-    }
-
-    
-  </PageBody>
-);
-
+          );
+        })
+      )}
+    </PageBody>
+  );
 
 }
 
