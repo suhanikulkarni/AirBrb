@@ -5,6 +5,7 @@ import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import DatePicker from "react-multi-date-picker";
+import { Box } from '@mui/material';
 
 const getAllListings = async (owner) => {
   let hostedListings = [];
@@ -196,7 +197,11 @@ function ViewHostedListings({ owner, token }) {
             }}
           >
             {activeListing && (
-              <>
+              <Box
+                sx={{
+                  padding: '10px',
+                }}
+              >
                 <Typography variant="h6" gutterBottom>
                   Set Availability for: {activeListing.title}
                 </Typography>
@@ -240,7 +245,7 @@ function ViewHostedListings({ owner, token }) {
                 >
                   Publish Listing
                 </Button>
-              </>
+              </Box>
             )}
           </Popover>
         </>
