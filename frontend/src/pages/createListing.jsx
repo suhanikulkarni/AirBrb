@@ -94,8 +94,8 @@ function CreateListing({ token }) {
   }
 
   useEffect(() => {
-    console.log("Updated address:", listingAddress);
-  }, [listingAddress]);
+      console.log("Updated address:", listingAddress);
+    }, [listingAddress]);
 
   const handleMetadataInfo = (e) => {
     const {name, value} = e.target;
@@ -111,9 +111,9 @@ function CreateListing({ token }) {
     }
   }
 
-  useEffect(() => {
-    console.log("Updated metadata:", listingMetadata);
-  }, [listingMetadata]);
+    useEffect(() => {
+      console.log("Updated metadata:", listingMetadata);
+    }, [listingMetadata]);
 
   const updateBedroomMetadata = (bedroomNumber, bedroomInfo) => {
     setListingMetadata(prev => {
@@ -132,7 +132,7 @@ function CreateListing({ token }) {
           key={i}
           bedroomNumber={i}
           updateBedroomMetadata={updateBedroomMetadata}
-        />
+          />
       )
     }
 
@@ -165,7 +165,7 @@ function CreateListing({ token }) {
       console.log({ priceNum, bathNum, bedNum });
       return setShowErrorPopup("Please insert a number");
     }
-    // TODO: default thumbnail
+        // TODO: default thumbnail
 
     const body = {
       ...listingInfo,
@@ -179,8 +179,8 @@ function CreateListing({ token }) {
   }
 
   useEffect(() => {
-    console.log("Updated all info:", listingInfo);
-  }, [listingInfo]);
+      console.log("Updated all info:", listingInfo);
+    }, [listingInfo]);
 
 
   return (
@@ -286,12 +286,13 @@ function CreateListing({ token }) {
         </Button>
         <br />
 
+        {/* TODO: create form elements for additional information */}
         <h2>Listing Details</h2>
         <FormControl fullWidth>
-          <InputLabel id="property-type-select-label">Property Type</InputLabel>
+          <InputLabel id="demo-simple-select-label">Property Type</InputLabel>
           <Select
-            labelId="property-type-select-label"
-            id="property-type-select"
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
             name="propertyType"
             value={listingMetadata.propertyType}
             label="Property Type"
