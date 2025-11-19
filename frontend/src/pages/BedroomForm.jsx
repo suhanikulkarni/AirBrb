@@ -11,26 +11,26 @@ function BedroomForm({ bedroomNumber, updateBedroomMetadata }) {
     'kingBed': '',
     'sofaBed': ''
   });
-    const handleBedroomBedInfo = (e) => {
-      const {name, value} = e.target;
+  const handleBedroomBedInfo = (e) => {
+    const {name, value} = e.target;
 
-      const updatedBeds = {
-        ...bedroomInfo,
-        [name]: Number(value) || 0
+    const updatedBeds = {
+      ...bedroomInfo,
+      [name]: Number(value) || 0
     };
 
     const totalBeds = Object.values(updatedBeds)
       .reduce((sum, count) => sum + count, 0);
 
-      setBedroomInfo(updatedBeds);
+    setBedroomInfo(updatedBeds);
 
-      updateBedroomMetadata(bedroomNumber, {
+    updateBedroomMetadata(bedroomNumber, {
       bedTypes: updatedBeds,
       bedCount: totalBeds
     });
   }
     
-    // TODO: set bed info into listing info
+  // TODO: set bed info into listing info
   return (
     <Box>
       <h4>Bedroom {bedroomNumber}</h4>

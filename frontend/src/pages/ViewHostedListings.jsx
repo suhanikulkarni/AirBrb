@@ -21,6 +21,31 @@ function ViewHostedListings({ owner, token }) {
   const navigate = useNavigate();
 
   const deleteListing = async (listingId) => {
+
+    let isPublished= await getListingInfo(listingId);
+    isPublished = isPublished.published;
+
+    console.log("isPublished", isPublished)
+    if (isPublished) {
+      try {
+        const res = await axios.put(
+          `${API_BASE_URL}listings/unpublish/${listingId}`,
+          {},
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        );
+        if (res) {
+
+          navigate('/')
+        }
+      }
+      catch (error){
+        setShowErrorPopup(error.response.data.error);
+      }
+    }
     try {
       const res = await axios.delete(`${API_BASE_URL}listings/${listingId}`,
         {
@@ -30,7 +55,6 @@ function ViewHostedListings({ owner, token }) {
         }
       );
       if (res) {
-        console.log("the thing is now deleted");
         setListings(prevListings => prevListings.filter(listing => listing.id !== listingId))
       } 
     }
@@ -39,7 +63,7 @@ function ViewHostedListings({ owner, token }) {
     }
   }
 
-  const getAllListings = async (owner) => {
+  const getAllListings = async () => {
     let hostedListings = [];
     try {
       const res = await axios.get(`${API_BASE_URL}listings`);
@@ -73,7 +97,7 @@ function ViewHostedListings({ owner, token }) {
   useEffect(() => {
     const getFetch = async () => {
       try {
-        const listingIds = await getAllListings(owner);
+        const listingIds = await getAllListings();
         if (!listingIds || listingIds.length === 0) {
           setListings([]);
           return;
