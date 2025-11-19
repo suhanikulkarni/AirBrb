@@ -20,6 +20,25 @@ function ViewHostedListings({ owner, token }) {
   const [allRanges, setAllRanges] = useState({});
   const navigate = useNavigate();
 
+  const deleteListing = async (listingId) => {
+    try {
+      const res = await axios.delete(`${API_BASE_URL}listings/${listingId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      if (res) {
+        console.log("the thing is now deleted");
+        setListings(prevListings => prevListings.filter(listing => listing.id !== listingId))
+      } 
+    }
+    catch (error){
+      setShowErrorPopup(error.response.data.error);
+    }
+  }
+
   const getAllListings = async (owner) => {
     let hostedListings = [];
     try {
@@ -261,6 +280,13 @@ function ViewHostedListings({ owner, token }) {
               onClick={(e) => handleClick(e, listing)}
             >
               Manage Availability
+            </Button>
+            <Button
+              name={listing.id} 
+              variant="contained" 
+              onClick={() => deleteListing(listing.id)}>
+
+            Delete Listing
             </Button>
           </div>
         ))

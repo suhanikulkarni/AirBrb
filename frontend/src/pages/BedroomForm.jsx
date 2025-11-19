@@ -5,47 +5,32 @@ import TextField from '@mui/material/TextField';
 
 function BedroomForm({ bedroomNumber, updateBedroomMetadata }) {
   const [bedroomInfo, setBedroomInfo] = useState({
-    'bedroomNumber': bedroomNumber,
-    'bedCount': '',
-    'bedTypes': {
-      'singleBed': '',
-      'doubleBed': '',
-      'queenBed': '',
-      'kingBed': '',
-      'sofaBed': ''
-    }
+    'singleBed': '',
+    'doubleBed': '',
+    'queenBed': '',
+    'kingBed': '',
+    'sofaBed': ''
   });
+    const handleBedroomBedInfo = (e) => {
+      const {name, value} = e.target;
 
-  const handleBedroomBedInfo = (e) => {
-    const {name, value} = e.target;
+      const updatedBeds = {
+        ...bedroomInfo,
+        [name]: Number(value) || 0
+    };
 
-    setBedroomInfo(prev => {
-      const updateBeds = {
-        ...prev,
-        bedTypes: {
-          ...prev.bedTypes,
-          [name]: Number(value)
-        }
-      };
+    const totalBeds = Object.values(updatedBeds)
+      .reduce((sum, count) => sum + count, 0);
 
-      const totalBeds = Object.values(updateBeds)
-        .filter(v => typeof v === 'number' && !isNaN(v))
-        .reduce((sum, count) => sum + count, 0);
+      setBedroomInfo(updatedBeds);
 
-      console.log(totalBeds);
-      const update = {
-        ...prev,
-        bedTypes: updateBeds,
-        bedCount: totalBeds 
-      };
-
-      updateBedroomMetadata(bedroomNumber, update);
-
-      return update;
+      updateBedroomMetadata(bedroomNumber, {
+      bedTypes: updatedBeds,
+      bedCount: totalBeds
     });
-    // TODO: set bed info into listing info
   }
-
+    
+    // TODO: set bed info into listing info
   return (
     <Box>
       <h4>Bedroom {bedroomNumber}</h4>
@@ -53,6 +38,7 @@ function BedroomForm({ bedroomNumber, updateBedroomMetadata }) {
       <TextField
         label="Single Beds"
         type="number"
+        value={bedroomInfo.singleBed}
         onChange={handleBedroomBedInfo}
         name="singleBed"
         slotProps={{ input: { min: 0 } }}
@@ -61,6 +47,7 @@ function BedroomForm({ bedroomNumber, updateBedroomMetadata }) {
       <TextField
         label="Double Beds"
         type="number"
+        value={bedroomInfo.doubleBed}
         onChange={handleBedroomBedInfo}
         name="doubleBed"
         slotProps={{ input: { min: 0 } }}
@@ -70,6 +57,7 @@ function BedroomForm({ bedroomNumber, updateBedroomMetadata }) {
       <TextField
         label="Queen Beds"
         type="number"
+        value={bedroomInfo.queenBed}
         onChange={handleBedroomBedInfo}
         name="queenBed"
         slotProps={{ input: { min: 0 } }}
@@ -78,6 +66,7 @@ function BedroomForm({ bedroomNumber, updateBedroomMetadata }) {
       <TextField
         label="King Beds"
         type="number"
+        value={bedroomInfo.kingBed}
         onChange={handleBedroomBedInfo}
         name="kingBed"
         slotProps={{ input: { min: 0 } }}
@@ -87,6 +76,7 @@ function BedroomForm({ bedroomNumber, updateBedroomMetadata }) {
       <TextField
         label="Sofa Beds"
         type="number"
+        value={bedroomInfo.sofaBed}
         onChange={handleBedroomBedInfo}
         name="sofaBed"
         slotProps={{ input: { min: 0 } }}
