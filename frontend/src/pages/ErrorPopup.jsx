@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { CloseButton, DimBackground, Heading, Popup } from '../styles/popupStyles';
 
 function ErrorPopup({ showErrorPopup, closeErrorPopup }) {
