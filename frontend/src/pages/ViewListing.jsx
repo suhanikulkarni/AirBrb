@@ -401,6 +401,57 @@ function ViewListing ( {token, owner}) {
           </Box>
           <br />
 
+          <ToggleButtonGroup
+            value={sortOrder}
+            exclusive
+            onChange={(e, newSortOrder) => {
+              if (newSortOrder !== null) setSortOrder(newSortOrder); 
+            }}
+            aria-label="list order"
+          >
+            <ToggleButton value="ascending" aria-label="ascending order">
+              <p>Ascending</p>
+            </ToggleButton>
+            <ToggleButton value="descending" aria-label="descending order">
+              <p>Descending</p>
+            </ToggleButton>
+          </ToggleButtonGroup>
+          <br />
+          {!filteredList.length ? (
+            <p>No listings found</p>
+          ) : (
+            <div style={styles.grid} >
+              {orderList().map((listing, index) => {
+                const booking = acceptedBookings.find(
+                  b => Number(b.listingId) === Number(listing.id)
+                );
+                
+                return (
+                  <div key={index}>
+                    <div style={styles.card} onClick={() => navigate(`/viewListings/${listing.id}`)}>
+                      <img src={listing.thumbnail} alt={listing.title} style={styles.thumbnail} />
+                      <h4 style={styles.address}>
+                        {`
+                          ${listing.address?.suburb},
+                          ${listing.address?.state},
+                          ${listing.address?.country}
+                        `}
+                      </h4>
+                      <h3 style={styles.title}>{listing.title}</h3>
+                      <p style={styles.address}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
+                      <p style={styles.address}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>                    
+                      <p style={styles.address}>{`${listing.reviews.length} reviews`}</p>
+                      <p style={styles.price}>${listing.price}</p>
+                    </div>
+                    {booking && (
+                      <Button onClick={() => handleOpen(listing.id, booking.id)}>
+                        Leave a Review
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           )}
         </>
       )}
