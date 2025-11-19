@@ -6,27 +6,21 @@ import { useNavigate } from 'react-router-dom';
 import { PageBody } from '../styles/mainStyles';
 import { ErrorContext } from '../context';
 
-import { Button, Modal, Rating, TextField } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Button from '@mui/material/Button';
+import { Box, Modal, Rating } from '@mui/material';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
+import DatePicker from "react-multi-date-picker";
 
-
-const getListings = async () => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}listings`);
-    if (response.data?.listings) return response.data.listings;
-  } catch (error) {
-    setShowErrorPopup(error.response.data.error);
-  }
-}
-
-function ViewListing ({token}) {
-  const setShowErrorPopup = useContext(ErrorContext); 
-  const [acceptedBookings, setAcceptedBookings] = useState([]);
+function ViewListing ( {token, owner}) {
   const navigate = useNavigate();
-
-  const [reviewRating, setReviewRating] = useState(0);
-  const [reviewComment, setReviewComment] = useState("");
-
+  const setShowErrorPopup = useContext(ErrorContext);
 
   const [list, setList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
@@ -37,8 +31,15 @@ function ViewListing ({token}) {
     'maxBedroomFilter': '',
     'minPriceFilter': '',
     'maxPriceFilter': '',
-    'reviewFilter': ''
+    'reviewFilter': '',
+    'dateFilter': ''
   });
+
+
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [acceptedBookings, setAcceptedBookings] = useState([]);
+
   const [open, setOpen] = useState(false);
   const [selectedListingId, setSelectedListingId] = useState(null);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
@@ -87,6 +88,27 @@ function ViewListing ({token}) {
     }
   }
 
+  const fetchAcceptedBookings = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await axios.get(`${API_BASE_URL}bookings`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.data?.bookings) {
+        const accepted = response.data.bookings.filter(
+          booking => booking.status === 'accepted'
+        );
+        setAcceptedBookings(accepted);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     const fetchListings = async () => {
       const data = await getListings();
@@ -108,8 +130,17 @@ function ViewListing ({token}) {
     }
 
     fetchListings();
+    fetchAcceptedBookings();
   }, []);
 
+  const getListings = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}listings`);
+      if (response.data?.listings) return response.data.listings;
+    } catch (error) {
+      setShowErrorPopup(error.response.data.error);
+    }
+  }
 
   const getListingInfo = async (listingId) => {
     try {
@@ -158,7 +189,7 @@ function ViewListing ({token}) {
       listing = listing.filter(l => {
         if (!l.reviews.length) return false;
         
-        const average = l.reviews.reduce((a, b) => a + b) / l.length;
+        const average = l.reviews.reduce((a, b) => a + b.rating) / l.reviews.length;
         if (average >= filter.reviewFilter) return true;
 
         return false;
@@ -214,61 +245,6 @@ function ViewListing ({token}) {
     return filteredList;
   }
 
-
-  const getBookingRequests = async () => {
-    if (!token) {
-      setShowErrorPopup("You need to be logged in the view booking requests");
-      return;
-    }
-
-    const publishedListings = await getListings();
-    console.log("published listings", publishedListings)
-
-    try {
-      const res = await axios.get(`${API_BASE_URL}bookings`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (res) {
-        const requests = res.data.bookings;
-
-        console.log("All bookings:", requests);
-        const acceptedBookings = requests.filter((booking) => {
-          const accepted = booking.status === "accepted";
-          const listings = publishedListings.filter(
-            (listing) => String(listing.id) === String(booking.listingId)
-          );
-          console.log(listings)
-          return accepted && listings.length > 0;
-        });
-
-        const uniqueAcceptedBookings = Object.values(
-          acceptedBookings.reduce((acc, booking) => {
-            acc[booking.listingId] = booking; 
-            return acc;
-          }, {})
-        );
-
-        console.log("Unique bookings:", uniqueAcceptedBookings);
-
-        setAcceptedBookings(uniqueAcceptedBookings);
-      }
-    } catch (error) {
-      console.log("ERROR123 FULL:", error.toJSON?.() || error);
-      console.log("ERROR123", error.response);
-      setShowErrorPopup(error.response?.data?.error || "Requests Failed To Show.");
-    }
-  };
-
-
-  useEffect (() => {
-    if (list.length > 0) {
-      getBookingRequests();
-    }
-    console.log("fgdf",acceptedBookings)
-  }, [list])
-
-
   return (
     <PageBody>
       <Modal 
@@ -307,24 +283,126 @@ function ViewListing ({token}) {
       {list.length === 0 ? (
         <div>No listings available</div>
       ) : (
-        list.map((listing, index) => {
-          const booking = acceptedBookings.find(
-            b => Number(b.listingId) === Number(listing.id)
-          );
-          return (
-            <div key={index}>
-              <div onClick={() => navigate(`/viewListings/${listing.id}`)}>
-                <div>{listing.title}</div>
-                <div>${listing.price}</div>
-              </div>
-              {booking && (
-                <Button onClick={() => handleOpen(listing.id, booking.id)}>
-                  Leave a Review
-                </Button>
-              )}
-            </div>
-          );
-        })
+        <>
+          <Box
+            sx={{
+              borderRadius: 3,
+              bgcolor: '#f3f3f3ff',
+              padding: '15px',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            <h2>Search Filter</h2>
+            <TextField
+              id="filter-search-input"
+              placeholder="Search Listing"
+              type="search"
+              variant="outlined"
+              value={filter.searchFilter}
+              name='searchFilter'
+              onChange={handleFilter}
+              onKeyDown={handleKeyDown}
+            />
+            <br />
+
+            <h2>Bedroom Filter (Min-Max)</h2>
+            {/* TODO: prevent no. from decreasing beyond 0 */}
+            <TextField
+              id="min-bedroom-filter-input"
+              label="Minimum Bedroom"
+              type="number"
+              value={filter.minBedroomFilter}
+              onChange={handleFilter}
+              name="minBedroomFilter"
+              slotProps={{ input: { min: 0 } }}
+            />
+            <br />
+
+            {/* TODO: prevent no. from decreasing beyond 0 */}
+            <TextField
+              id="max-bedroom-filter-input"
+              label="Maximum Bedroom"
+              type="number"
+              value={filter.maxBedroomFilter}
+              onChange={handleFilter}
+              name="maxBedroomFilter"
+              slotProps={{ input: { min: 0 } }}
+            />
+            <br />
+
+            <h2>Price Filter (Min-Max)</h2>
+            {/* TODO: prevent no. from decreasing beyond 0 */}
+            <TextField
+              id="min-price-filter-input"
+              label="Minimum Price"
+              type="number"
+              value={filter.minPriceFilter}
+              onChange={handleFilter}
+              name="minPriceFilter"
+              slotProps={{ input: { min: 0 } }}
+            />
+            <br />
+
+            {/* TODO: prevent no. from decreasing beyond 0 */}
+            <TextField
+              id="max-price-filter-input"
+              label="Maximum Price"
+              type="number"
+              value={filter.maxPriceFilter}
+              onChange={handleFilter}
+              name="maxPriceFilter"
+              slotProps={{ input: { min: 0 } }}
+            />
+            <br />
+
+            <h2>Review Filter</h2>
+            <FormControl fullWidth>
+              <InputLabel id="review-filter-select-label">Review</InputLabel>
+              <Select
+                labelId="review-filter-select-label"
+                id="review-filter-select"
+                name="reviewFilter"
+                value={filter.reviewFilter}
+                onChange={handleFilter}
+              >
+                <MenuItem value={'5'}>5</MenuItem>
+                <MenuItem value={'4'}>4+</MenuItem>
+                <MenuItem value={'3'}>3+</MenuItem>
+                <MenuItem value={'2'}>2+</MenuItem>
+                <MenuItem value={'1'}>1+</MenuItem>
+                <MenuItem value={'0'}>0+</MenuItem>
+              </Select>
+            </FormControl>
+            <br />
+
+            <h2>Date Filter</h2>
+            <DatePicker 
+              range 
+              value={filter.dateFilter} 
+              onChange={(e, dateRange) => {
+                setFilter((prevData) => ({
+                  ...prevData,
+                  'dateFilter': dateRange.validatedValue
+                }));
+              }}
+              placeholder="Filter available dates"
+            />
+
+            <Button
+              onClick={clearFilter}
+            >Clear Filter</Button>
+            <br />
+
+            <Button
+              variant="contained"
+              onClick={filterListing}
+            >Search</Button>
+          </Box>
+          <br />
+
+          )}
+        </>
       )}
     </PageBody>
   );
