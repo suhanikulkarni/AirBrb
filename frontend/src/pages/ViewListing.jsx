@@ -31,7 +31,8 @@ function ViewListing () {
     'maxBedroomFilter': '',
     'minPriceFilter': '',
     'maxPriceFilter': '',
-    'reviewFilter': ''
+    'reviewFilter': '',
+    'dateFilter': ''
   });
 
   useEffect(() => {
