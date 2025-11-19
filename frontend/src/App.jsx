@@ -4,7 +4,7 @@ import axios from 'axios';
 
 import Button from '@mui/material/Button';
 
-import { Page, NavBar, NavRight, NavLeft, PageBody } from './styles/mainStyles';
+import { Page, NavBar, NavRight, NavLeft } from './styles/mainStyles';
 
 import Login from './pages/Login';
 import Register from './pages/Register';
