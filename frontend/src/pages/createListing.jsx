@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { API_BASE_URL } from '../constants';
+import { API_BASE_URL, DEFAULT_IMAGE } from '../constants';
 import { useNavigate } from 'react-router-dom';
 
 import TextField from '@mui/material/TextField';
@@ -18,6 +18,8 @@ import { Form, PageBody } from '../styles/mainStyles';
 import { ErrorContext } from '../context';
 import { Box } from '@mui/material';
 import BedroomForm from './BedroomForm';
+
+import { fileToDataUrl } from '../helper';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -61,6 +63,8 @@ function CreateListing({ token }) {
     'amenities': []
   });
 
+  const [thumbnailName, setThumbnailName] = useState('');
+
   const setShowErrorPopup = useContext(ErrorContext);
 
   const postListing = async (body, token) => {
@@ -94,8 +98,8 @@ function CreateListing({ token }) {
   }
 
   useEffect(() => {
-      console.log("Updated address:", listingAddress);
-    }, [listingAddress]);
+    console.log("Updated address:", listingAddress);
+  }, [listingAddress]);
 
   const handleMetadataInfo = (e) => {
     const {name, value} = e.target;
@@ -111,9 +115,28 @@ function CreateListing({ token }) {
     }
   }
 
-    useEffect(() => {
-      console.log("Updated metadata:", listingMetadata);
-    }, [listingMetadata]);
+  useEffect(() => {
+    console.log("Updated metadata:", listingMetadata);
+  }, [listingMetadata]);
+
+  const handleThumbnailImage = async (file) => {
+    setThumbnailName(file.name);
+
+    const dataUrl = await fileToDataUrl(file);
+    setListingInfo((prevData) => ({
+      ...prevData,
+      'thumbnail': dataUrl
+    }))
+  }
+
+  const clearThumbnailImage = () => {
+    setThumbnailName('');
+
+    setListingInfo((prevData) => ({
+      ...prevData,
+      'thumbnail': ''
+    }))
+  }
 
   const updateBedroomMetadata = (bedroomNumber, bedroomInfo) => {
     setListingMetadata(prev => {
@@ -132,7 +155,7 @@ function CreateListing({ token }) {
           key={i}
           bedroomNumber={i}
           updateBedroomMetadata={updateBedroomMetadata}
-          />
+        />
       )
     }
 
@@ -140,11 +163,11 @@ function CreateListing({ token }) {
   }
 
   const handleSubmission = async () => {
-
     if (!listingInfo.title || !listingInfo.price) {
       // TODO: usability -> instead of popup -> highlight empty field with error
       return setShowErrorPopup("Please fill out the whole form");
     }
+
     if (!listingAddress.country||!listingAddress.postcode||!listingAddress.state||!listingAddress.streetAddress||! listingAddress.suburb) {
       return setShowErrorPopup("Please enter all the address information");
     }
@@ -152,7 +175,9 @@ function CreateListing({ token }) {
     if (!listingMetadata.bathroomCount||!listingMetadata.propertyType||!listingMetadata.bedroomCount) {
       return setShowErrorPopup("Please enter all the information about the property");
     }
+
     const bedNum   = Number(listingMetadata.bedroomCount);
+    
     if(bedNum > 0 && listingMetadata.bedrooms.length != bedNum) {
       return setShowErrorPopup("Please enter the bedroom information");
     }
@@ -160,18 +185,20 @@ function CreateListing({ token }) {
     const priceNum = Number(listingInfo.price);
     const bathNum  = Number(listingMetadata.bathroomCount);
     
-
     if (![priceNum, bathNum, bedNum].every(Number.isFinite)) {
-      console.log({ priceNum, bathNum, bedNum });
       return setShowErrorPopup("Please insert a number");
     }
-        // TODO: default thumbnail
+    
+    let thumbnail = listingInfo.thumbnail;
+    
+    if (!thumbnail) thumbnail = DEFAULT_IMAGE;
 
     const body = {
       ...listingInfo,
       address: listingAddress,
       metadata: listingMetadata,
-      price: parseInt(listingInfo.price, 10)
+      price: parseInt(listingInfo.price, 10),
+      thumbnail: thumbnail
     }
     console.log("Listing data: ",body)
 
@@ -179,8 +206,8 @@ function CreateListing({ token }) {
   }
 
   useEffect(() => {
-      console.log("Updated all info:", listingInfo);
-    }, [listingInfo]);
+    console.log("Updated all info:", listingInfo);
+  }, [listingInfo]);
 
 
   return (
@@ -266,10 +293,20 @@ function CreateListing({ token }) {
         </Box>
         <br />
 
-        
-        {/* TODO: upload files into a directory */}
         {/* TODO: clear file upload */}
         <h2>Listing Thumbnail</h2>
+        <p>
+          {thumbnailName === '' ? (
+            <>No image uploaded</>
+          ) : (
+            <>
+              {thumbnailName}
+              <Button 
+                onClick={clearThumbnailImage}
+              >✖</Button>
+            </>
+          )}
+        </p>
         <Button
           component="label"
           role={undefined}
@@ -279,7 +316,7 @@ function CreateListing({ token }) {
           Upload file
           <VisuallyHiddenInput
             type="file"
-            onChange={handleInfo}
+            onChange={e => {handleThumbnailImage(e.target.files[0])}}
             name="thumbnail"
             multiple
           />
@@ -331,7 +368,6 @@ function CreateListing({ token }) {
         <br />
 
         <h3>Bedrooms</h3>
-        {/* TODO: ability to add multiple bedroom */}
         <TextField
           label="Number of Bedrooms"
           type="number"
