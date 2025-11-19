@@ -17,7 +17,7 @@ function TemporaryConfirmation({ token }) {
   const navigate = useNavigate();
   return (
     <>
-      BLANFKNGF NFGS I AM LEVITATION
+      The booking has been confirmed, please wait to hear back from the host to see if they accepted or declined your booking
       <Button
   
         onClick={goToDashboard}

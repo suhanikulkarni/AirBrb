@@ -80,11 +80,9 @@ function ViewListing ( {token, owner}) {
       );
       if (response) {
         console.log("Review uploaded successfully");
-
         handleClose();
       }
     } catch (error) {
-      console.log(error.response)
       setShowErrorPopup(error.response.data.error);
     }
   }
@@ -106,7 +104,8 @@ function ViewListing ( {token, owner}) {
         setAcceptedBookings(accepted);
       }
     } catch (error) {
-      console.log(error);
+            setShowErrorPopup(error.response.data.error);
+
     }
   };
 

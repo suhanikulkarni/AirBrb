@@ -65,7 +65,6 @@ function UsersBookingForm({price, listingId, token}) {
 
       navigate('/temporaryConfirmation')
     } catch (error) {
-      console.log("Booking ERROR:", error);
       setShowErrorPopup(error.response?.data?.error || "Booking failed.");
     }
   };

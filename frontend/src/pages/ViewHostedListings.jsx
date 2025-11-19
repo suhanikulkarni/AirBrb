@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import DatePicker from "react-multi-date-picker";
 import { ErrorContext } from '../context';
+import { useNavigate } from "react-router-dom";
 
 
 const getAllListings = async (owner) => {
@@ -23,7 +24,8 @@ const getAllListings = async (owner) => {
     } 
   }
   catch {
-    console.log("ERROR");
+          setShowErrorPopup(error.response.data.error);
+
     return [];
   }
 }
@@ -35,8 +37,8 @@ const getListingInfo = async (id) => {
     
   }
   catch {
-    console.log("ERRORROR");
-    return;
+          setShowErrorPopup(error.response.data.error);
+
   }
 }
 
@@ -50,6 +52,8 @@ function ViewHostedListings({ owner, token }) {
   const [activeListing, setActiveListing] = useState(null);
   const [currentRange, setCurrentRange] = useState([]);
   const [allRanges, setAllRanges] = useState({});
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getFetch = async () => {
@@ -71,7 +75,8 @@ function ViewHostedListings({ owner, token }) {
         setListings(detailedListings.filter(Boolean));
       }
       catch (error) {
-        console.error("Error fetching listings:", error);
+        setShowErrorPopup(error.response.data.error);
+
       }
     } 
     getFetch();
@@ -118,12 +123,13 @@ function ViewHostedListings({ owner, token }) {
       );
 
       if (res) {
-        console.log("this si resdata",res)
+        console.log("this si resdata",res);
+        navigate('/')
       }
     }
     catch {
-      console.log("EROROROROORORORORO");
-      return;
+      setShowErrorPopup(error.response.data.error);
+
     } 
   }
   const addingRanges = () => {
@@ -175,7 +181,6 @@ function ViewHostedListings({ owner, token }) {
         setBookingRequests(bookingRequests);
       }
     } catch (error) {
-      //console.log("ERROR", error.response);
       setShowErrorPopup(error.response?.data?.error || "Requests Failed To Show.");
     }
   }

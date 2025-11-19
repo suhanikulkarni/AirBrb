@@ -7,20 +7,7 @@ import { Box, Modal, TextField, Tooltip } from '@mui/material';
 
 import Rating from '@mui/material/Rating';
 
-const getListingInfo = async (id) => {
-  try {
-    const response = await axios.get(
-      `${API_BASE_URL}listings/${id}`)
-    console.log(response)
-    if (response) {
-      console.log("this is the response",response.data.listing)
-      return response.data.listing;
-    }
-  }
-  catch (error) {
-    console.log("in the catch, there is an error", error.message);
-  }
-}
+
 
 function ListingInfo({ token }) {
   const { id } = useParams();
@@ -57,6 +44,22 @@ function ListingInfo({ token }) {
       const value = listingDetails.reviews.filter((review) => review.rating === reviewValue);
       console.log("plk",value)
       setSpecificRatingReviews(value);
+    }
+  }
+
+  const getListingInfo = async (id) => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}listings/${id}`)
+      console.log(response)
+      if (response) {
+        console.log("this is the response",response.data.listing)
+        return response.data.listing;
+      }
+    }
+    catch (error) {
+      setShowErrorPopup(error.response.data.error);
+
     }
   }
 
