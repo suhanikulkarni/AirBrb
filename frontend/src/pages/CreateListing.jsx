@@ -12,6 +12,8 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 import { Form, PageBody } from '../styles/mainStyles';
 
@@ -63,7 +65,8 @@ function CreateListing({ token }) {
     'amenities': []
   });
 
-  const [thumbnailName, setThumbnailName] = useState('');
+  const [thumbnailImageName, setThumbnailImageName] = useState('');
+  const [thumbnailType, setThumbnailType] = useState('image');
 
   const setShowErrorPopup = useContext(ErrorContext);
 
@@ -120,7 +123,7 @@ function CreateListing({ token }) {
   }, [listingMetadata]);
 
   const handleThumbnailImage = async (file) => {
-    setThumbnailName(file.name);
+    setThumbnailImageName(file.name);
 
     const dataUrl = await fileToDataUrl(file);
     setListingInfo((prevData) => ({
@@ -129,12 +132,19 @@ function CreateListing({ token }) {
     }))
   }
 
-  const clearThumbnailImage = () => {
-    setThumbnailName('');
+  const clearThumbnail = () => {
+    setThumbnailImageName('');
 
     setListingInfo((prevData) => ({
       ...prevData,
       'thumbnail': ''
+    }))
+  }
+
+  const handleThumbnailYoutube = (youtubeLink) => {
+    setListingInfo((prevData) => ({
+      ...prevData,
+      'thumbnail': youtubeLink
     }))
   }
 
@@ -190,6 +200,10 @@ function CreateListing({ token }) {
     }
     
     let thumbnail = listingInfo.thumbnail;
+
+    if (thumbnail && thumbnailType === "youtube" && !thumbnail.startsWith("https://www.youtube.com/")) {
+      return setShowErrorPopup("Invalid YouTube link");
+    };
     
     if (!thumbnail) thumbnail = DEFAULT_IMAGE;
 
@@ -293,34 +307,75 @@ function CreateListing({ token }) {
         </Box>
         <br />
 
-        {/* TODO: clear file upload */}
         <h2>Listing Thumbnail</h2>
-        <p>
-          {thumbnailName === '' ? (
-            <>No image uploaded</>
-          ) : (
-            <>
-              {thumbnailName}
-              <Button 
-                onClick={clearThumbnailImage}
-              >✖</Button>
-            </>
-          )}
-        </p>
-        <Button
-          component="label"
-          role={undefined}
-          variant="contained"
-          tabIndex={-1}  
+        <ToggleButtonGroup
+          value={thumbnailType}
+          exclusive
+          onChange={(e, thumbnailType) => {
+            if (thumbnailType !== null) {
+              clearThumbnail();
+              setThumbnailType(thumbnailType);
+            }; 
+          }}
+          aria-label="thumbnail type"
         >
-          Upload file
-          <VisuallyHiddenInput
-            type="file"
-            onChange={e => {handleThumbnailImage(e.target.files[0])}}
-            name="thumbnail"
-            multiple
-          />
-        </Button>
+          <ToggleButton value="image" aria-label="image thumbnail">
+            <p>Image</p>
+          </ToggleButton>
+          <ToggleButton value="youtube" aria-label="youtube thumbnail">
+            <p>Youtube</p>
+          </ToggleButton>
+        </ToggleButtonGroup>
+        <br />
+        
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+        >
+          {thumbnailType === 'image' && 
+            <>
+              <p>
+                {thumbnailImageName === '' ? (
+                  <>No image uploaded</>
+                ) : (
+                  <>
+                    {thumbnailImageName}
+                    <Button 
+                      onClick={clearThumbnail}
+                    >✖</Button>
+                  </>
+                )}
+              </p>
+              <Button
+                component="label"
+                role={undefined}
+                variant="contained"
+                tabIndex={-1}  
+              >
+                Upload file
+                <VisuallyHiddenInput
+                  type="file"
+                  onChange={e => {handleThumbnailImage(e.target.files[0])}}
+                  name="thumbnail"
+                  multiple
+                />
+              </Button>
+            </>
+          }
+          {thumbnailType === 'youtube' &&
+            <>
+              <TextField
+                id="youtube-thumbnail-input"
+                label="YouTube URL"
+                type="text"
+                onChange={e => {handleThumbnailYoutube(e.target.value)}}
+                name="thumbnail"
+              />
+            </>
+          }
+        </Box>
         <br />
 
         {/* TODO: create form elements for additional information */}

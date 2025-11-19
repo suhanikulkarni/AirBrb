@@ -17,6 +17,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
 import DatePicker from "react-multi-date-picker";
+import Thumbnail from './Thumbnail';
 
 function ViewListing () {
   const navigate = useNavigate();
@@ -315,7 +316,7 @@ function ViewListing () {
             <div style={styles.grid} >
               {orderList().map((listing, index) => (
                 <div key={index} style={styles.card} onClick={() => navigate(`/viewListings/${listing.id}`)}>
-                  <img src={listing.thumbnail} alt={listing.title} style={styles.thumbnail} />
+                  <Thumbnail thumbnail={listing.thumbnail} listingTitle={listing.title} />
                   <h4 style={styles.address}>
                     {`
                       ${listing.address?.state},
