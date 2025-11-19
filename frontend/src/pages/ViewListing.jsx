@@ -104,7 +104,7 @@ function ViewListing ( {token, owner}) {
         setAcceptedBookings(accepted);
       }
     } catch (error) {
-            setShowErrorPopup(error.response.data.error);
+      setShowErrorPopup(error.response.data.error);
 
     }
   };

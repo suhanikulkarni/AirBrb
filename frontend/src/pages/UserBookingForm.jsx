@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 
 import { Box, Button, InputLabel } from '@mui/material';
-import TextField from '@mui/material/TextField';
 import DatePicker from 'react-multi-date-picker';
 
 import { ErrorContext } from '../context';
@@ -13,6 +12,7 @@ function UsersBookingForm({price, listingId, token}) {
   const [bookingDates, setBookingDates] = useState();
   const [totalPrice, setTotalPrice] = useState();
   const navigate = useNavigate()
+  
   // console.log("now im here@@@")
   const setShowErrorPopup = useContext(ErrorContext); 
   useEffect(() => {
@@ -21,13 +21,7 @@ function UsersBookingForm({price, listingId, token}) {
       setTotalPrice(nights * price);
     }
   }, [bookingDates]);
-  
-  const calculatePrice = () => {
-    const bookingDays = calculateNumOfNights();
-    const totalPrice = bookingDays * price
-    setTotalPrice(totalPrice);
-    return totalPrice;
-  }
+
   const calculateNumOfNights = () => { 
     if (!bookingDates || bookingDates.length !== 2) return 0;
 

@@ -9,51 +9,47 @@ import { ErrorContext } from '../context';
 import { useNavigate } from "react-router-dom";
 
 
-const getAllListings = async (owner) => {
-  let hostedListings = [];
-  try {
-    const res = await axios.get(`${API_BASE_URL}listings`);
-    if (res) {
-      const listingData = res.data.listings;
-      listingData.forEach(element => {
-        if (element.owner === owner) {
-          hostedListings.push(element.id)
-        }
-      });
-      return hostedListings;
-    } 
-  }
-  catch {
-          setShowErrorPopup(error.response.data.error);
-
-    return [];
-  }
-}
-
-const getListingInfo = async (id) => {
-  try {
-    const res = await axios.get(`${API_BASE_URL}listings/${id}`);
-    if (res) return res.data.listing;
-    
-  }
-  catch {
-          setShowErrorPopup(error.response.data.error);
-
-  }
-}
-
 function ViewHostedListings({ owner, token }) {
   const setShowErrorPopup = useContext(ErrorContext); 
-  
+
   const [listings, setListings] = useState([]);
   const [bookingRequests, setBookingRequests] = useState([]);
-
   const [anchorEl, setAnchorEl] = useState(null);
   const [activeListing, setActiveListing] = useState(null);
   const [currentRange, setCurrentRange] = useState([]);
   const [allRanges, setAllRanges] = useState({});
-
   const navigate = useNavigate();
+
+  const getAllListings = async (owner) => {
+    let hostedListings = [];
+    try {
+      const res = await axios.get(`${API_BASE_URL}listings`);
+      if (res) {
+        const listingData = res.data.listings;
+        listingData.forEach(element => {
+          if (element.owner === owner) {
+            hostedListings.push(element.id)
+          }
+        });
+        return hostedListings;
+      } 
+    }
+    catch (error){
+      setShowErrorPopup(error.response.data.error);
+      return [];
+    }
+  }
+
+  const getListingInfo = async (id) => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}listings/${id}`);
+      if (res) return res.data.listing;
+    }
+    catch (error){
+      setShowErrorPopup(error.response.data.error);
+    }
+  }
+
 
   useEffect(() => {
     const getFetch = async () => {
@@ -127,7 +123,7 @@ function ViewHostedListings({ owner, token }) {
         navigate('/')
       }
     }
-    catch {
+    catch (error){
       setShowErrorPopup(error.response.data.error);
 
     } 

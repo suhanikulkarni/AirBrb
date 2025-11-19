@@ -1,19 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { API_BASE_URL } from '../constants';
 import axios from 'axios';
 import UsersBookingForm from './UserBookingForm';
-import { Box, Modal, TextField, Tooltip } from '@mui/material';
+import { Box, Modal, Tooltip } from '@mui/material';
 
 import Rating from '@mui/material/Rating';
-
-
+import { ErrorContext } from '../context';
 
 function ListingInfo({ token }) {
   const { id } = useParams();
   const [open, setOpen] = useState(false);
   const [listingDetails, setListingDetails] = useState(null);
-
+  const setShowErrorPopup = useContext(ErrorContext);
   const [reviewValue, setReviewValue] = useState(0);
   const [specificRatingReviews, setSpecificRatingReviews] = useState([]);
 
@@ -89,41 +88,41 @@ function ListingInfo({ token }) {
     <>
       {listingDetails && (
         <>
-        <div>
-          <h2>Listing Info</h2>
-          <p>Title: {listingDetails?.title}</p>
-          <p>
+          <div>
+            <h2>Listing Info</h2>
+            <p>Title: {listingDetails?.title}</p>
+            <p>
           Address: 
-            {listingDetails?.address?.streetAddress}, 
-            {listingDetails?.address?.suburb}, 
-            {listingDetails?.address?.postcode}, 
-            {listingDetails?.address?.state}, 
-            {listingDetails?.address?.country}
-          </p>
+              {listingDetails?.address?.streetAddress}, 
+              {listingDetails?.address?.suburb}, 
+              {listingDetails?.address?.postcode}, 
+              {listingDetails?.address?.state}, 
+              {listingDetails?.address?.country}
+            </p>
           
-          <p>Amenities: {listingDetails?.metadata?.amenities}</p>
-          <p>Price: ${listingDetails?.price} per night</p>
-          <p>Property Type: {listingDetails?.metadata?.propertyType}</p>
-          <p>Number of Beds: {listingDetails?.metadata?.bedroomCount}</p>
-          <p>Number of Bathrooms: {listingDetails?.metadata?.bathroomCount}</p>
-          <p>Number of Beds: {sum}</p>
-        </div>
+            <p>Amenities: {listingDetails?.metadata?.amenities}</p>
+            <p>Price: ${listingDetails?.price} per night</p>
+            <p>Property Type: {listingDetails?.metadata?.propertyType}</p>
+            <p>Number of Beds: {listingDetails?.metadata?.bedroomCount}</p>
+            <p>Number of Bathrooms: {listingDetails?.metadata?.bathroomCount}</p>
+            <p>Number of Beds: {sum}</p>
+          </div>
 
-        <Tooltip title={tooltipContent}>
-          <Rating 
-            value={reviewValue}
-            onChangeActive={(event, newHover) => {
-              setReviewValue(newHover);
-            }}
-            onClick={(event, newValue) => {
-              handleOpen()
-              if (newValue) {
-                setReviewValue(newValue);
+          <Tooltip title={tooltipContent}>
+            <Rating 
+              value={reviewValue}
+              onChangeActive={(event, newHover) => {
+                setReviewValue(newHover);
+              }}
+              onClick={(event, newValue) => {
+                handleOpen()
+                if (newValue) {
+                  setReviewValue(newValue);
                 
-              }
-            }}
-          />
-        </Tooltip>
+                }
+              }}
+            />
+          </Tooltip>
         </>
       )}
 
@@ -136,9 +135,9 @@ function ListingInfo({ token }) {
       )}
 
       <Modal
-          open={open}
-          onClose={handleClose}
-        >
+        open={open}
+        onClose={handleClose}
+      >
         <Box sx={{ 
           position: 'absolute',
           top: '50%',
