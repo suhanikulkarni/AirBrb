@@ -133,7 +133,6 @@ function ViewHostedListings({ owner, token }) {
       return;
     }
 
-    
     setAllRanges(prev => {
       const updatedRanges = {
         ...prev,
