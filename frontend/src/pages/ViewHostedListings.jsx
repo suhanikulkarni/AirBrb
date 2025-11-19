@@ -79,7 +79,7 @@ function ViewHostedListings({ owner, token }) {
   }, [owner]);
 
   useEffect(() => {
-    if (listings.length > 0) {
+    if (listings !== "LOADING" && listings.length > 0) {
       getBookingRequests();
     }
   }, [listings]);
@@ -193,7 +193,10 @@ function ViewHostedListings({ owner, token }) {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      if (response) {console.log(response);getBookingRequests();}
+      if (response) {
+        console.log(response);
+        getBookingRequests();
+      }
     }
     catch(error){
       setShowErrorPopup(error.response?.data?.error || "Failed to Accept Bookng Request");
