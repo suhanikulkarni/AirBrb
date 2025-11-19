@@ -55,7 +55,7 @@ function ListingInfo({ token }) {
           <p>Amenities: {listingDetails?.metadata?.amenities}</p>
           <p>Price: ${listingDetails?.price} per night</p>
           <p>Property Type: {listingDetails?.metadata?.propertyType}</p>
-          <p>Reviews: {listingDetails?.reviews}</p>
+          {/* <p>Reviews: {listingDetails?.reviews}</p> */}
           <p>Number of Beds: {listingDetails?.metadata?.bedroomCount}</p>
           <p>Number of Bathrooms: {listingDetails?.metadata?.bathroomCount}</p>
           <p>Number of Beds: {sum}</p>

@@ -80,6 +80,7 @@ function ViewListing ( {token, owner}) {
       );
       if (response) {
         console.log("Review uploaded successfully");
+
         handleClose();
       }
     } catch (error) {
@@ -100,7 +101,7 @@ function ViewListing ( {token, owner}) {
       
       if (response.data?.bookings) {
         const accepted = response.data.bookings.filter(
-          booking => booking.status === 'accepted'
+          booking => booking.status === 'accepted' && booking.owner === owner
         );
         setAcceptedBookings(accepted);
       }
@@ -131,7 +132,7 @@ function ViewListing ( {token, owner}) {
 
     fetchListings();
     fetchAcceptedBookings();
-  }, []);
+  }, [reviewComment, reviewRating]);
 
   const getListings = async () => {
     try {
@@ -427,8 +428,8 @@ function ViewListing ( {token, owner}) {
                 );
                 
                 return (
-                  <div key={index}>
-                    <div style={styles.card} onClick={() => navigate(`/viewListings/${listing.id}`)}>
+                  <div key={index} style={styles.card}>
+                    <div  onClick={() => navigate(`/viewListings/${listing.id}`)}>
                       <img src={listing.thumbnail} alt={listing.title} style={styles.thumbnail} />
                       <h4 style={styles.address}>
                         {`
@@ -444,7 +445,7 @@ function ViewListing ( {token, owner}) {
                       <p style={styles.price}>${listing.price}</p>
                     </div>
                     {booking && (
-                      <Button onClick={() => handleOpen(listing.id, booking.id)}>
+                      <Button variant="contained"onClick={() => handleOpen(listing.id, booking.id)}>
                         Leave a Review
                       </Button>
                     )}
