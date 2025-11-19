@@ -28,18 +28,16 @@ function ListingInfo({ token }) {
   const [listingDetails, setListingDetails] = useState(null);
 
   const [reviewValue, setReviewValue] = useState(0);
-  const [specificRatingReviews, setSpecificRatingReviews] = useState([])
+  const [specificRatingReviews, setSpecificRatingReviews] = useState([]);
 
   const handleClose = () => {
     setOpen(false);
   };
 
   const handleOpen = () => {
-    console.log("Opennign")
+    console.log("Opening")
     setOpen(true);
   };
-
-
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -55,23 +53,34 @@ function ListingInfo({ token }) {
   });
 
   const filterReviews = () => {
-
     if (listingDetails) {
-    // console.log(listingDetails)
-    // console.log("console.log",listingDetails.reviews)
-
-    const value = listingDetails.reviews.filter((review) => review.rating === reviewValue);
-    console.log("plk",value)
-
-    setSpecificRatingReviews(value);
-}
+      const value = listingDetails.reviews.filter((review) => review.rating === reviewValue);
+      console.log("plk",value)
+      setSpecificRatingReviews(value);
+    }
   }
+
+  const getBreakdownForStar = (starRating) => {
+    if (!listingDetails?.reviews || !starRating) return null;
+    
+    const count = listingDetails.reviews.filter(r => r.rating === starRating).length;
+    const total = listingDetails.reviews.length;
+    const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+    
+    return { starRating, count, percentage };
+  };
 
   useEffect(() => {
     filterReviews()
+  },[reviewValue, listingDetails]);
 
-  },[reviewValue, listingDetails])
+  const breakdown = getBreakdownForStar(reviewValue);
 
+  const tooltipContent = breakdown ? (
+    <div>
+      {breakdown.starRating} stars: {breakdown.percentage}% ({breakdown.count} reviews)
+    </div>
+  ) : '';
 
   return (
     <>
@@ -97,10 +106,20 @@ function ListingInfo({ token }) {
           <p>Number of Beds: {sum}</p>
         </div>
 
-        <Tooltip title='reviewValue'>
-          <Rating value={reviewValue}
-            onClick={handleOpen}
-            onChange={(event, newValue) => setReviewValue(newValue)}></Rating>
+        <Tooltip title={tooltipContent}>
+          <Rating 
+            value={reviewValue}
+            onChangeActive={(event, newHover) => {
+              setReviewValue(newHover);
+            }}
+            onClick={(event, newValue) => {
+              handleOpen()
+              if (newValue) {
+                setReviewValue(newValue);
+                
+              }
+            }}
+          />
         </Tooltip>
         </>
       )}
@@ -130,17 +149,23 @@ function ListingInfo({ token }) {
         }}>
           <h2>Reviews with {reviewValue} stars</h2>
 
-          {specificRatingReviews.map((review) => {
-            return(<div>
-              <p>{review.comment}</p>
-
-            </div>)
-          })}
+          {specificRatingReviews.length > 0 ? (
+            specificRatingReviews.map((review, index) => {
+              return(
+                <div key={index}>
+                  <Rating value={review.rating} readOnly />
+                  <p>{review.comment}</p>
+                  <br />
+                </div>
+              )
+            })
+          ) : (
+            <p>No reviews with {reviewValue} stars yet.</p>
+          )}
 
           <button onClick={handleClose}>Close</button>
         </Box>
       </Modal>
-     
     </>
   );
 }
