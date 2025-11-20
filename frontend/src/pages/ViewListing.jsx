@@ -17,12 +17,13 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
 import DatePicker from "react-multi-date-picker";
+import Thumbnail from './Thumbnail';
 
 function ViewListing ( {token, owner}) {
   const navigate = useNavigate();
   const setShowErrorPopup = useContext(ErrorContext);
 
-  const [list, setList] = useState([]);
+  const [list, setList] = useState("LOADING");
   const [filteredList, setFilteredList] = useState([]);
   const [sortOrder, setSortOrder] = useState('ascending');
   const [filter, setFilter] = useState({
@@ -124,6 +125,7 @@ function ViewListing ( {token, owner}) {
         }
         
         // TODO: sort list based on booked listing
+        fetchedList.sort((a, b) => a.title.localeCompare(b.title));
         setList(fetchedList);
         setFilteredList([...fetchedList]);
       }      
@@ -280,184 +282,196 @@ function ViewListing ( {token, owner}) {
         </div>
       </Modal>
 
-      {list.length === 0 ? (
-        <div>No listings available</div>
+      <Box
+        sx={{
+          borderRadius: 3,
+          bgcolor: '#f3f3f3ff',
+          padding: '15px',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
+        <h2>Search Filter</h2>
+        <TextField
+          id="filter-search-input"
+          placeholder="Search Listing"
+          type="search"
+          variant="outlined"
+          value={filter.searchFilter}
+          name='searchFilter'
+          onChange={handleFilter}
+          onKeyDown={handleKeyDown}
+        />
+        <br />
+
+        <h2>Bedroom Filter (Min-Max)</h2>
+        {/* TODO: prevent no. from decreasing beyond 0 */}
+        <TextField
+          id="min-bedroom-filter-input"
+          label="Minimum Bedroom"
+          type="number"
+          value={filter.minBedroomFilter}
+          onChange={handleFilter}
+          name="minBedroomFilter"
+          slotProps={{ input: { min: 0 } }}
+        />
+        <br />
+
+        {/* TODO: prevent no. from decreasing beyond 0 */}
+        <TextField
+          id="max-bedroom-filter-input"
+          label="Maximum Bedroom"
+          type="number"
+          value={filter.maxBedroomFilter}
+          onChange={handleFilter}
+          name="maxBedroomFilter"
+          slotProps={{ input: { min: 0 } }}
+        />
+        <br />
+
+        <h2>Price Filter (Min-Max)</h2>
+        {/* TODO: prevent no. from decreasing beyond 0 */}
+        <TextField
+          id="min-price-filter-input"
+          label="Minimum Price"
+          type="number"
+          value={filter.minPriceFilter}
+          onChange={handleFilter}
+          name="minPriceFilter"
+          slotProps={{ input: { min: 0 } }}
+        />
+        <br />
+
+        {/* TODO: prevent no. from decreasing beyond 0 */}
+        <TextField
+          id="max-price-filter-input"
+          label="Maximum Price"
+          type="number"
+          value={filter.maxPriceFilter}
+          onChange={handleFilter}
+          name="maxPriceFilter"
+          slotProps={{ input: { min: 0 } }}
+        />
+        <br />
+
+        <h2>Review Filter</h2>
+        <FormControl fullWidth>
+          <InputLabel id="review-filter-select-label">Review</InputLabel>
+          <Select
+            labelId="review-filter-select-label"
+            id="review-filter-select"
+            name="reviewFilter"
+            value={filter.reviewFilter}
+            onChange={handleFilter}
+          >
+            <MenuItem value={'5'}>5</MenuItem>
+            <MenuItem value={'4'}>4+</MenuItem>
+            <MenuItem value={'3'}>3+</MenuItem>
+            <MenuItem value={'2'}>2+</MenuItem>
+            <MenuItem value={'1'}>1+</MenuItem>
+            <MenuItem value={'0'}>0+</MenuItem>
+          </Select>
+        </FormControl>
+        <br />
+
+        <h2>Date Filter</h2>
+        <DatePicker 
+          range 
+          value={filter.dateFilter} 
+          onChange={(e, dateRange) => {
+            setFilter((prevData) => ({
+              ...prevData,
+              'dateFilter': dateRange.validatedValue
+            }));
+          }}
+          placeholder="Filter available dates"
+        />
+
+        <Button
+          onClick={clearFilter}
+        >Clear Filter</Button>
+        <br />
+
+        <Button
+          variant="contained"
+          onClick={filterListing}
+        >Search</Button>
+      </Box>
+      <br />
+
+      <ToggleButtonGroup
+        value={sortOrder}
+        exclusive
+        onChange={(e, newSortOrder) => {
+          if (newSortOrder !== null) setSortOrder(newSortOrder); 
+        }}
+        aria-label="list order"
+      >
+        <ToggleButton value="ascending" aria-label="ascending order">
+          <p>Ascending</p>
+        </ToggleButton>
+        <ToggleButton value="descending" aria-label="descending order">
+          <p>Descending</p>
+        </ToggleButton>
+      </ToggleButtonGroup>
+      <br />
+      
+
+      {list === "LOADING" ? (
+        <p>LOADING...</p>
       ) : (
         <>
-          <Box
-            sx={{
-              borderRadius: 3,
-              bgcolor: '#f3f3f3ff',
-              padding: '15px',
-              display: 'flex',
-              flexDirection: 'column'
-            }}
-          >
-            <h2>Search Filter</h2>
-            <TextField
-              id="filter-search-input"
-              placeholder="Search Listing"
-              type="search"
-              variant="outlined"
-              value={filter.searchFilter}
-              name='searchFilter'
-              onChange={handleFilter}
-              onKeyDown={handleKeyDown}
-            />
-            <br />
-
-            <h2>Bedroom Filter (Min-Max)</h2>
-            {/* TODO: prevent no. from decreasing beyond 0 */}
-            <TextField
-              id="min-bedroom-filter-input"
-              label="Minimum Bedroom"
-              type="number"
-              value={filter.minBedroomFilter}
-              onChange={handleFilter}
-              name="minBedroomFilter"
-              slotProps={{ input: { min: 0 } }}
-            />
-            <br />
-
-            {/* TODO: prevent no. from decreasing beyond 0 */}
-            <TextField
-              id="max-bedroom-filter-input"
-              label="Maximum Bedroom"
-              type="number"
-              value={filter.maxBedroomFilter}
-              onChange={handleFilter}
-              name="maxBedroomFilter"
-              slotProps={{ input: { min: 0 } }}
-            />
-            <br />
-
-            <h2>Price Filter (Min-Max)</h2>
-            {/* TODO: prevent no. from decreasing beyond 0 */}
-            <TextField
-              id="min-price-filter-input"
-              label="Minimum Price"
-              type="number"
-              value={filter.minPriceFilter}
-              onChange={handleFilter}
-              name="minPriceFilter"
-              slotProps={{ input: { min: 0 } }}
-            />
-            <br />
-
-            {/* TODO: prevent no. from decreasing beyond 0 */}
-            <TextField
-              id="max-price-filter-input"
-              label="Maximum Price"
-              type="number"
-              value={filter.maxPriceFilter}
-              onChange={handleFilter}
-              name="maxPriceFilter"
-              slotProps={{ input: { min: 0 } }}
-            />
-            <br />
-
-            <h2>Review Filter</h2>
-            <FormControl fullWidth>
-              <InputLabel id="review-filter-select-label">Review</InputLabel>
-              <Select
-                labelId="review-filter-select-label"
-                id="review-filter-select"
-                name="reviewFilter"
-                value={filter.reviewFilter}
-                onChange={handleFilter}
-              >
-                <MenuItem value={'5'}>5</MenuItem>
-                <MenuItem value={'4'}>4+</MenuItem>
-                <MenuItem value={'3'}>3+</MenuItem>
-                <MenuItem value={'2'}>2+</MenuItem>
-                <MenuItem value={'1'}>1+</MenuItem>
-                <MenuItem value={'0'}>0+</MenuItem>
-              </Select>
-            </FormControl>
-            <br />
-
-            <h2>Date Filter</h2>
-            <DatePicker 
-              range 
-              value={filter.dateFilter} 
-              onChange={(e, dateRange) => {
-                setFilter((prevData) => ({
-                  ...prevData,
-                  'dateFilter': dateRange.validatedValue
-                }));
-              }}
-              placeholder="Filter available dates"
-            />
-
-            <Button
-              onClick={clearFilter}
-            >Clear Filter</Button>
-            <br />
-
-            <Button
-              variant="contained"
-              onClick={filterListing}
-            >Search</Button>
-          </Box>
-          <br />
-
-          <ToggleButtonGroup
-            value={sortOrder}
-            exclusive
-            onChange={(e, newSortOrder) => {
-              if (newSortOrder !== null) setSortOrder(newSortOrder); 
-            }}
-            aria-label="list order"
-          >
-            <ToggleButton value="ascending" aria-label="ascending order">
-              <p>Ascending</p>
-            </ToggleButton>
-            <ToggleButton value="descending" aria-label="descending order">
-              <p>Descending</p>
-            </ToggleButton>
-          </ToggleButtonGroup>
-          <br />
-          {!filteredList.length ? (
-            <p>No listings found</p>
+          {list.length === 0 ? (
+            <div>No listings available</div>
           ) : (
-            <div style={styles.grid} >
-              {orderList().map((listing, index) => {
-                const booking = acceptedBookings.find(
-                  b => Number(b.listingId) === Number(listing.id)
-                );
-                
-                return (
-                  <div key={index} style={styles.card}>
-                    <div  onClick={() => navigate(`/viewListings/${listing.id}`)}>
-                      <img src={listing.thumbnail} alt={listing.title} style={styles.thumbnail} />
-                      <h4 style={styles.address}>
-                        {`
-                          ${listing.address?.suburb},
-                          ${listing.address?.state},
-                          ${listing.address?.country}
-                        `}
-                      </h4>
-                      <h3 style={styles.title}>{listing.title}</h3>
-                      <p style={styles.address}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
-                      <p style={styles.address}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>                    
-                      <p style={styles.address}>{`${listing.reviews.length} reviews`}</p>
-                      <p style={styles.price}>${listing.price}</p>
-                    </div>
-                    {booking && (
-                      <Button variant="contained"onClick={() => handleOpen(listing.id, booking.id)}>
-                        Leave a Review
-                      </Button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            <>
+              {!filteredList.length ? (
+                <p>No listings found</p>
+              ) : (
+                <div style={styles.grid} >
+                  {orderList().map((listing, index) => {
+                    const booking = acceptedBookings.find(
+                      b => Number(b.listingId) === Number(listing.id)
+                    );
+                    
+                    return (
+                      <div key={index} style={styles.card}>
+                        <div onClick={() => navigate(`/viewListings/${listing.id}`)}>
+                          <Thumbnail thumbnail={listing.thumbnail} listingTitle={listing.title} />
+                          <h4 style={styles.address}>
+                            {`
+                              ${listing.address?.suburb},
+                              ${listing.address?.state},
+                              ${listing.address?.country}
+                            `}
+                          </h4>
+                          <h3 style={styles.title}>{listing.title}</h3>
+                          <p style={styles.address}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
+                          <p style={styles.address}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>                    
+                          <p style={styles.address}>
+                            {listing.reviews.length > 0 && (
+                              <>`★ ${listing.reviews.reduce((a, b) => a + b.rating) / listing.reviews.length} `</>
+                            )}
+                            {`(${listing.reviews.length} reviews)`}
+                          </p>
+                          <p style={styles.price}>${listing.price}</p>
+                        </div>
+                        {booking && (
+                          <Button variant="contained"onClick={() => handleOpen(listing.id, booking.id)}>
+                            Leave a Review
+                          </Button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
           )}
         </>
       )}
     </PageBody>
   );
-
 }
 
 export default ViewListing;

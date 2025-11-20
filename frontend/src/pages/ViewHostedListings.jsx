@@ -5,14 +5,14 @@ import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import DatePicker from "react-multi-date-picker";
+import { Box } from '@mui/material';
 import { ErrorContext } from '../context';
 import { useNavigate } from "react-router-dom";
 
-
 function ViewHostedListings({ owner, token }) {
   const setShowErrorPopup = useContext(ErrorContext); 
-
-  const [listings, setListings] = useState([]);
+  
+  const [listings, setListings] = useState("LOADING");
   const [bookingRequests, setBookingRequests] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [activeListing, setActiveListing] = useState(null);
@@ -37,10 +37,6 @@ function ViewHostedListings({ owner, token }) {
             }
           }
         );
-        if (res) {
-
-          navigate('/')
-        }
       }
       catch (error){
         setShowErrorPopup(error.response.data.error);
@@ -83,16 +79,14 @@ function ViewHostedListings({ owner, token }) {
     }
   }
 
-  const getListingInfo = async (id) => {
+  const getListingInfo = async (listingId) => {
     try {
-      const res = await axios.get(`${API_BASE_URL}listings/${id}`);
-      if (res) return res.data.listing;
-    }
-    catch (error){
+      const response = await axios.get(`${API_BASE_URL}listings/${listingId}`);
+      if (response.data?.listing) return response.data?.listing;
+    } catch (error) {
       setShowErrorPopup(error.response.data.error);
     }
   }
-
 
   useEffect(() => {
     const getFetch = async () => {
@@ -122,7 +116,7 @@ function ViewHostedListings({ owner, token }) {
   }, [owner]);
 
   useEffect(() => {
-    if (listings.length > 0) {
+    if (listings !== "LOADING" && listings.length > 0) {
       getBookingRequests();
     }
   }, [listings]);
@@ -172,6 +166,7 @@ function ViewHostedListings({ owner, token }) {
     } 
   }
   const addingRanges = () => {
+    // TODO: only allow dates past today's date
     const listingId = activeListing?.id;
     if (!currentRange || currentRange.length !== 2) {
       alert("Please select a full date range (start and end date)");
@@ -235,7 +230,10 @@ function ViewHostedListings({ owner, token }) {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      if (response) {console.log(response);getBookingRequests();}
+      if (response) {
+        console.log(response);
+        getBookingRequests();
+      }
     }
     catch(error){
       setShowErrorPopup(error.response?.data?.error || "Failed to Accept Bookng Request");
@@ -264,119 +262,136 @@ function ViewHostedListings({ owner, token }) {
   return (
     <div>
       <h2>Hosted Listings</h2>
-      <h3>Booking Requests</h3>
-      {bookingRequests.length === 0 ? (
-        <p>No booking requests </p>
-      ) :(
-        bookingRequests.map((request) => (
-          <>
-            {request.status === "pending" && (
-              <div key={request.id}>
-                <h3>Request Id: {request.id}</h3>
-                <p>Start Date: {request.dateRange.start}</p>
-                <p>End Date: {request.dateRange.end}</p>
-                <Button
-                  onClick = {() => {acceptRequest(request.id)}}
-                >Accept
-                </Button>
-
-                <Button
-                  onClick = {() => {declineRequest(request.id)}}
-                >Decline
-                </Button>
-
-              </div>
-            )}
-          </>
-        ))
-      )}
-      {listings.length === 0 ? (
-        <p>No hosted listings found</p>
+      {listings === "LOADING" ? (
+        <p>Loading...</p>
       ) : (
-        listings.map((listing) => (
-          <div key={listing.id} >
-            <h3>{listing.title}</h3>
-            <p>${listing.price}</p>
-            <p>Number of Bedrooms: {listing.metadata?.bedroomCount}</p>
-            <Button 
-              aria-describedby={listing.id} 
-              variant="contained" 
-              onClick={(e) => handleClick(e, listing)}
-            >
-              Manage Availability
-            </Button>
-            <Button
-              name={listing.id} 
-              variant="contained" 
-              onClick={() => deleteListing(listing.id)}>
+        <>
+          <h3>Booking Requests</h3>
+          {bookingRequests.length === 0 ? (
+            <p>No booking requests </p>
+          ) : (
+            bookingRequests.map((request) => (
+              <>
+                {request.status === "pending" && (
+                  <div key={request.id}>
+                    <h3>Request Id: {request.id}</h3>
+                    <p>Start Date: {request.dateRange.start}</p>
+                    <p>End Date: {request.dateRange.end}</p>
+                    <Button
+                      onClick = {() => {acceptRequest(request.id)}}
+                    >Accept
+                    </Button>
 
-            Delete Listing
-            </Button>
-          </div>
-        ))
-      )}
-      <Popover
-        id={activeListing?.id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-      >
-        {activeListing && (
-          <>
-            <Typography variant="h6" gutterBottom>
-              Set Availability for: {activeListing.title}
-            </Typography>
+                    <Button
+                      onClick = {() => {declineRequest(request.id)}}
+                    >Decline
+                    </Button>
 
-            <DatePicker 
-              range 
-              value={currentRange} 
-              onChange={setCurrentRange} 
-              placeholder="Select availability date range"
-            />
-            
-            <Button
-              variant="outlined"
-              onClick={addingRanges}
-              fullWidth
-              
-            >
-              Add Availability
-            </Button>
+                  </div>
+                )}
+              </>
+            ))
+          )}
+          {listings.length === 0 ? (
+            <p>No hosted listings found</p>
+          ) : (
+            listings.map((listing) => (
+              <div key={listing.id} >
+                <h3>{listing.title}</h3>
+                <p>${listing.price}</p>
+                <p>Number of Bedrooms: {listing.metadata?.bedroomCount}</p>
+                <Button 
+                  aria-describedby={listing.id} 
+                  variant="contained" 
+                  onClick={(e) => handleClick(e, listing)}
+                >
+                  Manage Availability
+                </Button>
+                <Button
+                  variant="contained" 
+                  onClick={() => navigate(`edit-listing/${listing.id}`)}
+                >
+                  Edit Listing
+                </Button>
+                <Button
+                  name={listing.id} 
+                  variant="contained" 
+                  onClick={() => deleteListing(listing.id)}
+                >
+                  Delete Listing
+                </Button>
+              </div>
+            ))
+          )}
 
-            <div >
-              <strong>Current Availability:</strong>
+          <Popover
+            id={activeListing?.id}
+            open={open}
+            anchorEl={anchorEl}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+          >
+            {activeListing && (
+              <Box
+                sx={{
+                  padding: '10px',
+                }}
+              >
+                <Typography variant="h6" gutterBottom>
+                  Set Availability for: {activeListing.title}
+                </Typography>
 
-              {(allRanges[activeListing.id] || []).length === 0 ? (
-                <p>No ranges added yet.</p>
-              ) : (
-                <div>
-                  {(allRanges[activeListing.id] || []).map((range, index) => (
-                    <p key={index} >
-                      {range[0].format("DD/MM/YYYY")} to {range[1].format("DD/MM/YYYY")}
-                    </p>
-                  ))}
+                <DatePicker 
+                  range 
+                  value={currentRange} 
+                  onChange={setCurrentRange} 
+                  placeholder="Select availability date range"
+                />
+                
+                <Button
+                  variant="outlined"
+                  onClick={addingRanges}
+                  fullWidth
+                  
+                >
+                  Add Availability
+                </Button>
+
+                <div >
+                  <strong>Current Availability:</strong>
+
+                  {(allRanges[activeListing.id] || []).length === 0 ? (
+                    <p>No ranges added yet.</p>
+                  ) : (
+                    <div>
+                      {(allRanges[activeListing.id] || []).map((range, index) => (
+                        <p key={index} >
+                          {range[0].format("DD/MM/YYYY")} to {range[1].format("DD/MM/YYYY")}
+                        </p>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
 
-            <Button
-              variant="contained"
-              fullWidth
-              onClick={publishDates}
-            >
-              Publish Listing
-            </Button>
-          </>
-        )}
-      </Popover>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={publishDates}
+                >
+                  Publish Listing
+                </Button>
+              </Box>
+            )}
+          </Popover>
+        </>
+      )}
     </div>
   );
 }

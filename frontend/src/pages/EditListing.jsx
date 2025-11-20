@@ -1,21 +1,45 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { API_BASE_URL, DEFAULT_IMAGE } from '../constants';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { PageBody } from '../styles/mainStyles';
 import Button from '@mui/material/Button';
 
 import { ErrorContext } from '../context';
 
-
 import ListingForm from './ListingForm';
 
-function CreateListing({ token }) {
+function EditListing({ token }) {
+  const setShowErrorPopup = useContext(ErrorContext); 
   const navigate = useNavigate();
+  const { listingId } = useParams();
+
   useEffect(() => {
     if (token === 'LOADING' || !token) navigate('/login');
   }, [token]);
+
+  const getListingInfo = async (listingId) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}listings/${listingId}`);
+      if (response.data?.listing) return response.data?.listing;
+    } catch (error) {
+      setShowErrorPopup(error.response.data.error);
+    }
+  }
+
+  useEffect(() => {
+    const setInfo = async () => {
+      const listingInfo = await getListingInfo(listingId);
+
+      console.log('hi', listingId, listingInfo)
+      setListingInfo(listingInfo);
+      setListingAddress(listingInfo.address);
+      setListingMetadata(listingInfo.metadata);
+    }
+
+    setInfo();
+  }, []);
 
   const [listingInfo, setListingInfo] = useState({
     'title': '',
@@ -56,12 +80,10 @@ function CreateListing({ token }) {
     setListingMetadata,
     setThumbnailType
   }
-
-  const setShowErrorPopup = useContext(ErrorContext);
   
-  const postListing = async (body, token) => {
+  const postEditedListing = async (body, token) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}listings/new`, body, {
+      const response = await axios.put(`${API_BASE_URL}listings/${listingId}`, body, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -84,7 +106,7 @@ function CreateListing({ token }) {
     console.log("Updated all info:", listingInfo);
   }, [listingInfo]);
 
-  const handleSubmission = async () => {
+  const handleSave = async () => {
     if (!listingInfo.title || !listingInfo.price) {
       // TODO: usability -> instead of popup -> highlight empty field with error
       return setShowErrorPopup("Please fill out the whole form");
@@ -126,23 +148,22 @@ function CreateListing({ token }) {
       price: parseInt(listingInfo.price, 10),
       thumbnail: thumbnail
     }
-
+    
     console.log("Listing data: ",body)
 
-    postListing(body, token);
+    postEditedListing(body, token);
   }
-
 
   return (
     <PageBody>
-      <h1>Create Listing</h1>
+      <h1>Edit Listing</h1>
       <ListingForm getters={getters} setters={setters} />
       <Button 
         variant="contained"
-        onClick={handleSubmission}
-      >Submit</Button>
+        onClick={handleSave}
+      >Save</Button>
     </PageBody>
   )
 }
 
-export default CreateListing
+export default EditListing
