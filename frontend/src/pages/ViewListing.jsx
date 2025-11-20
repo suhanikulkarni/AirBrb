@@ -1,10 +1,14 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { API_BASE_URL } from '../constants';
-import { styles } from '../styles/ListingStyles';
 import { useNavigate } from 'react-router-dom';
-import { PageBody } from '../styles/mainStyles';
+import DatePicker from 'react-multi-date-picker';
+
+import { API_BASE_URL } from '../constants';
 import { ErrorContext } from '../context';
+import Thumbnail from './Thumbnail';
+
+import { styles } from '../styles/ListingStyles';
+import { PageBody } from '../styles/mainStyles';
 
 import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
@@ -16,14 +20,11 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
-import DatePicker from "react-multi-date-picker";
-import Thumbnail from './Thumbnail';
-
 function ViewListing ( {token, owner}) {
   const navigate = useNavigate();
   const setShowErrorPopup = useContext(ErrorContext);
 
-  const [list, setList] = useState("LOADING");
+  const [list, setList] = useState('LOADING');
   const [filteredList, setFilteredList] = useState([]);
   const [sortOrder, setSortOrder] = useState('ascending');
   const [filter, setFilter] = useState({
@@ -36,9 +37,8 @@ function ViewListing ( {token, owner}) {
     'dateFilter': ''
   });
 
-
   const [reviewRating, setReviewRating] = useState(0);
-  const [reviewComment, setReviewComment] = useState("");
+  const [reviewComment, setReviewComment] = useState('');
   const [acceptedBookings, setAcceptedBookings] = useState([]);
 
   const [open, setOpen] = useState(false);
@@ -55,7 +55,7 @@ function ViewListing ( {token, owner}) {
   };
 
   const handleOpen = (listingId, bookingId) => {
-    console.log("Opennign")
+    console.log('Opennign')
     setSelectedListingId(listingId);
     setSelectedBookingId(bookingId);
     setOpen(true);
@@ -63,7 +63,7 @@ function ViewListing ( {token, owner}) {
 
 
   const uploadReview = async () => {
-    console.log("Uploading review:", reviewComment, reviewRating);
+    console.log('Uploading review:', reviewComment, reviewRating);
     const review = {
       rating: reviewRating,
       comment: reviewComment
@@ -80,7 +80,7 @@ function ViewListing ( {token, owner}) {
         }
       );
       if (response) {
-        console.log("Review uploaded successfully");
+        console.log('Review uploaded successfully');
         handleClose();
       }
     } catch (error) {
@@ -253,14 +253,14 @@ function ViewListing ( {token, owner}) {
         open={open} 
         onClose={handleClose} 
         style={{
-          position: "absolute",
-          border: "2px solid #000",
-          backgroundColor: "pink",
+          position: 'absolute',
+          border: '2px solid #000',
+          backgroundColor: 'pink',
           height: 200,
           width: 240,
-          margin: "auto",
-          padding: "2%",
-          color: "white",
+          margin: 'auto',
+          padding: '2%',
+          color: 'white',
         }}
       >
         <div>
@@ -293,10 +293,10 @@ function ViewListing ( {token, owner}) {
       >
         <h2>Search Filter</h2>
         <TextField
-          id="filter-search-input"
-          placeholder="Search Listing"
-          type="search"
-          variant="outlined"
+          id='filter-search-input'
+          placeholder='Search Listing'
+          type='search'
+          variant='outlined'
           value={filter.searchFilter}
           name='searchFilter'
           onChange={handleFilter}
@@ -307,24 +307,24 @@ function ViewListing ( {token, owner}) {
         <h2>Bedroom Filter (Min-Max)</h2>
         {/* TODO: prevent no. from decreasing beyond 0 */}
         <TextField
-          id="min-bedroom-filter-input"
-          label="Minimum Bedroom"
-          type="number"
+          id='min-bedroom-filter-input'
+          label='Minimum Bedroom'
+          type='number'
           value={filter.minBedroomFilter}
           onChange={handleFilter}
-          name="minBedroomFilter"
+          name='minBedroomFilter'
           slotProps={{ input: { min: 0 } }}
         />
         <br />
 
         {/* TODO: prevent no. from decreasing beyond 0 */}
         <TextField
-          id="max-bedroom-filter-input"
-          label="Maximum Bedroom"
-          type="number"
+          id='max-bedroom-filter-input'
+          label='Maximum Bedroom'
+          type='number'
           value={filter.maxBedroomFilter}
           onChange={handleFilter}
-          name="maxBedroomFilter"
+          name='maxBedroomFilter'
           slotProps={{ input: { min: 0 } }}
         />
         <br />
@@ -332,35 +332,35 @@ function ViewListing ( {token, owner}) {
         <h2>Price Filter (Min-Max)</h2>
         {/* TODO: prevent no. from decreasing beyond 0 */}
         <TextField
-          id="min-price-filter-input"
-          label="Minimum Price"
-          type="number"
+          id='min-price-filter-input'
+          label='Minimum Price'
+          type='number'
           value={filter.minPriceFilter}
           onChange={handleFilter}
-          name="minPriceFilter"
+          name='minPriceFilter'
           slotProps={{ input: { min: 0 } }}
         />
         <br />
 
         {/* TODO: prevent no. from decreasing beyond 0 */}
         <TextField
-          id="max-price-filter-input"
-          label="Maximum Price"
-          type="number"
+          id='max-price-filter-input'
+          label='Maximum Price'
+          type='number'
           value={filter.maxPriceFilter}
           onChange={handleFilter}
-          name="maxPriceFilter"
+          name='maxPriceFilter'
           slotProps={{ input: { min: 0 } }}
         />
         <br />
 
         <h2>Review Filter</h2>
         <FormControl fullWidth>
-          <InputLabel id="review-filter-select-label">Review</InputLabel>
+          <InputLabel id='review-filter-select-label'>Review</InputLabel>
           <Select
-            labelId="review-filter-select-label"
-            id="review-filter-select"
-            name="reviewFilter"
+            labelId='review-filter-select-label'
+            id='review-filter-select'
+            name='reviewFilter'
             value={filter.reviewFilter}
             onChange={handleFilter}
           >
@@ -384,7 +384,7 @@ function ViewListing ( {token, owner}) {
               'dateFilter': dateRange.validatedValue
             }));
           }}
-          placeholder="Filter available dates"
+          placeholder='Filter available dates'
         />
 
         <Button
@@ -393,7 +393,7 @@ function ViewListing ( {token, owner}) {
         <br />
 
         <Button
-          variant="contained"
+          variant='contained'
           onClick={filterListing}
         >Search</Button>
       </Box>
@@ -405,19 +405,19 @@ function ViewListing ( {token, owner}) {
         onChange={(e, newSortOrder) => {
           if (newSortOrder !== null) setSortOrder(newSortOrder); 
         }}
-        aria-label="list order"
+        aria-label='list order'
       >
-        <ToggleButton value="ascending" aria-label="ascending order">
+        <ToggleButton value='ascending' aria-label='ascending order'>
           <p>Ascending</p>
         </ToggleButton>
-        <ToggleButton value="descending" aria-label="descending order">
+        <ToggleButton value='descending' aria-label='descending order'>
           <p>Descending</p>
         </ToggleButton>
       </ToggleButtonGroup>
       <br />
       
 
-      {list === "LOADING" ? (
+      {list === 'LOADING' ? (
         <p>LOADING...</p>
       ) : (
         <>
@@ -457,7 +457,7 @@ function ViewListing ( {token, owner}) {
                           <p style={styles.price}>${listing.price}</p>
                         </div>
                         {booking && (
-                          <Button variant="contained"onClick={() => handleOpen(listing.id, booking.id)}>
+                          <Button variant='contained'onClick={() => handleOpen(listing.id, booking.id)}>
                             Leave a Review
                           </Button>
                         )}
