@@ -28,7 +28,7 @@ function ViewHostedListings({ owner, token }) {
     console.log("isPublished", isPublished)
     if (isPublished) {
       try {
-        const res = await axios.put(
+        await axios.put(
           `${API_BASE_URL}listings/unpublish/${listingId}`,
           {},
           {

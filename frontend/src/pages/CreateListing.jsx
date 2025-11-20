@@ -61,7 +61,7 @@ function CreateListing({ token }) {
   
   const postListing = async (body, token) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}listings/new`, body, {
+      await axios.post(`${API_BASE_URL}listings/new`, body, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

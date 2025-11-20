@@ -162,7 +162,7 @@ function ViewListing ( {token, owner}) {
     }));
   }
 
-  const filterListing = (e) => {
+  const filterListing = () => {
     let listing = [...list];
 
     // search filter

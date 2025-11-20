@@ -83,7 +83,7 @@ function EditListing({ token }) {
   
   const postEditedListing = async (body, token) => {
     try {
-      const response = await axios.put(`${API_BASE_URL}listings/${listingId}`, body, {
+      await axios.put(`${API_BASE_URL}listings/${listingId}`, body, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
