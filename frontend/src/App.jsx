@@ -16,6 +16,7 @@ import ErrorPopup from './pages/ErrorPopup';
 import { API_BASE_URL } from './constants';
 import ListingInfo from './pages/ListingInfo';
 import TemporaryConfirmation from './pages/TemporaryConnfirmation';
+import ViweBookingRequest from './pages/ViewBookingRequests';
 
 function App() {
   const [token, setToken] = useState('LOADING');
@@ -93,6 +94,7 @@ function App() {
               <Route path="/login" element={<Login setToken={setToken} setOwner={setOwner}/>} />
               <Route path="/viewListings/:id" element={<ListingInfo token={token}/>} />
               <Route path="/temporaryConfirmation" element={<TemporaryConfirmation token={token}/>} />
+              <Route path="/:id/viewBooking" element={<ViweBookingRequest token={token} owner={owner}/>} />
               <Route path="/register" element={<Register setToken={setToken} setOwner={setOwner} />} />
               <Route path="/dashboard">
                 <Route index element={<Dashboard token={token} owner={owner} />} />

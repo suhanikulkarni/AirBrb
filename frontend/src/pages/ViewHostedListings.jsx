@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 
 function ViewHostedListings({ owner, token }) {
-  const setShowErrorPopup = useContext(ErrorContext); 
+  const setShowErrorPopup = useContext(ErrorContext);
 
   const [listings, setListings] = useState([]);
   const [bookingRequests, setBookingRequests] = useState([]);
@@ -22,7 +22,7 @@ function ViewHostedListings({ owner, token }) {
 
   const deleteListing = async (listingId) => {
 
-    let isPublished= await getListingInfo(listingId);
+    let isPublished = await getListingInfo(listingId);
     isPublished = isPublished.published;
 
     console.log("isPublished", isPublished)
@@ -42,7 +42,7 @@ function ViewHostedListings({ owner, token }) {
           navigate('/')
         }
       }
-      catch (error){
+      catch (error) {
         setShowErrorPopup(error.response.data.error);
       }
     }
@@ -56,9 +56,9 @@ function ViewHostedListings({ owner, token }) {
       );
       if (res) {
         setListings(prevListings => prevListings.filter(listing => listing.id !== listingId))
-      } 
+      }
     }
-    catch (error){
+    catch (error) {
       setShowErrorPopup(error.response.data.error);
     }
   }
@@ -75,9 +75,9 @@ function ViewHostedListings({ owner, token }) {
           }
         });
         return hostedListings;
-      } 
+      }
     }
-    catch (error){
+    catch (error) {
       setShowErrorPopup(error.response.data.error);
       return [];
     }
@@ -88,7 +88,7 @@ function ViewHostedListings({ owner, token }) {
       const res = await axios.get(`${API_BASE_URL}listings/${id}`);
       if (res) return res.data.listing;
     }
-    catch (error){
+    catch (error) {
       setShowErrorPopup(error.response.data.error);
     }
   }
@@ -117,7 +117,7 @@ function ViewHostedListings({ owner, token }) {
         setShowErrorPopup(error.response.data.error);
 
       }
-    } 
+    }
     getFetch();
   }, [owner]);
 
@@ -162,14 +162,14 @@ function ViewHostedListings({ owner, token }) {
       );
 
       if (res) {
-        console.log("this si resdata",res);
+        console.log("this si resdata", res);
         navigate('/')
       }
     }
-    catch (error){
+    catch (error) {
       setShowErrorPopup(error.response.data.error);
 
-    } 
+    }
   }
   const addingRanges = () => {
     const listingId = activeListing?.id;
@@ -188,7 +188,7 @@ function ViewHostedListings({ owner, token }) {
       console.log("Updated allRanges:", updatedRanges);
       return updatedRanges;
     });
-    
+
     setCurrentRange([]);
   };
 
@@ -205,7 +205,7 @@ function ViewHostedListings({ owner, token }) {
       const res = await axios.get(`${API_BASE_URL}bookings`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       if (res) {
         const requestData = res.data.bookings;
         const listingIds = listings.map(listing => String(listing.id));
@@ -224,72 +224,11 @@ function ViewHostedListings({ owner, token }) {
     }
   }
 
-  const acceptRequest = async (bookingId) => {
-    console.log("accepted");
-    try{
-      console.log("accepted!!!!!!!!!");
 
-      const response = await axios.put(
-        `${API_BASE_URL}bookings/accept/${bookingId}`, {},
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-      if (response) {console.log(response);getBookingRequests();}
-    }
-    catch(error){
-      setShowErrorPopup(error.response?.data?.error || "Failed to Accept Bookng Request");
-    }
-  }
-
-  const declineRequest = async (bookingId) => {
-    console.log("decline");
-
-    try{
-      const response = await axios.put(
-        `${API_BASE_URL}bookings/decline/${bookingId}`, {},
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-      console.log("Decline response:", response);
-      getBookingRequests();
-    }
-
-    catch(error){
-      setShowErrorPopup(error.response?.data?.error || "Failed to Decline Bookng Request");
-    }
-  }
 
   return (
     <div>
       <h2>Hosted Listings</h2>
-      <h3>Booking Requests</h3>
-      {bookingRequests.length === 0 ? (
-        <p>No booking requests </p>
-      ) :(
-        bookingRequests.map((request) => (
-          <>
-            {request.status === "pending" && (
-              <div key={request.id}>
-                <h3>Request Id: {request.id}</h3>
-                <p>Start Date: {request.dateRange.start}</p>
-                <p>End Date: {request.dateRange.end}</p>
-                <Button
-                  onClick = {() => {acceptRequest(request.id)}}
-                >Accept
-                </Button>
-
-                <Button
-                  onClick = {() => {declineRequest(request.id)}}
-                >Decline
-                </Button>
-
-              </div>
-            )}
-          </>
-        ))
-      )}
       {listings.length === 0 ? (
         <p>No hosted listings found</p>
       ) : (
@@ -298,19 +237,23 @@ function ViewHostedListings({ owner, token }) {
             <h3>{listing.title}</h3>
             <p>${listing.price}</p>
             <p>Number of Bedrooms: {listing.metadata?.bedroomCount}</p>
-            <Button 
-              aria-describedby={listing.id} 
-              variant="contained" 
+            <Button
+              onClick={() => navigate(`/${listing.id}/viewBooking`)}
+              variant="contained"
+            >Booking Information</Button>
+            <Button
+              aria-describedby={listing.id}
+              variant="contained"
               onClick={(e) => handleClick(e, listing)}
             >
               Manage Availability
             </Button>
             <Button
-              name={listing.id} 
-              variant="contained" 
+              name={listing.id}
+              variant="contained"
               onClick={() => deleteListing(listing.id)}>
 
-            Delete Listing
+              Delete Listing
             </Button>
           </div>
         ))
@@ -335,18 +278,18 @@ function ViewHostedListings({ owner, token }) {
               Set Availability for: {activeListing.title}
             </Typography>
 
-            <DatePicker 
-              range 
-              value={currentRange} 
-              onChange={setCurrentRange} 
+            <DatePicker
+              range
+              value={currentRange}
+              onChange={setCurrentRange}
               placeholder="Select availability date range"
             />
-            
+
             <Button
               variant="outlined"
               onClick={addingRanges}
               fullWidth
-              
+
             >
               Add Availability
             </Button>
