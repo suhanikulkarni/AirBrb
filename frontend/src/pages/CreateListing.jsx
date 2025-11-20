@@ -93,8 +93,8 @@ function CreateListing({ token }) {
   }
 
   useEffect(() => {
-      console.log("Updated address:", listingAddress);
-    }, [listingAddress]);
+    console.log("Updated address:", listingAddress);
+  }, [listingAddress]);
 
   const handleMetadataInfo = (e) => {
     const {name, value} = e.target;
@@ -110,9 +110,9 @@ function CreateListing({ token }) {
     }
   }
 
-    useEffect(() => {
-      console.log("Updated metadata:", listingMetadata);
-    }, [listingMetadata]);
+  useEffect(() => {
+    console.log("Updated metadata:", listingMetadata);
+  }, [listingMetadata]);
 
   const updateBedroomMetadata = (bedroomNumber, bedroomInfo) => {
     setListingMetadata(prev => {
@@ -131,7 +131,7 @@ function CreateListing({ token }) {
           key={i}
           bedroomNumber={i}
           updateBedroomMetadata={updateBedroomMetadata}
-          />
+        />
       )
     }
 
@@ -164,7 +164,7 @@ function CreateListing({ token }) {
       console.log({ priceNum, bathNum, bedNum });
       return setShowErrorPopup("Please insert a number");
     }
-        // TODO: default thumbnail
+    // TODO: default thumbnail
 
     const body = {
       ...listingInfo,
@@ -178,8 +178,8 @@ function CreateListing({ token }) {
   }
 
   useEffect(() => {
-      console.log("Updated all info:", listingInfo);
-    }, [listingInfo]);
+    console.log("Updated all info:", listingInfo);
+  }, [listingInfo]);
 
 
   return (

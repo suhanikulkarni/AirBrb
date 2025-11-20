@@ -20,7 +20,50 @@ function ViewHostedListings({ owner, token }) {
   const [allRanges, setAllRanges] = useState({});
   const navigate = useNavigate();
 
-  const getAllListings = async (owner) => {
+  const deleteListing = async (listingId) => {
+
+    let isPublished= await getListingInfo(listingId);
+    isPublished = isPublished.published;
+
+    console.log("isPublished", isPublished)
+    if (isPublished) {
+      try {
+        const res = await axios.put(
+          `${API_BASE_URL}listings/unpublish/${listingId}`,
+          {},
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        );
+        if (res) {
+
+          navigate('/')
+        }
+      }
+      catch (error){
+        setShowErrorPopup(error.response.data.error);
+      }
+    }
+    try {
+      const res = await axios.delete(`${API_BASE_URL}listings/${listingId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      if (res) {
+        setListings(prevListings => prevListings.filter(listing => listing.id !== listingId))
+      } 
+    }
+    catch (error){
+      setShowErrorPopup(error.response.data.error);
+    }
+  }
+
+  const getAllListings = async () => {
     let hostedListings = [];
     try {
       const res = await axios.get(`${API_BASE_URL}listings`);
@@ -54,7 +97,7 @@ function ViewHostedListings({ owner, token }) {
   useEffect(() => {
     const getFetch = async () => {
       try {
-        const listingIds = await getAllListings(owner);
+        const listingIds = await getAllListings();
         if (!listingIds || listingIds.length === 0) {
           setListings([]);
           return;
@@ -261,6 +304,13 @@ function ViewHostedListings({ owner, token }) {
               onClick={(e) => handleClick(e, listing)}
             >
               Manage Availability
+            </Button>
+            <Button
+              name={listing.id} 
+              variant="contained" 
+              onClick={() => deleteListing(listing.id)}>
+
+            Delete Listing
             </Button>
           </div>
         ))
