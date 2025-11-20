@@ -41,12 +41,12 @@ function ViewListing ( {token, owner}) {
   const [reviewComment, setReviewComment] = useState('');
   const [acceptedBookings, setAcceptedBookings] = useState([]);
 
-  const [open, setOpen] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
   const [selectedListingId, setSelectedListingId] = useState(null);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
 
   const handleClose = () => {
-    setOpen(false);
+    setReviewOpen(false);
     setSelectedListingId(null);
     setSelectedBookingId(null);
     setReviewRating(null);
@@ -58,7 +58,7 @@ function ViewListing ( {token, owner}) {
     console.log('Opennign')
     setSelectedListingId(listingId);
     setSelectedBookingId(bookingId);
-    setOpen(true);
+    setReviewOpen(true);
   };
 
 
@@ -67,8 +67,10 @@ function ViewListing ( {token, owner}) {
     const review = {
       rating: reviewRating,
       comment: reviewComment
-    }
-    const body = { review }
+    };
+    
+    const body = { review };
+
     try {
       const response = await axios.put(
         `${API_BASE_URL}listings/${selectedListingId}/review/${selectedBookingId}`, 
@@ -106,7 +108,6 @@ function ViewListing ( {token, owner}) {
       }
     } catch (error) {
       setShowErrorPopup(error.response.data.error);
-
     }
   };
 
@@ -250,7 +251,7 @@ function ViewListing ( {token, owner}) {
   return (
     <PageBody>
       <Modal 
-        open={open} 
+        open={reviewOpen} 
         onClose={handleClose} 
         style={{
           position: 'absolute',
@@ -291,71 +292,125 @@ function ViewListing ( {token, owner}) {
           flexDirection: 'column'
         }}
       >
-        <h2>Search Filter</h2>
-        <TextField
-          id='filter-search-input'
-          placeholder='Search Listing'
-          type='search'
-          variant='outlined'
-          value={filter.searchFilter}
-          name='searchFilter'
-          onChange={handleFilter}
-          onKeyDown={handleKeyDown}
-        />
-        <br />
+        <b>Search Filter</b>
+        <FormControl sx={{ marginBottom: '10px' }}>
+          <TextField
+            id='filter-search-input'
+            name='searchFilter'
+            type='search'
+            placeholder='Search Listing'
+            value={filter.searchFilter}
+            onChange={handleFilter}
+            onKeyDown={handleKeyDown}
+            variant='outlined'
+            size='small'
+          />
+        </FormControl>
 
-        <h2>Bedroom Filter (Min-Max)</h2>
-        {/* TODO: prevent no. from decreasing beyond 0 */}
-        <TextField
-          id='min-bedroom-filter-input'
-          label='Minimum Bedroom'
-          type='number'
-          value={filter.minBedroomFilter}
-          onChange={handleFilter}
-          name='minBedroomFilter'
-          slotProps={{ input: { min: 0 } }}
-        />
-        <br />
+        <b>Bedroom Filter</b>
+        {/* TODO: prevent no. from decreasing beyond 0 and scroll effect */}
+        <FormControl
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            marginBottom: '10px'
+          }}
+        >
+          <FormControl
+            sx={{
+              marginRight: '5px',
+              width: '100%'
+            }}
+          >
+            <TextField
+              id='min-bedroom-filter-input'
+              name='minBedroomFilter'
+              type='number'
+              label='Minimum Bedroom'
+              value={filter.minBedroomFilter}
+              onChange={handleFilter}
+              onKeyDown={handleKeyDown}
+              slotProps={{ input: { min: 0 } }}
+              size='small'
+            />
+          </FormControl>
+          
+          {/* TODO: prevent no. from decreasing beyond 0 and scroll effect */}
+          <FormControl
+            sx={{
+              width: '100%'
+            }}
+          >
+            <TextField
+              id='max-bedroom-filter-input'
+              name='maxBedroomFilter'
+              type='number'
+              label='Maximum Bedroom'
+              value={filter.maxBedroomFilter}
+              onChange={handleFilter}
+              onKeyDown={handleKeyDown}
+              slotProps={{ input: { min: 0 } }}
+              size='small'
+            />
+          </FormControl>
+        </FormControl>
 
-        {/* TODO: prevent no. from decreasing beyond 0 */}
-        <TextField
-          id='max-bedroom-filter-input'
-          label='Maximum Bedroom'
-          type='number'
-          value={filter.maxBedroomFilter}
-          onChange={handleFilter}
-          name='maxBedroomFilter'
-          slotProps={{ input: { min: 0 } }}
-        />
-        <br />
+        <b>Price Filter</b>
+        {/* TODO: prevent no. from decreasing beyond 0 and scroll effect */}
+        <FormControl
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            marginBottom: '10px'
+          }}
+        >
+          <FormControl
+            sx={{
+              marginRight: '5px',
+              width: '100%'
+            }}
+          >
+            <TextField
+              id='min-price-filter-input'
+              name='minPriceFilter'
+              type='number'
+              label='Minimum Price'
+              value={filter.minPriceFilter}
+              onChange={handleFilter}
+              onKeyDown={handleKeyDown}
+              slotProps={{ input: { min: 0 } }}
+              size='small'
+            />
+          </FormControl>
+          
+          {/* TODO: prevent no. from decreasing beyond 0 and scroll effect */}
+          <FormControl
+            sx={{
+              width: '100%'
+            }}
+          >
+            <TextField
+              id='max-price-filter-input'
+              name='maxPriceFilter'
+              type='number'
+              label='Maximum Price'
+              value={filter.maxPriceFilter}
+              onChange={handleFilter}
+              onKeyDown={handleKeyDown}
+              slotProps={{ input: { min: 0 } }}
+              size='small'
+            />
+          </FormControl>
+        </FormControl>
 
-        <h2>Price Filter (Min-Max)</h2>
-        {/* TODO: prevent no. from decreasing beyond 0 */}
-        <TextField
-          id='min-price-filter-input'
-          label='Minimum Price'
-          type='number'
-          value={filter.minPriceFilter}
-          onChange={handleFilter}
-          name='minPriceFilter'
-          slotProps={{ input: { min: 0 } }}
-        />
-        <br />
-
-        {/* TODO: prevent no. from decreasing beyond 0 */}
-        <TextField
-          id='max-price-filter-input'
-          label='Maximum Price'
-          type='number'
-          value={filter.maxPriceFilter}
-          onChange={handleFilter}
-          name='maxPriceFilter'
-          slotProps={{ input: { min: 0 } }}
-        />
-        <br />
-
-        <h2>Review Filter</h2>
-        <FormControl fullWidth>
+        <b>Review Filter</b>
+        <FormControl
+          fullWidth
+          size="small"
+          sx={{
+            marginBottom: '10px'
+          }}
+        >
           <InputLabel id='review-filter-select-label'>Review</InputLabel>
           <Select
             labelId='review-filter-select-label'
@@ -372,9 +427,8 @@ function ViewListing ( {token, owner}) {
             <MenuItem value={'0'}>0+</MenuItem>
           </Select>
         </FormControl>
-        <br />
 
-        <h2>Date Filter</h2>
+        <b>Date Filter</b>
         <DatePicker 
           range 
           value={filter.dateFilter} 
@@ -385,9 +439,17 @@ function ViewListing ( {token, owner}) {
             }));
           }}
           placeholder='Filter available dates'
+          render={
+            <TextField
+              fullWidth
+              size="small"
+            />
+          }
         />
+        <br />
 
         <Button
+          variant='outlined'
           onClick={clearFilter}
         >Clear Filter</Button>
         <br />

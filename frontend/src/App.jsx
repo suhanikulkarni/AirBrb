@@ -54,12 +54,14 @@ function App() {
             <>
               <NavLeft>
                 <Button
+                  variant='outlined'
                   onClick={() => navigate('/')}
                 >Home</Button>
               </NavLeft>
               {" "}
               <NavRight>
                 <Button
+                  variant='outlined'
                   onClick={() => navigate('/dashboard')}
                 >Your Listings</Button>
                 {" "}
