@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Box } from '@mui/material';
 import TextField from '@mui/material/TextField';
@@ -32,6 +32,26 @@ const VisuallyHiddenInput = styled('input')({
 
 function ListingForm({ getters, setters }) {
   const [thumbnailImageName, setThumbnailImageName] = useState('');
+
+  useEffect(() => {
+    const thumbnail = getters.listingInfo.thumbnail;
+
+    if (!thumbnail) {
+      return;
+    }
+
+    if (thumbnail.startsWith("https://www.youtube.com/")) {
+      setters.setThumbnailType('youtube');
+    } else if (thumbnail.startsWith("data:image/")) {
+      setters.setThumbnailType('image');
+      setThumbnailImageName('previous_thumbnail');
+    }
+
+    setters.setListingInfo((prevData) => ({
+      ...prevData,
+      'thumbnail': thumbnail
+    }));
+  }, []);
 
   const handleInfo = (e) => {
     const {name, value} = e.target;
