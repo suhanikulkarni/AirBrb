@@ -223,9 +223,6 @@ function ViewHostedListings({ owner, token }) {
       setShowErrorPopup(error.response?.data?.error || "Requests Failed To Show.");
     }
   }
-
-
-
   return (
     <div>
       <h2>Hosted Listings</h2>

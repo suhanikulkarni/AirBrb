@@ -1,25 +1,36 @@
 import { useContext, useEffect, useState } from "react";
 import { ErrorContext } from '../context';
+import axios from "axios";
+import { API_BASE_URL } from "../constants";
+import Button from '@mui/material/Button';
+import { useNavigate } from "react-router-dom";
 
-function ViweBookingRequest( {token, owner}) {
+
+
+function ViweBookingRequest({ token, owner }) {
 
   const [bookingRequests, setBookingRequests] = useState([]);
   const [listings, setListings] = useState([]);
-    const setShowErrorPopup = useContext(ErrorContext);
+  const setShowErrorPopup = useContext(ErrorContext);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (token === 'LOADING' || !token) navigate('/login');
+  }, [token]);
 
 
-    const getListingInfo = async (id) => {
-        try {
-          const res = await axios.get(`${API_BASE_URL}listings/${id}`);
-          if (res) return res.data.listing;
-        }
-        catch (error) {
-          setShowErrorPopup(error.response.data.error);
-        }
-      }
+  const getListingInfo = async (id) => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}listings/${id}`);
+      if (res) return res.data.listing;
+    }
+    catch (error) {
+      setShowErrorPopup(error.response.data.error);
+    }
+  }
 
-      
-    const getAllListings = async () => {
+  const getAllListings = async () => {
     let hostedListings = [];
     try {
       const res = await axios.get(`${API_BASE_URL}listings`);
@@ -38,9 +49,9 @@ function ViweBookingRequest( {token, owner}) {
       return [];
     }
   }
-  
 
-   useEffect(() => {
+
+  useEffect(() => {
     const getFetch = async () => {
       try {
         const listingIds = await getAllListings();
@@ -60,7 +71,7 @@ function ViweBookingRequest( {token, owner}) {
         setListings(detailedListings.filter(Boolean));
       }
       catch (error) {
-        console.log ("ngregnjkgnrek")
+        console.log("ngregnjkgnrek")
         setShowErrorPopup(error.response.data.error);
       }
     }
@@ -119,7 +130,6 @@ function ViweBookingRequest( {token, owner}) {
 
   const declineRequest = async (bookingId) => {
     console.log("decline");
-
     try {
       const response = await axios.put(
         `${API_BASE_URL}bookings/decline/${bookingId}`, {},
