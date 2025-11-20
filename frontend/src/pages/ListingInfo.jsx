@@ -9,7 +9,7 @@ import Rating from '@mui/material/Rating';
 import { ErrorContext } from '../context';
 
 function ListingInfo({ token }) {
-  const { id } = useParams();
+  const { listingId } = useParams();
   const [open, setOpen] = useState(false);
   const [listingDetails, setListingDetails] = useState(null);
   const setShowErrorPopup = useContext(ErrorContext);
@@ -27,11 +27,11 @@ function ListingInfo({ token }) {
 
   useEffect(() => {
     const fetchListings = async () => {
-      const data = await getListingInfo(id);
+      const data = await getListingInfo(listingId);
       if (data) setListingDetails(data);
     };
     fetchListings();
-  }, [id])
+  }, [listingId])
 
   let sum = 0;
   listingDetails?.metadata?.bedrooms?.forEach(element => {
@@ -46,10 +46,10 @@ function ListingInfo({ token }) {
     }
   }
 
-  const getListingInfo = async (id) => {
+  const getListingInfo = async (listingId) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}listings/${id}`)
+        `${API_BASE_URL}listings/${listingId}`)
       console.log(response)
       if (response) {
         console.log("this is the response",response.data.listing)
@@ -129,7 +129,7 @@ function ListingInfo({ token }) {
       {listingDetails && token && token !== 'LOADING' && (
         <UsersBookingForm 
           price={listingDetails.price} 
-          listingId={id}
+          listingId={listingId}
           token={token}
         />
       )}

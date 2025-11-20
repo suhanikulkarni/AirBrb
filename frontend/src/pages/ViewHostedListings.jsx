@@ -10,9 +10,9 @@ import { ErrorContext } from '../context';
 import { useNavigate } from "react-router-dom";
 
 function ViewHostedListings({ owner, token }) {
-  const [listings, setListings] = useState("LOADING");
   const setShowErrorPopup = useContext(ErrorContext); 
-
+  
+  const [listings, setListings] = useState("LOADING");
   const [bookingRequests, setBookingRequests] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [activeListing, setActiveListing] = useState(null);
@@ -79,16 +79,14 @@ function ViewHostedListings({ owner, token }) {
     }
   }
 
-  const getListingInfo = async (id) => {
+  const getListingInfo = async (listingId) => {
     try {
-      const res = await axios.get(`${API_BASE_URL}listings/${id}`);
-      if (res) return res.data.listing;
-    }
-    catch (error){
+      const response = await axios.get(`${API_BASE_URL}listings/${listingId}`);
+      if (response.data?.listing) return response.data?.listing;
+    } catch (error) {
       setShowErrorPopup(error.response.data.error);
     }
   }
-
 
   useEffect(() => {
     const getFetch = async () => {
@@ -310,18 +308,17 @@ function ViewHostedListings({ owner, token }) {
                   Manage Availability
                 </Button>
                 <Button
-                  name={listing.id} 
                   variant="contained" 
-                  onClick={() => navigate('edit-listing')}>
-
-                Edit Listing
+                  onClick={() => navigate(`edit-listing/${listing.id}`)}
+                >
+                  Edit Listing
                 </Button>
                 <Button
                   name={listing.id} 
                   variant="contained" 
-                  onClick={() => deleteListing(listing.id)}>
-
-                Delete Listing
+                  onClick={() => deleteListing(listing.id)}
+                >
+                  Delete Listing
                 </Button>
               </div>
             ))

@@ -436,7 +436,7 @@ function ViewListing ( {token, owner}) {
                     
                     return (
                       <div key={index} style={styles.card}>
-                        <div  onClick={() => navigate(`/viewListings/${listing.id}`)}>
+                        <div onClick={() => navigate(`/viewListings/${listing.id}`)}>
                           <Thumbnail thumbnail={listing.thumbnail} listingTitle={listing.title} />
                           <h4 style={styles.address}>
                             {`

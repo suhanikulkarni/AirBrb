@@ -92,13 +92,13 @@ function App() {
             <>
               <Route path="/" element={<ViewListing token = {token} owner = {owner} />} />
               <Route path="/login" element={<Login setToken={setToken} setOwner={setOwner}/>} />
-              <Route path="/viewListings/:id" element={<ListingInfo token={token}/>} />
+              <Route path="/viewListings/:listingId" element={<ListingInfo token={token}/>} />
               <Route path="/temporaryConfirmation" element={<TemporaryConfirmation token={token}/>} />
               <Route path="/register" element={<Register setToken={setToken} setOwner={setOwner} />} />
               <Route path="/dashboard">
                 <Route index element={<Dashboard token={token} owner={owner} />} />
                 <Route path="create-listing" element={<CreateListing token={token} />} />
-                <Route path="edit-listing" element={<EditListing token={token} />} />
+                <Route path="edit-listing/:listingId" element={<EditListing token={token} />} />
               </Route>
             </>
           )}

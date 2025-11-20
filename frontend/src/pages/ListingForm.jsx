@@ -99,6 +99,7 @@ function ListingForm({ getters, setters }) {
           key={i}
           bedroomNumber={i}
           updateBedroomMetadata={updateBedroomMetadata}
+          bedroomMetadata={getters.listingMetadata.bedrooms[i - 1].bedTypes}
         />
       )
     }
@@ -122,6 +123,7 @@ function ListingForm({ getters, setters }) {
         type="text"
         onChange={handleInfo}
         name="title"
+        value={getters.listingInfo.title}
         required
       />
       <br />
@@ -133,6 +135,7 @@ function ListingForm({ getters, setters }) {
         label="Amount"
         name="price"
         onChange={handleInfo}
+        value={getters.listingInfo.price}
         required
       />
       <br />
@@ -151,6 +154,7 @@ function ListingForm({ getters, setters }) {
           type="text"
           onChange={handleAddressInfo}
           name="streetAddress"
+          value={getters.listingAddress.streetAddress}
           required
         />
         <br /><br />
@@ -161,6 +165,7 @@ function ListingForm({ getters, setters }) {
           type="text"
           onChange={handleAddressInfo}
           name="suburb"
+          value={getters.listingAddress.suburb}
           required
         />
 
@@ -170,6 +175,7 @@ function ListingForm({ getters, setters }) {
           type="text"
           onChange={handleAddressInfo}
           name="state"
+          value={getters.listingAddress.state}
           required
         />
         <br /><br />
@@ -180,6 +186,7 @@ function ListingForm({ getters, setters }) {
           type="text"
           onChange={handleAddressInfo}
           name="country"
+          value={getters.listingAddress.country}
           required
         />
 
@@ -189,6 +196,7 @@ function ListingForm({ getters, setters }) {
           type="text"
           onChange={handleAddressInfo}
           name="postcode"
+          value={getters.listingAddress.postcode}
           required
         />
       </Box>
@@ -293,6 +301,7 @@ function ListingForm({ getters, setters }) {
         rows={3}
         name="amenities"
         onChange={handleMetadataInfo}
+        value={getters.listingMetadata.amenities}
       />
       <br />
 
@@ -303,6 +312,7 @@ function ListingForm({ getters, setters }) {
         type="number"
         onChange={handleMetadataInfo}
         name="bathroomCount"
+        value={getters.listingMetadata.bathroomCount}
         slotProps={{ input: { min: 0 } }}
         required
       />
@@ -314,6 +324,7 @@ function ListingForm({ getters, setters }) {
         type="number"
         onChange={handleMetadataInfo}
         name="bedroomCount"
+        value={getters.listingMetadata.bedroomCount}
         slotProps={{ input: { min: 0 } }}
       />
       <br />
