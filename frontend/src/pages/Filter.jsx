@@ -9,7 +9,32 @@ import Select from '@mui/material/Select';
 import DatePicker from 'react-multi-date-picker';
 
 function Filter({ filter, setFilter, filterListing }) {
+  const handleFilter = (e) => {
+    const {name, value} = e.target;
+
+    setFilter((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  }
   
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') filterListing();
+  };
+
+  const clearFilter = () => {
+    setFilter({
+      'searchFilter': '',
+      'minBedroomFilter': '',
+      'maxBedroomFilter': '',
+      'minPriceFilter': '',
+      'maxPriceFilter': '',
+      'reviewFilter': '',
+      'dateFilter': ''
+    });
+
+    filterListing();
+  };
 
   return (
     <Box

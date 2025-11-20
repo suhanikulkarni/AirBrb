@@ -19,6 +19,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import Filter from './Filter';
 
 function ViewListing ( {token, owner}) {
   const navigate = useNavigate();
@@ -154,15 +155,6 @@ function ViewListing ( {token, owner}) {
     }
   }
 
-  const handleFilter = (e) => {
-    const {name, value} = e.target;
-
-    setFilter((prevData) => ({
-      ...prevData,
-      [name]: value
-    }));
-  }
-
   const filterListing = () => {
     let listing = [...list];
 
@@ -200,47 +192,33 @@ function ViewListing ( {token, owner}) {
     }
 
     // date filter
-    listing = listing.filter(l => {
-      const [filterStart, filterEnd] = filter.dateFilter;
-      const [listingAvailability] = l.availability;
-
-      const filterStartEpoch = new Date(filterStart).getTime() / 1000;
-      const filterEndEpoch = new Date(filterEnd).getTime() / 1000;
-      
-      const listingStartParts = listingAvailability.start.split('-');
-      const listingEndParts = listingAvailability.end.split('-');
-      
-      const listingStartEpoch = new Date(listingStartParts[2], listingStartParts[1] - 1, listingStartParts[0]).getTime() / 1000;
-      const listingEndEpoch = new Date(listingEndParts[2], listingEndParts[1] - 1, listingEndParts[0]).getTime() / 1000;
-
-      if (filterStartEpoch < listingStartEpoch) return false;
-      if (filterEndEpoch > listingEndEpoch) return false;
-      return true;
-    });
+    if (filter.dateFilter !== '') {
+      listing = listing.filter(l => {
+        const [filterStart, filterEnd] = filter.dateFilter;
+        const [listingAvailability] = l.availability;
+  
+        const filterStartEpoch = new Date(filterStart).getTime() / 1000;
+        const filterEndEpoch = new Date(filterEnd).getTime() / 1000;
+        
+        const listingStartParts = listingAvailability.start.split('-');
+        const listingEndParts = listingAvailability.end.split('-');
+        
+        const listingStartEpoch = new Date(listingStartParts[2], listingStartParts[1] - 1, listingStartParts[0]).getTime() / 1000;
+        const listingEndEpoch = new Date(listingEndParts[2], listingEndParts[1] - 1, listingEndParts[0]).getTime() / 1000;
+  
+        if (filterStartEpoch < listingStartEpoch) return false;
+        if (filterEndEpoch > listingEndEpoch) return false;
+        return true;
+      });
+    }
 
     // sort listing alphabetically
+    // TODO: sort based on booking status
     listing.sort((a, b) => a.title.localeCompare(b.title));
 
     // TODO: sort based on individual filter
 
     setFilteredList(listing);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') filterListing();
-  };
-
-  const clearFilter = () => {
-    setFilter({
-      'searchFilter': '',
-      'minBedroomFilter': '',
-      'maxBedroomFilter': '',
-      'minPriceFilter': '',
-      'maxPriceFilter': '',
-      'reviewFilter': '',
-      'dateFilter': ''
-    });
-    setFilteredList([...list]);
   };
 
   const orderList = () => {
@@ -283,182 +261,7 @@ function ViewListing ( {token, owner}) {
         </div>
       </Modal>
 
-      <Box
-        sx={{
-          borderRadius: 3,
-          bgcolor: '#f3f3f3ff',
-          padding: '15px',
-          display: 'flex',
-          flexDirection: 'column'
-        }}
-      >
-        <b>Search Filter</b>
-        <FormControl sx={{ marginBottom: '10px' }}>
-          <TextField
-            id='filter-search-input'
-            name='searchFilter'
-            type='search'
-            placeholder='Search Listing'
-            value={filter.searchFilter}
-            onChange={handleFilter}
-            onKeyDown={handleKeyDown}
-            variant='outlined'
-            size='small'
-          />
-        </FormControl>
-
-        <b>Bedroom Filter</b>
-        {/* TODO: prevent no. from decreasing beyond 0 and scroll effect */}
-        <FormControl
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            marginBottom: '10px'
-          }}
-        >
-          <FormControl
-            sx={{
-              marginRight: '5px',
-              width: '100%'
-            }}
-          >
-            <TextField
-              id='min-bedroom-filter-input'
-              name='minBedroomFilter'
-              type='number'
-              label='Minimum Bedroom'
-              value={filter.minBedroomFilter}
-              onChange={handleFilter}
-              onKeyDown={handleKeyDown}
-              slotProps={{ input: { min: 0 } }}
-              size='small'
-            />
-          </FormControl>
-          
-          {/* TODO: prevent no. from decreasing beyond 0 and scroll effect */}
-          <FormControl
-            sx={{
-              width: '100%'
-            }}
-          >
-            <TextField
-              id='max-bedroom-filter-input'
-              name='maxBedroomFilter'
-              type='number'
-              label='Maximum Bedroom'
-              value={filter.maxBedroomFilter}
-              onChange={handleFilter}
-              onKeyDown={handleKeyDown}
-              slotProps={{ input: { min: 0 } }}
-              size='small'
-            />
-          </FormControl>
-        </FormControl>
-
-        <b>Price Filter</b>
-        {/* TODO: prevent no. from decreasing beyond 0 and scroll effect */}
-        <FormControl
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            marginBottom: '10px'
-          }}
-        >
-          <FormControl
-            sx={{
-              marginRight: '5px',
-              width: '100%'
-            }}
-          >
-            <TextField
-              id='min-price-filter-input'
-              name='minPriceFilter'
-              type='number'
-              label='Minimum Price'
-              value={filter.minPriceFilter}
-              onChange={handleFilter}
-              onKeyDown={handleKeyDown}
-              slotProps={{ input: { min: 0 } }}
-              size='small'
-            />
-          </FormControl>
-          
-          {/* TODO: prevent no. from decreasing beyond 0 and scroll effect */}
-          <FormControl
-            sx={{
-              width: '100%'
-            }}
-          >
-            <TextField
-              id='max-price-filter-input'
-              name='maxPriceFilter'
-              type='number'
-              label='Maximum Price'
-              value={filter.maxPriceFilter}
-              onChange={handleFilter}
-              onKeyDown={handleKeyDown}
-              slotProps={{ input: { min: 0 } }}
-              size='small'
-            />
-          </FormControl>
-        </FormControl>
-
-        <b>Review Filter</b>
-        <FormControl
-          fullWidth
-          size="small"
-          sx={{
-            marginBottom: '10px'
-          }}
-        >
-          <InputLabel id='review-filter-select-label'>Review</InputLabel>
-          <Select
-            labelId='review-filter-select-label'
-            id='review-filter-select'
-            name='reviewFilter'
-            value={filter.reviewFilter}
-            onChange={handleFilter}
-          >
-            <MenuItem value={'5'}>5</MenuItem>
-            <MenuItem value={'4'}>4+</MenuItem>
-            <MenuItem value={'3'}>3+</MenuItem>
-            <MenuItem value={'2'}>2+</MenuItem>
-            <MenuItem value={'1'}>1+</MenuItem>
-            <MenuItem value={'0'}>0+</MenuItem>
-          </Select>
-        </FormControl>
-
-        <b>Date Filter</b>
-        <DatePicker 
-          range 
-          value={filter.dateFilter} 
-          onChange={(e, dateRange) => {
-            setFilter((prevData) => ({
-              ...prevData,
-              'dateFilter': dateRange.validatedValue
-            }));
-          }}
-          render={
-            <TextField
-              fullWidth
-              size="small"
-              placeholder='Filter available dates'
-            />
-          }
-        />
-        <br />
-
-        <Button
-          variant='outlined'
-          onClick={clearFilter}
-        >Clear Filter</Button>
-        <br />
-
-        <Button
-          variant='contained'
-          onClick={filterListing}
-        >Search</Button>
-      </Box>
+      <Filter filter={filter} setFilter={setFilter} filterListing={filterListing}/>
       <br />
 
       <ToggleButtonGroup
