@@ -37,10 +37,6 @@ function ViewHostedListings({ owner, token }) {
             }
           }
         );
-        if (res) {
-
-          navigate('/')
-        }
       }
       catch (error){
         setShowErrorPopup(error.response.data.error);
