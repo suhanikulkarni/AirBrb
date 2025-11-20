@@ -116,8 +116,6 @@ function ListingForm({ getters, setters }) {
 
   return (
     <Form>
-      <h1>Listing Information</h1>
-
       <TextField 
         id="listing-title-input" 
         label="Property Name"

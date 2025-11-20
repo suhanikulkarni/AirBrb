@@ -312,6 +312,13 @@ function ViewHostedListings({ owner, token }) {
                 <Button
                   name={listing.id} 
                   variant="contained" 
+                  onClick={() => navigate('edit-listing')}>
+
+                Edit Listing
+                </Button>
+                <Button
+                  name={listing.id} 
+                  variant="contained" 
                   onClick={() => deleteListing(listing.id)}>
 
                 Delete Listing

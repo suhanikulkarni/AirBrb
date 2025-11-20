@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import CreateListing from './pages/CreateListing';
+import EditListing from './pages/EditListing';
 import ViewListing from './pages/ViewListing';
 import { ErrorContext } from './context';
 import ErrorPopup from './pages/ErrorPopup';
@@ -97,6 +98,7 @@ function App() {
               <Route path="/dashboard">
                 <Route index element={<Dashboard token={token} owner={owner} />} />
                 <Route path="create-listing" element={<CreateListing token={token} />} />
+                <Route path="edit-listing" element={<EditListing token={token} />} />
               </Route>
             </>
           )}
