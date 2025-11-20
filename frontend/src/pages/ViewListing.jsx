@@ -125,6 +125,7 @@ function ViewListing ( {token, owner}) {
         }
         
         // TODO: sort list based on booked listing
+        fetchedList.sort((a, b) => a.title.localeCompare(b.title));
         setList(fetchedList);
         setFilteredList([...fetchedList]);
       }      
@@ -447,7 +448,12 @@ function ViewListing ( {token, owner}) {
                           <h3 style={styles.title}>{listing.title}</h3>
                           <p style={styles.address}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
                           <p style={styles.address}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>                    
-                          <p style={styles.address}>{`${listing.reviews.length} reviews`}</p>
+                          <p style={styles.address}>
+                            {listing.reviews.length > 0 && (
+                              <>`★ ${listing.reviews.reduce((a, b) => a + b.rating) / listing.reviews.length} `</>
+                            )}
+                            {`(${listing.reviews.length} reviews)`}
+                          </p>
                           <p style={styles.price}>${listing.price}</p>
                         </div>
                         {booking && (
@@ -466,7 +472,6 @@ function ViewListing ( {token, owner}) {
       )}
     </PageBody>
   );
-
 }
 
 export default ViewListing;
