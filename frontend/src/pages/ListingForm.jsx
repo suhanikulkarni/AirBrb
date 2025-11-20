@@ -31,6 +31,89 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 function ListingForm({ getters, setters }) {
+  const [thumbnailImageName, setThumbnailImageName] = useState('');
+
+  const handleInfo = (e) => {
+    const {name, value} = e.target;
+
+    setters.setListingInfo((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  }
+
+  const handleAddressInfo = (e) => {
+    const {name, value} = e.target;
+    setters.setListingAddress((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  }
+
+  const handleMetadataInfo = (e) => {
+    const {name, value} = e.target;
+    console.log("name and vakue", name, value)
+
+    setters.setListingMetadata((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+
+    if (name === 'bedroomCount') {
+      renderBedroomForm();
+    }
+  }
+
+  const handleThumbnailImage = async (file) => {
+    setThumbnailImageName(file.name);
+
+    const dataUrl = await fileToDataUrl(file);
+    setters.setListingInfo((prevData) => ({
+      ...prevData,
+      'thumbnail': dataUrl
+    }))
+  }
+
+  const clearThumbnail = () => {
+    setThumbnailImageName('');
+
+    setters.setListingInfo((prevData) => ({
+      ...prevData,
+      'thumbnail': ''
+    }))
+  }
+
+  const handleThumbnailYoutube = (youtubeLink) => {
+    setters.setListingInfo((prevData) => ({
+      ...prevData,
+      'thumbnail': youtubeLink
+    }))
+  }
+
+  const renderBedroomForm = () => {
+    const array = [];
+
+    for (let i = 1; i <= getters.listingMetadata.bedroomCount; i++) {
+      array.push(
+        <BedroomForm
+          key={i}
+          bedroomNumber={i}
+          updateBedroomMetadata={updateBedroomMetadata}
+        />
+      )
+    }
+
+    return array;
+  }
+
+  const updateBedroomMetadata = (bedroomNumber, bedroomInfo) => {
+    setters.setListingMetadata(prev => {
+      const updated = [...prev.bedrooms];
+      updated[bedroomNumber - 1] = bedroomInfo;
+      return { ...prev, bedrooms: updated };
+    });
+  };
+
   return (
     <Form>
       <h1>Listing Information</h1>
@@ -184,6 +267,75 @@ function ListingForm({ getters, setters }) {
       </Box>
       <br />
 
+      <h2>Listing Details</h2>
+      <FormControl fullWidth>
+        <InputLabel id="demo-simple-select-label">Property Type</InputLabel>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          name="propertyType"
+          value={getters.listingMetadata.propertyType}
+          label="Property Type"
+          onChange={handleMetadataInfo}
+        >
+          <MenuItem value={"apartment"}>Apartment</MenuItem>
+          <MenuItem value={"house"}>House</MenuItem>
+          <MenuItem value={"guesthouse"}>Guesthouse</MenuItem>
+          <MenuItem value={"hotelroom"}>Hotel Room</MenuItem>
+          <MenuItem value={"cabin"}>Cabin</MenuItem>
+          <MenuItem value={"other"}>Other</MenuItem>
+        </Select>
+      </FormControl>
+      <br />
+
+      <TextField
+        type="text"
+        label="Amenities"
+        multiline
+        rows={3}
+        name="amenities"
+        onChange={handleMetadataInfo}
+      />
+      <br />
+
+      {/* TODO: prevent no. from decreasing beyond 0 */}
+      <TextField
+        id="bathroom-count-input"
+        label="Number of Bathrooms"
+        type="number"
+        onChange={handleMetadataInfo}
+        name="bathroomCount"
+        slotProps={{ input: { min: 0 } }}
+        required
+      />
+      <br />
+
+      <h3>Bedrooms</h3>
+      <TextField
+        label="Number of Bedrooms"
+        type="number"
+        onChange={handleMetadataInfo}
+        name="bedroomCount"
+        slotProps={{ input: { min: 0 } }}
+      />
+      <br />
+
+      <Box
+        sx={{
+          borderRadius: 3,
+          bgcolor: '#f3f3f3ff',
+          padding: '15px'
+        }}
+      >          
+        <Box
+          sx={{
+            margin: '0 10px 15px 10px'
+          }}
+        >
+          {renderBedroomForm()}
+        </Box>
+      </Box>
+      <br />
     </Form>
   )
 }
