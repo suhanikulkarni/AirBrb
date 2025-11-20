@@ -281,6 +281,141 @@ function ViewListing ( {token, owner}) {
         </div>
       </Modal>
 
+      <Box
+        sx={{
+          borderRadius: 3,
+          bgcolor: '#f3f3f3ff',
+          padding: '15px',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
+        <h2>Search Filter</h2>
+        <TextField
+          id="filter-search-input"
+          placeholder="Search Listing"
+          type="search"
+          variant="outlined"
+          value={filter.searchFilter}
+          name='searchFilter'
+          onChange={handleFilter}
+          onKeyDown={handleKeyDown}
+        />
+        <br />
+
+        <h2>Bedroom Filter (Min-Max)</h2>
+        {/* TODO: prevent no. from decreasing beyond 0 */}
+        <TextField
+          id="min-bedroom-filter-input"
+          label="Minimum Bedroom"
+          type="number"
+          value={filter.minBedroomFilter}
+          onChange={handleFilter}
+          name="minBedroomFilter"
+          slotProps={{ input: { min: 0 } }}
+        />
+        <br />
+
+        {/* TODO: prevent no. from decreasing beyond 0 */}
+        <TextField
+          id="max-bedroom-filter-input"
+          label="Maximum Bedroom"
+          type="number"
+          value={filter.maxBedroomFilter}
+          onChange={handleFilter}
+          name="maxBedroomFilter"
+          slotProps={{ input: { min: 0 } }}
+        />
+        <br />
+
+        <h2>Price Filter (Min-Max)</h2>
+        {/* TODO: prevent no. from decreasing beyond 0 */}
+        <TextField
+          id="min-price-filter-input"
+          label="Minimum Price"
+          type="number"
+          value={filter.minPriceFilter}
+          onChange={handleFilter}
+          name="minPriceFilter"
+          slotProps={{ input: { min: 0 } }}
+        />
+        <br />
+
+        {/* TODO: prevent no. from decreasing beyond 0 */}
+        <TextField
+          id="max-price-filter-input"
+          label="Maximum Price"
+          type="number"
+          value={filter.maxPriceFilter}
+          onChange={handleFilter}
+          name="maxPriceFilter"
+          slotProps={{ input: { min: 0 } }}
+        />
+        <br />
+
+        <h2>Review Filter</h2>
+        <FormControl fullWidth>
+          <InputLabel id="review-filter-select-label">Review</InputLabel>
+          <Select
+            labelId="review-filter-select-label"
+            id="review-filter-select"
+            name="reviewFilter"
+            value={filter.reviewFilter}
+            onChange={handleFilter}
+          >
+            <MenuItem value={'5'}>5</MenuItem>
+            <MenuItem value={'4'}>4+</MenuItem>
+            <MenuItem value={'3'}>3+</MenuItem>
+            <MenuItem value={'2'}>2+</MenuItem>
+            <MenuItem value={'1'}>1+</MenuItem>
+            <MenuItem value={'0'}>0+</MenuItem>
+          </Select>
+        </FormControl>
+        <br />
+
+        <h2>Date Filter</h2>
+        <DatePicker 
+          range 
+          value={filter.dateFilter} 
+          onChange={(e, dateRange) => {
+            setFilter((prevData) => ({
+              ...prevData,
+              'dateFilter': dateRange.validatedValue
+            }));
+          }}
+          placeholder="Filter available dates"
+        />
+
+        <Button
+          onClick={clearFilter}
+        >Clear Filter</Button>
+        <br />
+
+        <Button
+          variant="contained"
+          onClick={filterListing}
+        >Search</Button>
+      </Box>
+      <br />
+
+      <ToggleButtonGroup
+        value={sortOrder}
+        exclusive
+        onChange={(e, newSortOrder) => {
+          if (newSortOrder !== null) setSortOrder(newSortOrder); 
+        }}
+        aria-label="list order"
+      >
+        <ToggleButton value="ascending" aria-label="ascending order">
+          <p>Ascending</p>
+        </ToggleButton>
+        <ToggleButton value="descending" aria-label="descending order">
+          <p>Descending</p>
+        </ToggleButton>
+      </ToggleButtonGroup>
+      <br />
+      
+
       {list === "LOADING" ? (
         <p>LOADING...</p>
       ) : (
@@ -289,139 +424,6 @@ function ViewListing ( {token, owner}) {
             <div>No listings available</div>
           ) : (
             <>
-              <Box
-                sx={{
-                  borderRadius: 3,
-                  bgcolor: '#f3f3f3ff',
-                  padding: '15px',
-                  display: 'flex',
-                  flexDirection: 'column'
-                }}
-              >
-                <h2>Search Filter</h2>
-                <TextField
-                  id="filter-search-input"
-                  placeholder="Search Listing"
-                  type="search"
-                  variant="outlined"
-                  value={filter.searchFilter}
-                  name='searchFilter'
-                  onChange={handleFilter}
-                  onKeyDown={handleKeyDown}
-                />
-                <br />
-
-                <h2>Bedroom Filter (Min-Max)</h2>
-                {/* TODO: prevent no. from decreasing beyond 0 */}
-                <TextField
-                  id="min-bedroom-filter-input"
-                  label="Minimum Bedroom"
-                  type="number"
-                  value={filter.minBedroomFilter}
-                  onChange={handleFilter}
-                  name="minBedroomFilter"
-                  slotProps={{ input: { min: 0 } }}
-                />
-                <br />
-
-                {/* TODO: prevent no. from decreasing beyond 0 */}
-                <TextField
-                  id="max-bedroom-filter-input"
-                  label="Maximum Bedroom"
-                  type="number"
-                  value={filter.maxBedroomFilter}
-                  onChange={handleFilter}
-                  name="maxBedroomFilter"
-                  slotProps={{ input: { min: 0 } }}
-                />
-                <br />
-
-                <h2>Price Filter (Min-Max)</h2>
-                {/* TODO: prevent no. from decreasing beyond 0 */}
-                <TextField
-                  id="min-price-filter-input"
-                  label="Minimum Price"
-                  type="number"
-                  value={filter.minPriceFilter}
-                  onChange={handleFilter}
-                  name="minPriceFilter"
-                  slotProps={{ input: { min: 0 } }}
-                />
-                <br />
-
-                {/* TODO: prevent no. from decreasing beyond 0 */}
-                <TextField
-                  id="max-price-filter-input"
-                  label="Maximum Price"
-                  type="number"
-                  value={filter.maxPriceFilter}
-                  onChange={handleFilter}
-                  name="maxPriceFilter"
-                  slotProps={{ input: { min: 0 } }}
-                />
-                <br />
-
-                <h2>Review Filter</h2>
-                <FormControl fullWidth>
-                  <InputLabel id="review-filter-select-label">Review</InputLabel>
-                  <Select
-                    labelId="review-filter-select-label"
-                    id="review-filter-select"
-                    name="reviewFilter"
-                    value={filter.reviewFilter}
-                    onChange={handleFilter}
-                  >
-                    <MenuItem value={'5'}>5</MenuItem>
-                    <MenuItem value={'4'}>4+</MenuItem>
-                    <MenuItem value={'3'}>3+</MenuItem>
-                    <MenuItem value={'2'}>2+</MenuItem>
-                    <MenuItem value={'1'}>1+</MenuItem>
-                    <MenuItem value={'0'}>0+</MenuItem>
-                  </Select>
-                </FormControl>
-                <br />
-
-                <h2>Date Filter</h2>
-                <DatePicker 
-                  range 
-                  value={filter.dateFilter} 
-                  onChange={(e, dateRange) => {
-                    setFilter((prevData) => ({
-                      ...prevData,
-                      'dateFilter': dateRange.validatedValue
-                    }));
-                  }}
-                  placeholder="Filter available dates"
-                />
-
-                <Button
-                  onClick={clearFilter}
-                >Clear Filter</Button>
-                <br />
-
-                <Button
-                  variant="contained"
-                  onClick={filterListing}
-                >Search</Button>
-              </Box>
-              <br />
-
-              <ToggleButtonGroup
-                value={sortOrder}
-                exclusive
-                onChange={(e, newSortOrder) => {
-                  if (newSortOrder !== null) setSortOrder(newSortOrder); 
-                }}
-                aria-label="list order"
-              >
-                <ToggleButton value="ascending" aria-label="ascending order">
-                  <p>Ascending</p>
-                </ToggleButton>
-                <ToggleButton value="descending" aria-label="descending order">
-                  <p>Descending</p>
-                </ToggleButton>
-              </ToggleButtonGroup>
-              <br />
               {!filteredList.length ? (
                 <p>No listings found</p>
               ) : (
