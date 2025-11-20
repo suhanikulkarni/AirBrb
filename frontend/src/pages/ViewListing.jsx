@@ -7,7 +7,7 @@ import { API_BASE_URL } from '../constants';
 import { ErrorContext } from '../context';
 import Thumbnail from './Thumbnail';
 
-import { styles } from '../styles/ListingStyles';
+import styles from '../styles/listingStyles.module.css';
 import { PageBody } from '../styles/mainStyles';
 
 import TextField from '@mui/material/TextField';
@@ -438,11 +438,11 @@ function ViewListing ( {token, owner}) {
               'dateFilter': dateRange.validatedValue
             }));
           }}
-          placeholder='Filter available dates'
           render={
             <TextField
               fullWidth
               size="small"
+              placeholder='Filter available dates'
             />
           }
         />
@@ -467,7 +467,8 @@ function ViewListing ( {token, owner}) {
         onChange={(e, newSortOrder) => {
           if (newSortOrder !== null) setSortOrder(newSortOrder); 
         }}
-        aria-label='list order'
+        aria-label='listing order'
+        size='small'
       >
         <ToggleButton value='ascending' aria-label='ascending order'>
           <p>Ascending</p>
@@ -490,33 +491,33 @@ function ViewListing ( {token, owner}) {
               {!filteredList.length ? (
                 <p>No listings found</p>
               ) : (
-                <div style={styles.grid} >
+                <div className={styles.grid} >
                   {orderList().map((listing, index) => {
                     const booking = acceptedBookings.find(
                       b => Number(b.listingId) === Number(listing.id)
                     );
                     
                     return (
-                      <div key={index} style={styles.card}>
+                      <div key={index} className={styles.card}>
                         <div onClick={() => navigate(`/viewListings/${listing.id}`)}>
                           <Thumbnail thumbnail={listing.thumbnail} listingTitle={listing.title} />
-                          <h4 style={styles.address}>
+                          <h4 className={styles.address}>
                             {`
                               ${listing.address?.suburb},
                               ${listing.address?.state},
                               ${listing.address?.country}
                             `}
                           </h4>
-                          <h3 style={styles.title}>{listing.title}</h3>
-                          <p style={styles.address}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
-                          <p style={styles.address}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>                    
-                          <p style={styles.address}>
+                          <h3 className={styles.title}>{listing.title}</h3>
+                          <p className={styles.address}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
+                          <p className={styles.address}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>                    
+                          <p className={styles.address}>
                             {listing.reviews.length > 0 && (
                               <>`★ ${listing.reviews.reduce((a, b) => a + b.rating) / listing.reviews.length} `</>
                             )}
                             {`(${listing.reviews.length} reviews)`}
                           </p>
-                          <p style={styles.price}>${listing.price}</p>
+                          <p className={styles.price}>${listing.price}</p>
                         </div>
                         {booking && (
                           <Button variant='contained'onClick={() => handleOpen(listing.id, booking.id)}>

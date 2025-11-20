@@ -13,7 +13,8 @@ function BedroomForm({ bedroomNumber, updateBedroomMetadata, bedroomMetadata }) 
   });
 
   useEffect(() => {
-    setBedroomInfo(bedroomMetadata);
+    console.log('bedrooms', bedroomMetadata.bedTypes)
+    setBedroomInfo(bedroomMetadata.bedTypes);
   }, []);
 
   const handleBedroomBedInfo = (e) => {

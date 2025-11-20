@@ -1,0 +1,50 @@
+.container { 
+  padding: 20px;
+}
+
+.loadingText {
+  font-style: italic;
+  color: #888;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.card:hover {
+  background-color: #ddd;
+}
+
+.thumbnail {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.title {
+  margin: 12px 0 6px;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.address {
+  margin: 4px 0;
+  color: #555;
+}
+
+.price {
+  margin: 4px 0;
+  font-weight: bold;
+  color: #007BFF;
+}
