@@ -181,9 +181,62 @@ function ViewHostedListings({ owner, token }) {
     today.setHours(0, 0, 0, 0);
     const start = currentRange[0].toDate();
     start.setHours(0, 0, 0, 0);
+    const end = currentRange[1].toDate();
+    end.setHours(0, 0, 0, 0);
 
     if (start <= today) {
-      setShowErrorPopup("Please enter a date in the future");
+      return;
+    }
+
+    const existingRanges = allRanges[listingId] || [];
+    let merged = false;
+
+    const updatedRanges = existingRanges.map(range => {
+      const existingStart = range[0].toDate();
+      existingStart.setHours(0, 0, 0, 0);
+
+      const existingEnd = range[1].toDate();
+      existingEnd.setHours(0, 0, 0, 0);
+
+      if (start >= existingStart && start <= existingEnd && end > existingEnd) {
+        merged = true;
+        return [range[0], currentRange[1]];
+      }
+
+      return range;
+    });
+
+    if (merged) {
+
+      setAllRanges(prev => ({
+        ...prev,
+        [listingId]: updatedRanges
+      }));
+      setCurrentRange([]);
+      console.log("Range merged - extended existing range");
+      return;
+    }
+
+    const hasInvalidOverlap = existingRanges.some(range => {
+      const existingStart = range[0].toDate();
+      existingStart.setHours(0, 0, 0, 0);
+      const existingEnd = range[1].toDate();
+      existingEnd.setHours(0, 0, 0, 0);
+
+      if (start < existingStart && end >= existingStart) {
+        return true; 
+      }
+      if (start <= existingStart && end >= existingEnd) {
+        return true; 
+      }
+      if (start > existingStart && start <= existingEnd && end <= existingEnd) {
+        return true;
+      }
+      return false;
+    });
+
+    if (hasInvalidOverlap) {
+      setShowErrorPopup("This date range has an invalid overlap with existing availability");
       return;
     }
 
@@ -198,7 +251,6 @@ function ViewHostedListings({ owner, token }) {
       console.log("Updated allRanges:", updatedRanges);
       return updatedRanges;
     });
-
     setCurrentRange([]);
   };
 
