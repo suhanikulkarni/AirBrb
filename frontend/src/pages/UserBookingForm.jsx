@@ -37,8 +37,8 @@ function UsersBookingForm({price, listingId, token}) {
   const submitBooking = async () => {
     // if this sudednnly stops working make it y-m-d
     const dates = {
-      start: bookingDates[0].format("DD-MM-YYYY"),
-      end: bookingDates[1].format("DD-MM-YYYY")
+      start: bookingDates[0].format("YYYY-MM-DD"),
+      end: bookingDates[1].format("YYYY-MM-DD")
     };
 
     const body = {
