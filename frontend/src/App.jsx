@@ -60,6 +60,11 @@ function App() {
                 {" "}
                 <NavRight>
                   <Button
+                    variant="outlined"
+                    onClick={() => navigate('/dashboard')}
+                  >Your Listings</Button>
+                  {" "}
+                  <Button
                     variant="contained"
                     onClick={() => logoutUser()}
                   >Logout</Button>
