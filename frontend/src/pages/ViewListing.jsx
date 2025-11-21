@@ -13,10 +13,10 @@ import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Button from '@mui/material/Button';
-import { Modal, Rating } from '@mui/material';
 import Filter from './Filter';
+import { Modal, Rating, Typography } from '@mui/material';
 
-function ViewListing ( {token, owner}) {
+function ViewListing({ token, owner }) {
   const navigate = useNavigate();
   const setShowErrorPopup = useContext(ErrorContext);
 
@@ -38,6 +38,7 @@ function ViewListing ( {token, owner}) {
   const [acceptedBookings, setAcceptedBookings] = useState([]);
 
   const [reviewOpen, setReviewOpen] = useState(false);
+  const [allBookings, setAllBookings] = useState([]);
   const [selectedListingId, setSelectedListingId] = useState(null);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
 
@@ -57,7 +58,6 @@ function ViewListing ( {token, owner}) {
     setReviewOpen(true);
   };
 
-
   const uploadReview = async () => {
     console.log('Uploading review:', reviewComment, reviewRating);
     const review = {
@@ -69,8 +69,8 @@ function ViewListing ( {token, owner}) {
 
     try {
       const response = await axios.put(
-        `${API_BASE_URL}listings/${selectedListingId}/review/${selectedBookingId}`, 
-        body, 
+        `${API_BASE_URL}listings/${selectedListingId}/review/${selectedBookingId}`,
+        body,
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -88,20 +88,25 @@ function ViewListing ( {token, owner}) {
 
   const fetchAcceptedBookings = async () => {
     if (!token) return;
-    
+
     try {
       const response = await axios.get(`${API_BASE_URL}bookings`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (response.data?.bookings) {
-        const accepted = response.data.bookings.filter(
-          booking => booking.status === 'accepted' && booking.owner === owner
+        const userBookings = response.data.bookings.filter(
+          booking => booking.owner === owner
+        );
+        setAllBookings(userBookings);
+        const accepted = userBookings.filter(
+          booking => booking.status === 'accepted'
         );
         setAcceptedBookings(accepted);
       }
+
     } catch (error) {
       setShowErrorPopup(error.response.data.error);
     }
@@ -120,18 +125,42 @@ function ViewListing ( {token, owner}) {
             fetchedList.push({ ...listing, ...listingInfo });
           }
         }
-        
+
         // TODO: sort list based on booked listing
         fetchedList.sort((a, b) => a.title.localeCompare(b.title));
         setList(fetchedList);
         setFilteredList([...fetchedList]);
-        console.log(fetchedList)
-      }      
+      }
     }
 
     fetchListings();
-    fetchAcceptedBookings();
-  }, [reviewComment, reviewRating]);
+    if (token) {
+      fetchAcceptedBookings();
+    } else {
+      setAllBookings([]);
+      setAcceptedBookings([]);
+    }
+  }, [reviewComment, reviewRating, token]);
+
+  // Sort listings when bookings are loaded
+  useEffect(() => {
+    if (list !== 'LOADING') {
+      const sortedList = [...list].sort((a, b) => {
+        const aHasBooking = allBookings.some(booking => Number(booking.listingId) === Number(a.id));
+        const bHasBooking = allBookings.some(booking => Number(booking.listingId) === Number(b.id));
+
+        console.log(`Listing ${a.id} (${a.title}): has booking = ${aHasBooking}`);
+        console.log(`Listing ${b.id} (${b.title}): has booking = ${bHasBooking}`);
+
+        if (aHasBooking && !bHasBooking) return -1;
+        if (!aHasBooking && bHasBooking) return 1;
+
+        return a.title.localeCompare(b.title);
+      });
+
+      setFilteredList(sortedList);
+    }
+  }, [allBookings, list]);
 
   const getListings = async () => {
     try {
@@ -151,7 +180,16 @@ function ViewListing ( {token, owner}) {
     }
   }
 
-  const filterListing = () => {
+  const handleFilter = (e) => {
+    const { name, value } = e.target;
+
+    setFilter((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  }
+
+  const filterListing = (e) => {
     let listing = [...list];
 
     // search filter
@@ -179,7 +217,7 @@ function ViewListing ( {token, owner}) {
     if (filter.reviewFilter !== '') {
       listing = listing.filter(l => {
         if (!l.reviews.length) return false;
-        
+
         const average = l.reviews.reduce((a, b) => a + b.rating) / l.reviews.length;
         if (average >= filter.reviewFilter) return true;
 
@@ -223,10 +261,11 @@ function ViewListing ( {token, owner}) {
   }
 
   return (
+    <>
     <PageBody>
-      <Modal 
-        open={reviewOpen} 
-        onClose={handleClose} 
+      <Modal
+        open={reviewOpen}
+        onClose={handleClose}
         style={{
           position: 'absolute',
           border: '2px solid #000',
@@ -248,8 +287,8 @@ function ViewListing ( {token, owner}) {
             value={reviewComment}
             onChange={(e) => setReviewComment(e.target.value)}
           />
-          <Button 
-            onClick={uploadReview} 
+          <Button
+            onClick={uploadReview}
             variant='contained'
           >
             Submit Review
@@ -264,7 +303,7 @@ function ViewListing ( {token, owner}) {
         value={sortOrder}
         exclusive
         onChange={(e, newSortOrder) => {
-          if (newSortOrder !== null) setSortOrder(newSortOrder); 
+          if (newSortOrder !== null) setSortOrder(newSortOrder);
         }}
         aria-label='listing order'
         size='small'
@@ -277,7 +316,7 @@ function ViewListing ( {token, owner}) {
         </ToggleButton>
       </ToggleButtonGroup>
       <br />
-      
+
 
       {list === 'LOADING' ? (
         <p>LOADING...</p>
@@ -295,7 +334,7 @@ function ViewListing ( {token, owner}) {
                     const booking = acceptedBookings.find(
                       b => Number(b.listingId) === Number(listing.id)
                     );
-                    
+
                     return (
                       <div key={index} className={styles.card}>
                         <div key={listing.id} onClick={() => navigate(`/viewListings/${listing.id}`)}>
@@ -326,8 +365,24 @@ function ViewListing ( {token, owner}) {
                             </p>
                           <p className={styles.price}>${listing.price} per night</p>
                         </div>
+
                         {booking && (
-                          <Button variant='contained'onClick={() => handleOpen(listing.id, booking.id)}>
+                          <Typography
+                            variant="body1"
+                            style={{
+                              marginTop: '8px',
+                              fontWeight: 'bold',
+                              color: booking.status === 'accepted' ? 'green' :
+                                booking.status === 'pending' ? 'orange' :
+                                  booking.status === 'declined' ? 'red' : 'pink'
+                            }}
+                          >
+                            Booking Status: {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                          </Typography>
+                        )}
+
+                        {booking && (
+                          <Button variant="contained" onClick={() => handleOpen(listing.id, booking.id)}>
                             Leave a Review
                           </Button>
                         )}
@@ -341,6 +396,7 @@ function ViewListing ( {token, owner}) {
         </>
       )}
     </PageBody>
+    </>
   );
 }
 
