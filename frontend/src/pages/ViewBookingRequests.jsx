@@ -1,16 +1,18 @@
+
 import { useContext, useEffect, useState } from "react";
 import { ErrorContext } from '../context';
 import axios from "axios";
 import { API_BASE_URL } from "../constants";
 import Button from '@mui/material/Button';
 import { useNavigate } from "react-router-dom";
-import { Box, Input, InputLabel } from "@mui/material";
+import { Box, Chip } from "@mui/material";
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 dayjs.extend(customParseFormat);
 
-function ViweBookingRequest({ token, owner }) {
+function ViewBookingRequest({ token, owner }) {
 
   const [bookingRequests, setBookingRequests] = useState([]);
   const [listings, setListings] = useState([]);
@@ -22,23 +24,18 @@ function ViweBookingRequest({ token, owner }) {
 
   useEffect(() => {
     let profit1 = 0;
-    // only if acceptef
-
     bookingRequests.map(booking => {
       profit1 += booking.totalPrice;
     })
-
-    console.log(profit1)
     setProfit(profit1);
   }, [bookingRequests])
 
-useEffect(() => {
+  useEffect(() => {
     let daysBooked = 0;
 
     bookingRequests
       .filter(booking => booking.status === 'accepted')
       .forEach(booking => {
-        // Parse dates with the correct format: DD-MM-YYYY
         const start1 = dayjs(booking.dateRange.start, 'DD-MM-YYYY');
         const end1 = dayjs(booking.dateRange.end, 'DD-MM-YYYY');
 
@@ -47,21 +44,16 @@ useEffect(() => {
           return;
         }
 
-        console.log("Formatted start1:", start1.format('YYYY-MM-DD'));
-        console.log("Formatted end1:", end1.format('YYYY-MM-DD'));
-
         const nights = end1.diff(start1, 'day');
         daysBooked += nights;
       });
 
-    console.log("Total days booked:", daysBooked);
     setTotalDaysBooked(daysBooked);
   }, [listings, bookingRequests]);
 
   useEffect(() => {
     if (token === 'LOADING' || !token) navigate('/login');
   }, [token]);
-
 
   const getListingInfo = async (id) => {
     try {
@@ -113,13 +105,11 @@ useEffect(() => {
         setListings(detailedListings.filter(Boolean));
       }
       catch (error) {
-        console.log("ngregnjkgnrek")
         setShowErrorPopup(error.response.data.error);
       }
     }
     getFetch();
   }, [owner]);
-
 
   useEffect(() => {
     if (listings.length > 0) {
@@ -137,14 +127,11 @@ useEffect(() => {
       if (res) {
         const requestData = res.data.bookings;
         const listingIds = listings.map(listing => String(listing.id));
-        //console.log("Listing IDs:", listingIds);
         bookingRequests = requestData.filter(booking => {
           const match = listingIds.includes(String(booking.listingId));
-          //console.log(`Comparing ${booking.listingId} with myListingIds:`, match);
           return match;
         });
 
-        console.log("Filtered Booking Requests:", bookingRequests);
         setBookingRequests(bookingRequests);
       }
     } catch (error) {
@@ -153,25 +140,21 @@ useEffect(() => {
   }
 
   const acceptRequest = async (bookingId) => {
-    console.log("accepted");
     try {
-      console.log("accepted!!!!!!!!!");
-
       const response = await axios.put(
         `${API_BASE_URL}bookings/accept/${bookingId}`, {},
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      if (response) { console.log(response); getBookingRequests(); }
+      if (response) { getBookingRequests(); }
     }
     catch (error) {
-      setShowErrorPopup(error.response?.data?.error || "Failed to Accept Bookng Request");
+      setShowErrorPopup(error.response?.data?.error || "Failed to Accept Booking Request");
     }
   }
 
   const declineRequest = async (bookingId) => {
-    console.log("decline");
     try {
       const response = await axios.put(
         `${API_BASE_URL}bookings/decline/${bookingId}`, {},
@@ -179,64 +162,156 @@ useEffect(() => {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      console.log("Decline response:", response);
       getBookingRequests();
     }
-
     catch (error) {
-      setShowErrorPopup(error.response?.data?.error || "Failed to Decline Bookng Request");
+      setShowErrorPopup(error.response?.data?.error || "Failed to Decline Booking Request");
     }
   }
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'accepted':
+        return 'success';
+      case 'declined':
+        return 'error';
+      case 'pending':
+        return 'warning';
+      default:
+        return 'default';
+    }
+  }
+
+  const pendingRequests = bookingRequests.filter(req => req.status === 'pending');
+
   return (
-    <div>
-      <h3>Booking Requests</h3>
-      {bookingRequests.length === 0 ? (
-        <p>No booking requests </p>
-      ) : (
-        bookingRequests.map((request) => (
-          <>
-            {request.status === "pending" && (
-              <div key={request.id}>
-                <h3>Request Id: {request.id}</h3>
-                <p>Start Date: {request.dateRange.start}</p>
-                <p>End Date: {request.dateRange.end}</p>
-                <Button
-                  onClick={() => { acceptRequest(request.id) }}
-                >Accept
-                </Button>
+    <div className="container">
+      <div className="banner">
+        <div className="bannerContent">
+          <h1 className="title">Booking Dashboard</h1>
+          <p className="subtitle">Manage and track your property bookings</p>
+          
+          <div className="statsContainer">
+            <div className="statBox">
+              <h4>${profit}</h4>
+              <p>Total Profit</p>
+            </div>
+            <div className="statBox">
+              <h4>{totalDaysBooked}</h4>
+              <p>Days Booked</p>
+            </div>
+            <div className="statBox">
+              <h4>{pendingRequests.length}</h4>
+              <p>Pending</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-                <Button
-                  onClick={() => { declineRequest(request.id) }}
-                >Decline
-                </Button>
+      <div className="mainContent">
+        <div className="gridLayout">
+          
+          {/* Left Column - Pending Requests */}
+          <div>
+            <div className="sectionHeader">
+              <h2 className="sectionTitle">Action Required</h2>
+              {pendingRequests.length > 0 && (
+                <Chip 
+                  label={`${pendingRequests.length} pending`} 
+                  color="warning" 
+                  sx={{ fontWeight: 600 }}
+                />
+              )}
+            </div>
 
+            {pendingRequests.length === 0 ? (
+              <div className="emptyCard">
+                <h3 className="emptyTitle">✅ All caught up!</h3>
+                <p className="emptyText">No pending requests to review</p>
+              </div>
+            ) : (
+              <div>
+                {pendingRequests.map((request) => (
+                  <div key={request.id} className="requestCard pendingCard">
+                    <h3 className="requestTitle">Request #{request.id}</h3>
+                    
+                    <div className="dateRow">
+                      <CalendarTodayIcon sx={{ fontSize: 16 }} />
+                      <span>{request.dateRange.start} → {request.dateRange.end}</span>
+                    </div>
+
+                    {request.totalPrice && (
+                      <p className="price">${request.totalPrice}</p>
+                    )}
+
+                    <div className="buttonRow">
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        color="success"
+                        onClick={() => acceptRequest(request.id)}
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="error"
+                        onClick={() => declineRequest(request.id)}
+                      >
+                        Decline
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
-          </>
-        ))
-      )}
+          </div>
 
-      <Box>
-        <InputLabel>Suhani</InputLabel>
+          {/* Right Column - Booking History */}
+          <div>
+            <div className="sectionHeader">
+              <h2 className="sectionTitle">Booking History</h2>
+            </div>
 
-        {bookingRequests.map((request) => (
-          <>
-            <h4>Request Id: {request.id}</h4>
-            <p>Start Date: {request.dateRange.start}</p>
-            <p>End Date: {request.dateRange.end}</p>
-            <p>Status: {request.status}</p>
-          </>
-        ))}
+            {bookingRequests.length === 0 ? (
+              <div className="emptyCard">
+                <h3 className="emptyTitle">📋 No bookings yet</h3>
+                <p className="emptyText">Your booking history will appear here</p>
+              </div>
+            ) : (
+              <div>
+                {bookingRequests.map((request) => (
+                  <div key={request.id} className="historyCard">
+                    <div className="historyHeader">
+                      <div className="historyLeft">
+                        <h6>Request #{request.id}</h6>
+                        <Chip 
+                          label={request.status.toUpperCase()} 
+                          color={getStatusColor(request.status)}
+                          size="small"
+                        />
+                      </div>
+                      {request.totalPrice && (
+                        <h6 className="historyPrice">${request.totalPrice}</h6>
+                      )}
+                    </div>
 
-        <InputLabel>Profit Made: ${profit}</InputLabel>
-        <InputLabel>Days booked: {totalDaysBooked}</InputLabel>
-
-      </Box>
+                    <div className="dateRow">
+                      <CalendarTodayIcon sx={{ fontSize: 14 }} />
+                      <span style={{ fontSize: '0.875rem' }}>
+                        {request.dateRange.start} → {request.dateRange.end}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   )
-
-
 }
 
-export default ViweBookingRequest
+export default ViewBookingRequest
