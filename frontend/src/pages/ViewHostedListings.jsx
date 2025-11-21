@@ -6,13 +6,14 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import DatePicker from "react-multi-date-picker";
 import { Box } from '@mui/material';
-import { ErrorContext } from '../context';
+import { ErrorContext, ConfirmationContext } from '../context';
 import { useNavigate } from "react-router-dom";
 import Thumbnail from "./Thumbnail";
 import styles from '../styles/listingStyles.module.css';
 
 function ViewHostedListings({ owner, token }) {
   const setShowErrorPopup = useContext(ErrorContext); 
+  const setShowConfirmDeletePopup = useContext(ConfirmationContext);
   const navigate = useNavigate();
   
   const [listings, setListings] = useState("LOADING");
@@ -388,7 +389,10 @@ function ViewHostedListings({ owner, token }) {
                       <Button
                         name={listing.id} 
                         variant="contained" 
-                        onClick={() => deleteListing(listing.id)}
+                        onClick={() => setShowConfirmDeletePopup({
+                          'function': () => deleteListing(listing.id),
+                          'value': true
+                        })}
                         color='error'
                       >
                         Delete Listing
