@@ -62,7 +62,7 @@ function Filter({ filter, setFilter, filterListing }) {
       </FormControl>
 
       <b>Bedroom Filter</b>
-      {/* TODO: prevent no. from decreasing beyond 0 and scroll effect */}
+      {/* TODO: prevent no. from decreasing beyond 0 */}
       <FormControl
         sx={{
           display: 'flex',
@@ -86,10 +86,11 @@ function Filter({ filter, setFilter, filterListing }) {
             onKeyDown={handleKeyDown}
             slotProps={{ input: { min: 0 } }}
             size='small'
+            onWheel={(e) => e.target.blur()}
           />
         </FormControl>
         
-        {/* TODO: prevent no. from decreasing beyond 0 and scroll effect */}
+        {/* TODO: prevent no. from decreasing beyond 0 */}
         <FormControl
           sx={{
             width: '100%'
@@ -105,12 +106,13 @@ function Filter({ filter, setFilter, filterListing }) {
             onKeyDown={handleKeyDown}
             slotProps={{ input: { min: 0 } }}
             size='small'
+            onWheel={(e) => e.target.blur()}
           />
         </FormControl>
       </FormControl>
 
       <b>Price Filter</b>
-      {/* TODO: prevent no. from decreasing beyond 0 and scroll effect */}
+      {/* TODO: prevent no. from decreasing beyond 0 */}
       <FormControl
         sx={{
           display: 'flex',
@@ -134,10 +136,11 @@ function Filter({ filter, setFilter, filterListing }) {
             onKeyDown={handleKeyDown}
             slotProps={{ input: { min: 0 } }}
             size='small'
+            onWheel={(e) => e.target.blur()}
           />
         </FormControl>
         
-        {/* TODO: prevent no. from decreasing beyond 0 and scroll effect */}
+        {/* TODO: prevent no. from decreasing beyond 0 */}
         <FormControl
           sx={{
             width: '100%'
@@ -153,6 +156,7 @@ function Filter({ filter, setFilter, filterListing }) {
             onKeyDown={handleKeyDown}
             slotProps={{ input: { min: 0 } }}
             size='small'
+            onWheel={(e) => e.target.blur()}
           />
         </FormControl>
       </FormControl>

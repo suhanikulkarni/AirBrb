@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_BASE_URL } from "../constants";
 import { useContext, useEffect, useState } from "react";
 import Popover from '@mui/material/Popover';
-import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import DatePicker from "react-multi-date-picker";
 import { Box } from '@mui/material';
@@ -422,23 +422,39 @@ function ViewHostedListings({ owner, token }) {
               <Box
                 sx={{
                   padding: '10px',
+                  fontFamily: 'Calibri, sans-serif',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minWidth: '350px',
+                  height: '430px',
                 }}
               >
-                <Typography variant="h6" gutterBottom>
-                  Set Availability for: {activeListing.title}
-                </Typography>
+                <h3>Set Availability for: {activeListing.title}</h3>
 
                 <DatePicker 
                   range 
                   value={currentRange} 
-                  onChange={setCurrentRange} 
-                  placeholder="Select availability date range"
+                  onChange={setCurrentRange}
+                  render={
+                    <TextField
+                      fullWidth
+                      size="small"
+                      placeholder="Select availability range"
+                      sx={{
+                        marginBottom: '5px',
+                      }}
+                    />
+                  }
+                  calendarPosition={'bottom-center'}
+                  fixMainPosition={true}
                 />
                 
                 <Button
                   variant="outlined"
                   onClick={addingRanges}
-                  fullWidth
+                  sx={{
+                    marginBottom: '10px'
+                  }}
                 >
                   Add Availability
                 </Button>

@@ -400,6 +400,7 @@ function ListingForm({ getters, setters }) {
         value={getters.listingMetadata.bathroomCount}
         slotProps={{ input: { min: 0 } }}
         required
+        onWheel={(e) => e.target.blur()}
       />
       <br />
 
@@ -412,6 +413,7 @@ function ListingForm({ getters, setters }) {
         value={getters.listingMetadata.bedroomCount}
         slotProps={{ input: { min: 0 } }}
         required
+        onWheel={(e) => e.target.blur()}
       />
       <br />
 
