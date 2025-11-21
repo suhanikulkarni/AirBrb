@@ -3,7 +3,7 @@ import axios from 'axios';
 import { API_BASE_URL, DEFAULT_IMAGE } from '../constants';
 import { useNavigate } from 'react-router-dom';
 
-import { PageBody } from '../styles/mainStyles';
+import { Form, PageBody } from '../styles/mainStyles';
 import Button from '@mui/material/Button';
 
 import { ErrorContext } from '../context';
@@ -136,11 +136,13 @@ function CreateListing({ token }) {
   return (
     <PageBody>
       <h1>Create Listing</h1>
-      <ListingForm getters={getters} setters={setters} />
-      <Button 
-        variant="contained"
-        onClick={handleSubmission}
-      >Submit</Button>
+      <Form>
+        <ListingForm getters={getters} setters={setters} />
+        <Button 
+          variant="contained"
+          onClick={handleSubmission}
+        >Submit</Button>
+      </Form>
     </PageBody>
   )
 }
