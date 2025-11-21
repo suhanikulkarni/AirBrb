@@ -9,7 +9,7 @@ import { Box, Chip } from "@mui/material";
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-
+import styles from '../styles/listingStyles.module.css';
 dayjs.extend(customParseFormat);
 
 function ViewBookingRequest({ token, owner }) {
