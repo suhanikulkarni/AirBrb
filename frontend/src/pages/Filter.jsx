@@ -7,7 +7,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import DatePicker from 'react-multi-date-picker';
 
-function Filter({ filter, setFilter, filterListing }) {
+function Filter({ filter, setFilter, filterListing, resetList }) {
   const handleFilter = (e) => {
     const {name, value} = e.target;
 
@@ -32,7 +32,7 @@ function Filter({ filter, setFilter, filterListing }) {
       'dateFilter': ''
     });
     
-    filterListing();
+    resetList();
   };
 
   return (
