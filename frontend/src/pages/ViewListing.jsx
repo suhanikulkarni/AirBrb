@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import DatePicker from 'react-multi-date-picker';
 
 import { API_BASE_URL } from '../constants';
 import { ErrorContext } from '../context';
@@ -14,11 +13,7 @@ import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Button from '@mui/material/Button';
-import { Box, Modal, Rating } from '@mui/material';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import { Modal, Rating } from '@mui/material';
 import Filter from './Filter';
 
 function ViewListing ( {token, owner}) {
@@ -295,7 +290,7 @@ function ViewListing ( {token, owner}) {
               {!filteredList.length ? (
                 <p>No listings found</p>
               ) : (
-                <div className={styles.grid} >
+                <div className={styles.grid}>
                   {orderList().map((listing, index) => {
                     const booking = acceptedBookings.find(
                       b => Number(b.listingId) === Number(listing.id)
@@ -303,7 +298,7 @@ function ViewListing ( {token, owner}) {
                     
                     return (
                       <div key={index} className={styles.card}>
-                        <div onClick={() => navigate(`/viewListings/${listing.id}`)}>
+                        <div key={listing.id} onClick={() => navigate(`/viewListings/${listing.id}`)}>
                           <Thumbnail thumbnail={listing.thumbnail} listingTitle={listing.title} />
                           <p className={styles.reviews}>
                             ★ 

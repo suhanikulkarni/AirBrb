@@ -8,6 +8,8 @@ import DatePicker from "react-multi-date-picker";
 import { Box } from '@mui/material';
 import { ErrorContext } from '../context';
 import { useNavigate } from "react-router-dom";
+import Thumbnail from "./Thumbnail";
+import styles from '../styles/listingStyles.module.css';
 
 function ViewHostedListings({ owner, token }) {
   const setShowErrorPopup = useContext(ErrorContext); 
@@ -110,11 +112,13 @@ function ViewHostedListings({ owner, token }) {
         );
         
         setListings(detailedListings.filter(Boolean));
+        console.log('listings', detailedListings.filter(Boolean))
       } catch (error) {
         setShowErrorPopup(error.response.data.error);
 
       }
     } 
+
     getFetch();
   }, [owner]);
 
@@ -263,67 +267,120 @@ function ViewHostedListings({ owner, token }) {
 
   return (
     <div>
-      <h2>Hosted Listings</h2>
       {listings === "LOADING" ? (
         <p>Loading...</p>
       ) : (
         <>
-          <h3>Booking Requests</h3>
-          {bookingRequests.length === 0 ? (
-            <p>No booking requests </p>
-          ) : (
-            bookingRequests.map((request) => (
-              <>
-                {request.status === "pending" && (
-                  <div key={request.id}>
-                    <h3>Request Id: {request.id}</h3>
-                    <p>Start Date: {request.dateRange.start}</p>
-                    <p>End Date: {request.dateRange.end}</p>
-                    <Button
-                      onClick = {() => {acceptRequest(request.id)}}
-                    >Accept
-                    </Button>
+          <Box
+            sx={{
+              borderRadius: 3,
+              bgcolor: '#f3f3f3ff',
+              padding: '15px',
+              marginBottom: '15px'
+            }}
+          >
+            <h3>Booking Requests</h3>
+            {bookingRequests.length ? (
+              <p>No booking requests</p>
+            ) : (
+              bookingRequests.map((request) => (
+                <>
+                  {request.status === "pending" && (
+                    <div key={request.id}>
+                      <h3>Request Id: {request.id}</h3>
+                      <p>Start Date: {request.dateRange.start}</p>
+                      <p>End Date: {request.dateRange.end}</p>
+                      <Button
+                        onClick = {() => {acceptRequest(request.id)}}
+                      >Accept
+                      </Button>
 
-                    <Button
-                      onClick = {() => {declineRequest(request.id)}}
-                    >Decline
-                    </Button>
+                      <Button
+                        onClick = {() => {declineRequest(request.id)}}
+                      >Decline
+                      </Button>
 
-                  </div>
-                )}
-              </>
-            ))
-          )}
+                    </div>
+                  )}
+                </>
+              ))
+            )}
+          </Box>
+
           {listings.length === 0 ? (
             <p>No hosted listings found</p>
           ) : (
-            listings.map((listing) => (
-              <div key={listing.id} >
-                <h3>{listing.title}</h3>
-                <p>${listing.price}</p>
-                <p>Number of Bedrooms: {listing.metadata?.bedroomCount}</p>
-                <Button 
-                  aria-describedby={listing.id} 
-                  variant="contained" 
-                  onClick={(e) => handleClick(e, listing)}
+            <Box
+              sx={{
+                border: '1px solid #e0e0e0ff',
+                padding: '15px',
+                borderRadius: '15px'
+              }}
+            >
+              {listings.map((listing) => (
+                <Box
+                  key={listing.id} 
+                  sx={{
+                    padding: '15px',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    borderBottom: '1px solid #e0e0e0ff',
+                  }}
                 >
-                  Manage Availability
-                </Button>
-                <Button
-                  variant="contained" 
-                  onClick={() => navigate(`edit-listing/${listing.id}`)}
-                >
-                  Edit Listing
-                </Button>
-                <Button
-                  name={listing.id} 
-                  variant="contained" 
-                  onClick={() => deleteListing(listing.id)}
-                >
-                  Delete Listing
-                </Button>
-              </div>
-            ))
+                  <Thumbnail thumbnail={listing.thumbnail} listingTitle={listing.title} />
+                  <Box
+                    key={listing.id} 
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      margin: '10px',
+                    }}
+                  >
+                    <h3 className={styles.title}>{listing.title}</h3>
+                    <p className={styles.subInfo}>Rating:</p>
+                    <p className={styles.price}>${listing.price} per night</p>
+                    <p className={styles.subInfo}>Property Type: {listing.metadata?.bedroomCount}</p>
+                    <p className={styles.subInfo}>Number of Beds: {listing.metadata?.bedroomCount}</p>
+                    <p className={styles.subInfo}>Number of Bathrooms: {listing.metadata?.bathroomCount}</p>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        marginTop: '10px'
+                      }}
+                    >
+                      <Button 
+                        aria-describedby={listing.id} 
+                        variant="outlined" 
+                        onClick={(e) => handleClick(e, listing)}
+                        sx={{
+                          marginRight: '5px'
+                        }}
+                      >
+                        Manage Availability
+                      </Button>
+                      <Button
+                        variant="outlined" 
+                        onClick={() => navigate(`edit-listing/${listing.id}`)}
+                        sx={{
+                          marginRight: '5px'
+                        }}
+                      >
+                        Edit Listing
+                      </Button>
+                      <Button
+                        name={listing.id} 
+                        variant="outlined" 
+                        onClick={() => deleteListing(listing.id)}
+                      >
+                        Delete Listing
+                      </Button>
+                    </Box>
+                  </Box>
+                </Box>
+              ))}
+            </Box>
           )}
 
           <Popover
@@ -361,7 +418,6 @@ function ViewHostedListings({ owner, token }) {
                   variant="outlined"
                   onClick={addingRanges}
                   fullWidth
-                  
                 >
                   Add Availability
                 </Button>
@@ -383,7 +439,7 @@ function ViewHostedListings({ owner, token }) {
                 </div>
 
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   fullWidth
                   onClick={publishDates}
                 >

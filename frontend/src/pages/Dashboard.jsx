@@ -16,10 +16,12 @@ function Dashboard({ token, owner }) {
 
   return (
     <PageBody>
+      <h2>Your Hosted Listings</h2>
       <Button
         variant="contained"
         onClick={() => navigate('create-listing')}
       >Create A New Listing</Button>
+      <br />
       <ViewHostedListings owner={owner} token={token} />
     </PageBody>
   )
