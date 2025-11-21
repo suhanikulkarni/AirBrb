@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Box } from '@mui/material';
 import TextField from '@mui/material/TextField';
 
-function BedroomForm({ bedroomNumber, updateBedroomMetadata }) {
+function BedroomForm({ bedroomNumber, updateBedroomMetadata, bedroomMetadata }) {
   const [bedroomInfo, setBedroomInfo] = useState({
     'singleBed': '',
     'doubleBed': '',
@@ -11,6 +11,11 @@ function BedroomForm({ bedroomNumber, updateBedroomMetadata }) {
     'kingBed': '',
     'sofaBed': ''
   });
+
+  useEffect(() => {
+    setBedroomInfo(bedroomMetadata);
+  }, []);
+
   const handleBedroomBedInfo = (e) => {
     const {name, value} = e.target;
 
