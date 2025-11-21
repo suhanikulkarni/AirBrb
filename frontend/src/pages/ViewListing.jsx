@@ -49,14 +49,12 @@ function ViewListing({ token, owner }) {
   };
 
   const handleOpen = (listingId, bookingId) => {
-    console.log('Opennign')
     setSelectedListingId(listingId);
     setSelectedBookingId(bookingId);
     setReviewOpen(true);
   };
 
   const uploadReview = async () => {
-    console.log('Uploading review:', reviewComment, reviewRating);
     const review = {
       rating: reviewRating,
       comment: reviewComment
@@ -75,7 +73,6 @@ function ViewListing({ token, owner }) {
         }
       );
       if (response) {
-        console.log('Review uploaded successfully');
         handleClose();
       }
     } catch (error) {
@@ -146,8 +143,6 @@ function ViewListing({ token, owner }) {
         const aHasBooking = allBookings.some(booking => Number(booking.listingId) === Number(a.id));
         const bHasBooking = allBookings.some(booking => Number(booking.listingId) === Number(b.id));
 
-        console.log(`Listing ${a.id} (${a.title}): has booking = ${aHasBooking}`);
-        console.log(`Listing ${b.id} (${b.title}): has booking = ${bHasBooking}`);
 
         if (aHasBooking && !bHasBooking) return -1;
         if (!aHasBooking && bHasBooking) return 1;

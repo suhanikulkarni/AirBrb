@@ -68,7 +68,6 @@ function ListingForm({ getters, setters }) {
 
   const handleMetadataInfo = (e) => {
     const {name, value} = e.target;
-    console.log('name and vakue', name, value)
 
     setters.setListingMetadata((prevData) => ({
       ...prevData,
