@@ -171,6 +171,10 @@ function ViewListing({ token, owner }) {
     }
   };
 
+  const resetList = () => {
+    setFilteredList([...list]);
+  }
+
   const filterListing = () => {
     let listing = [...list];
 
@@ -231,7 +235,6 @@ function ViewListing({ token, owner }) {
     // sort listing alphabetically
     listing.sort((a, b) => a.title.localeCompare(b.title));
 
-
     setFilteredList(listing);
   };
 
@@ -276,7 +279,7 @@ function ViewListing({ token, owner }) {
           </div>
         </Modal>
 
-        <Filter filter={filter} setFilter={setFilter} filterListing={filterListing}/>
+        <Filter filter={filter} setFilter={setFilter} filterListing={filterListing} resetList={resetList}/>
         <br />
 
         <ToggleButtonGroup
