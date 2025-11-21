@@ -442,6 +442,73 @@ function ViewListing({ token, owner }) {
       </ToggleButtonGroup>
       <br />
 
+
+      {list === "LOADING" ? (
+        <p>LOADING...</p>
+      ) : (
+        <>
+          {list.length === 0 ? (
+            <div>No listings available</div>
+          ) : (
+            <>
+              {!filteredList.length ? (
+                <p>No listings found</p>
+              ) : (
+                <div style={styles.grid} >
+                  {orderList().map((listing, index) => {
+                    const booking = acceptedBookings.find(
+                      b => Number(b.listingId) === Number(listing.id)
+                    );
+
+                    return (
+                      <div key={index} style={styles.card}>
+                        <div onClick={() => navigate(`/viewListings/${listing.id}`)}>
+                          <Thumbnail thumbnail={listing.thumbnail} listingTitle={listing.title} />
+                          <h4 style={styles.address}>
+                            {`
+                              ${listing.address?.suburb},
+                              ${listing.address?.state},
+                              ${listing.address?.country}
+                            `}
+                          </h4>
+                          <h3 style={styles.title}>{listing.title}</h3>
+                          <p style={styles.address}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
+                          <p style={styles.address}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>
+                          <p style={styles.address}>
+
+                            {`(${listing.reviews.length} reviews)`}
+                          </p>
+                          <p style={styles.price}>${listing.price}</p>
+                        </div>
+
+                        {booking && (
+                          <Typography
+                            variant="body1"
+                            style={{
+                              marginTop: '8px',
+                              fontWeight: 'bold',
+                              color: booking.status === 'accepted' ? 'green' :
+                                booking.status === 'pending' ? 'orange' :
+                                  booking.status === 'declined' ? 'red' : 'pink'
+                            }}
+                          >
+                            Booking Status: {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                          </Typography>
+                        )}
+
+                        {booking && (
+                          <Button variant="contained" onClick={() => handleOpen(listing.id, booking.id)}>
+                            Leave a Review
+                          </Button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          )}
+        </>
       )}
     </PageBody>
   );
