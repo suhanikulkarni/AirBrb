@@ -338,10 +338,26 @@ function ViewHostedListings({ owner, token }) {
                     }}
                   >
                     <h3 className={styles.title}>{listing.title}</h3>
-                    <p className={styles.subInfo}>Rating:</p>
                     <p className={styles.price}>${listing.price} per night</p>
+                    <p className={styles.subInfo}>
+                      ★ 
+                      {listing.reviews.length > 0 ? (
+                        // check if reduce works
+                        <>{listing.reviews.reduce((a, b) => a + b.rating, 0) / listing.reviews.length}</>
+                      ) : (
+                        <>0</>
+                      )}
+                      {` (${listing.reviews.length})`}
+                    </p>
                     <p className={styles.subInfo}>Property Type: {listing.metadata?.bedroomCount}</p>
-                    <p className={styles.subInfo}>Number of Beds: {listing.metadata?.bedroomCount}</p>
+                    <p className={styles.subInfo}>
+                      Number of Beds: 
+                      {listing.metadata.bedrooms.length > 0 ? (
+                        <> {listing.metadata?.bedrooms.reduce((a, b) => a + b.bedCount, 0)}</>
+                      ) : (
+                        <> 0</>
+                      )}
+                    </p>
                     <p className={styles.subInfo}>Number of Bathrooms: {listing.metadata?.bathroomCount}</p>
                     <Box
                       sx={{
@@ -371,8 +387,9 @@ function ViewHostedListings({ owner, token }) {
                       </Button>
                       <Button
                         name={listing.id} 
-                        variant="outlined" 
+                        variant="contained" 
                         onClick={() => deleteListing(listing.id)}
+                        color='error'
                       >
                         Delete Listing
                       </Button>

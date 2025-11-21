@@ -303,7 +303,7 @@ function ViewListing ( {token, owner}) {
                           <p className={styles.reviews}>
                             ★ 
                             {listing.reviews.length > 0 ? (
-                              <>`${listing.reviews.reduce((a, b) => a + b.rating) / listing.reviews.length}`</>
+                              <>{listing.reviews.reduce((a, b) => a + b.rating, 0) / listing.reviews.length}</>
                             ) : (
                               <>0</>
                             )}
