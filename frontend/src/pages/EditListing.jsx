@@ -1,13 +1,10 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { API_BASE_URL, DEFAULT_IMAGE } from '../constants';
 import { useNavigate, useParams } from 'react-router-dom';
-
+import { API_BASE_URL, DEFAULT_IMAGE } from '../constants';
+import { ErrorContext } from '../context';
 import { Form, PageBody } from '../styles/mainStyles';
 import Button from '@mui/material/Button';
-
-import { ErrorContext } from '../context';
-
 import ListingForm from './ListingForm';
 
 function EditListing({ token }) {
@@ -72,14 +69,14 @@ function EditListing({ token }) {
     listingAddress,
     listingMetadata,
     thumbnailType
-  }
+  };
 
   const setters = {
     setListingInfo,
     setListingAddress,
     setListingMetadata,
     setThumbnailType
-  }
+  };
   
   const postEditedListing = async (body, token) => {
     try {
@@ -95,49 +92,48 @@ function EditListing({ token }) {
   }
 
   useEffect(() => {
-    console.log("Updated address:", listingAddress);
+    console.log('Updated address:', listingAddress);
   }, [listingAddress]);
 
   useEffect(() => {
-    console.log("Updated metadata:", listingMetadata);
+    console.log('Updated metadata:', listingMetadata);
   }, [listingMetadata]);
   
   useEffect(() => {
-    console.log("Updated all info:", listingInfo);
+    console.log('Updated all info:', listingInfo);
   }, [listingInfo]);
 
   const handleSave = async () => {
     if (!listingInfo.title || !listingInfo.price) {
-      // TODO: usability -> instead of popup -> highlight empty field with error
-      return setShowErrorPopup("Please fill out the whole form");
+      return setShowErrorPopup('Please fill out the whole form');
     }
 
     if (!listingAddress.country||!listingAddress.postcode||!listingAddress.state||!listingAddress.streetAddress||! listingAddress.suburb) {
-      return setShowErrorPopup("Please enter all the address information");
+      return setShowErrorPopup('Please enter all the address information');
     }
 
     if (!listingMetadata.bathroomCount||!listingMetadata.propertyType||!listingMetadata.bedroomCount) {
-      return setShowErrorPopup("Please enter all the information about the property");
+      return setShowErrorPopup('Please enter all the property information');
     }
 
     const bedNum = Number(listingMetadata.bedroomCount);
     
     if (bedNum > 0 && listingMetadata.bedrooms.length != bedNum) {
-      return setShowErrorPopup("Please enter the bedroom information");
+      return setShowErrorPopup('Please enter the bedroom information');
     }
     
     const priceNum = Number(listingInfo.price);
     const bathNum = Number(listingMetadata.bathroomCount);
     
     if (![priceNum, bathNum, bedNum].every(Number.isFinite)) {
-      return setShowErrorPopup("Please insert a number");
+      return setShowErrorPopup('Please insert a number');
     }
     
     let thumbnail = listingInfo.thumbnail;
 
-    if (thumbnail && thumbnailType === "youtube" && !thumbnail.startsWith("https://www.youtube.com/")) {
-      return setShowErrorPopup("Invalid YouTube link");
-    };
+    if (thumbnail && thumbnailType === 'youtube' && !thumbnail.startsWith('https://www.youtube.com/')) {
+      return setShowErrorPopup('Invalid YouTube link');
+    }
     
     if (!thumbnail) thumbnail = DEFAULT_IMAGE;
 
@@ -147,9 +143,9 @@ function EditListing({ token }) {
       metadata: listingMetadata,
       price: parseInt(listingInfo.price, 10),
       thumbnail: thumbnail
-    }
+    };
     
-    console.log("Listing data: ",body)
+    console.log('Listing data: ',body)
 
     postEditedListing(body, token);
   }
@@ -160,7 +156,7 @@ function EditListing({ token }) {
       <Form>
         <ListingForm getters={getters} setters={setters} />
         <Button 
-          variant="contained"
+          variant='contained'
           onClick={handleSave}
         >Save</Button>
       </Form>

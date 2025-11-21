@@ -5,7 +5,6 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-
 import DatePicker from 'react-multi-date-picker';
 
 function Filter({ filter, setFilter, filterListing }) {
@@ -16,7 +15,7 @@ function Filter({ filter, setFilter, filterListing }) {
       ...prevData,
       [name]: value
     }));
-  }
+  };
   
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') filterListing();
@@ -164,7 +163,7 @@ function Filter({ filter, setFilter, filterListing }) {
       <b>Review Filter</b>
       <FormControl
         fullWidth
-        size="small"
+        size='small'
         sx={{
           marginBottom: '10px'
         }}
@@ -199,7 +198,7 @@ function Filter({ filter, setFilter, filterListing }) {
         render={
           <TextField
             fullWidth
-            size="small"
+            size='small'
             placeholder='Filter available dates'
           />
         }

@@ -111,7 +111,7 @@ function CreateListing({ token }) {
 
     if (thumbnail && thumbnailType === 'youtube' && !thumbnail.startsWith('https://www.youtube.com/')) {
       return setShowErrorPopup('Invalid YouTube link');
-    };
+    }
     
     if (!thumbnail) thumbnail = DEFAULT_IMAGE;
 

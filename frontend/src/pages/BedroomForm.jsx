@@ -32,7 +32,7 @@ function BedroomForm({ bedroomNumber, updateBedroomMetadata, bedroomMetadata }) 
       bedTypes: updatedBeds,
       bedCount: totalBeds
     });
-  }
+  };
   
   return (
     <>
