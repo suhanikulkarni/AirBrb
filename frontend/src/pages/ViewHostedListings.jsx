@@ -1,14 +1,14 @@
-import axios from "axios";
-import { API_BASE_URL } from "../constants";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import DatePicker from 'react-multi-date-picker';
+import { API_BASE_URL } from '../constants';
+import { ErrorContext, ConfirmationContext } from '../context';
+import Thumbnail from './Thumbnail';
 import Popover from '@mui/material/Popover';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import DatePicker from "react-multi-date-picker";
 import { Box } from '@mui/material';
-import { ErrorContext, ConfirmationContext } from '../context';
-import { useNavigate } from "react-router-dom";
-import Thumbnail from "./Thumbnail";
 import styles from '../styles/listingStyles.module.css';
 
 function ViewHostedListings({ owner, token }) {
@@ -16,7 +16,7 @@ function ViewHostedListings({ owner, token }) {
   const setShowConfirmDeletePopup = useContext(ConfirmationContext);
   const navigate = useNavigate();
   
-  const [listings, setListings] = useState("LOADING");
+  const [listings, setListings] = useState('LOADING');
   const [bookingRequests, setBookingRequests] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [activeListing, setActiveListing] = useState(null);
@@ -27,7 +27,7 @@ function ViewHostedListings({ owner, token }) {
     let isPublished= await getListingInfo(listingId);
     isPublished = isPublished.published;
 
-    console.log("isPublished", isPublished)
+    console.log('isPublished', isPublished)
     if (isPublished) {
       try {
         await axios.put(
@@ -124,13 +124,13 @@ function ViewHostedListings({ owner, token }) {
   }, [owner]);
 
   useEffect(() => {
-    if (listings !== "LOADING" && listings.length > 0) {
+    if (listings !== 'LOADING' && listings.length > 0) {
       getBookingRequests();
     }
   }, [listings]);
 
   const handleClick = (event, listing) => {
-    console.log("clicked", listing.id);
+    console.log('clicked', listing.id);
     setAnchorEl(event.currentTarget);
     setActiveListing(listing);
     setCurrentRange([]);
@@ -143,12 +143,12 @@ function ViewHostedListings({ owner, token }) {
     const ranges = allRanges[listingId] || [];
 
     if (ranges.length === 0) {
-      alert("Please add at least one availability range before publishing");
+      alert('Please add at least one availability range before publishing');
       return;
     }
     const availability = ranges.map(range => ({
-      start: range[0].format("DD-MM-YYYY"),
-      end: range[1].format("DD-MM-YYYY")
+      start: range[0].format('DD-MM-YYYY'),
+      end: range[1].format('DD-MM-YYYY')
     }));
 
     const body = { availability };
@@ -164,20 +164,19 @@ function ViewHostedListings({ owner, token }) {
       );
 
       if (res) {
-        console.log("this si resdata", res);
+        console.log('this si resdata', res);
         navigate('/')
       }
     } catch (error) {
       setShowErrorPopup(error.response.data.error);
-
     }
-  }
+  };
+  
   const addingRanges = () => {
-    // TODO: only allow dates past today's date
     const listingId = activeListing?.id;
 
     if (!currentRange || currentRange.length !== 2) {
-      alert("Please select a full date range (start and end date)");
+      alert('Please select a full date range (start and end date)');
       return;
     }
     const today = new Date();
@@ -216,7 +215,7 @@ function ViewHostedListings({ owner, token }) {
         [listingId]: updatedRanges
       }));
       setCurrentRange([]);
-      console.log("Range merged - extended existing range");
+      console.log('Range merged - extended existing range');
       return;
     }
 
@@ -239,7 +238,7 @@ function ViewHostedListings({ owner, token }) {
     });
 
     if (hasInvalidOverlap) {
-      setShowErrorPopup("This date range has an invalid overlap with existing availability");
+      setShowErrorPopup('This date range has an invalid overlap with existing availability');
       return;
     }
 
@@ -251,7 +250,7 @@ function ViewHostedListings({ owner, token }) {
           currentRange
         ]
       };
-      console.log("Updated allRanges:", updatedRanges);
+      console.log('Updated allRanges:', updatedRanges);
       return updatedRanges;
     });
     setCurrentRange([]);
@@ -275,25 +274,25 @@ function ViewHostedListings({ owner, token }) {
       if (res) {
         const requestData = res.data.bookings;
         const listingIds = listings.map(listing => String(listing.id));
-        //console.log("Listing IDs:", listingIds);
+        //console.log('Listing IDs:', listingIds);
         bookingRequests = requestData.filter(booking => {
           const match = listingIds.includes(String(booking.listingId));
           //console.log(`Comparing ${booking.listingId} with myListingIds:`, match);
           return match;
         });
 
-        console.log("Filtered Booking Requests:", bookingRequests);
+        console.log('Filtered Booking Requests:', bookingRequests);
         setBookingRequests(bookingRequests);
       }
     } catch (error) {
-      setShowErrorPopup(error.response?.data?.error || "Requests Failed To Show.");
+      setShowErrorPopup(error.response?.data?.error || 'Requests Failed To Show.');
     }
-  }
+  };
 
   const acceptRequest = async (bookingId) => {
-    console.log("accepted");
+    console.log('accepted');
     try {
-      console.log("accepted!!!!!!!!!");
+      console.log('accepted!!!!!!!!!');
 
       const response = await axios.put(
         `${API_BASE_URL}bookings/accept/${bookingId}`, {},
@@ -306,12 +305,12 @@ function ViewHostedListings({ owner, token }) {
         getBookingRequests();
       }
     } catch (error) {
-      setShowErrorPopup(error.response?.data?.error || "Failed to Accept Bookng Request");
+      setShowErrorPopup(error.response?.data?.error || 'Failed to Accept Bookng Request');
     }
-  }
+  };
 
   const declineRequest = async (bookingId) => {
-    console.log("decline");
+    console.log('decline');
 
     try {
       const response = await axios.put(
@@ -320,17 +319,17 @@ function ViewHostedListings({ owner, token }) {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      console.log("Decline response:", response);
+      console.log('Decline response:', response);
       getBookingRequests();
     } catch (error) {
-      setShowErrorPopup(error.response?.data?.error || "Failed to Decline Bookng Request");
+      setShowErrorPopup(error.response?.data?.error || 'Failed to Decline Bookng Request');
     }
-  }
+  };
 
-  console.log("this is all the listings: ", listings)
+  console.log('this is all the listings: ', listings)
   return (
     <div>
-      {listings === "LOADING" ? (
+      {listings === 'LOADING' ? (
         <p>Loading...</p>
       ) : (
         <>
@@ -348,7 +347,7 @@ function ViewHostedListings({ owner, token }) {
             ) : (
               bookingRequests.map((request) => (
                 <>
-                  {request.status === "pending" && (
+                  {request.status === 'pending' && (
                     <div key={request.id}>
                       <h3>Request Id: {request.id}</h3>
                       <p>Start Date: {request.dateRange.start}</p>
@@ -437,7 +436,7 @@ function ViewHostedListings({ owner, token }) {
                     >
                       <Button
                         onClick={() => navigate(`/${listing.id}/viewBooking`)}
-                        variant="outlined"
+                        variant='outlined'
                         sx={{
                           margin: '0 5px 5px 0',
                           flexGrow: '1'
@@ -445,7 +444,7 @@ function ViewHostedListings({ owner, token }) {
                       >Booking Information</Button>
                       <Button 
                         aria-describedby={listing.id} 
-                        variant="outlined" 
+                        variant='outlined' 
                         onClick={(e) => handleClick(e, listing)}
                         sx={{
                           margin: '0 5px 5px 0',
@@ -455,7 +454,7 @@ function ViewHostedListings({ owner, token }) {
                         Manage Availability
                       </Button>
                       <Button
-                        variant="outlined" 
+                        variant='outlined' 
                         onClick={() => navigate(`edit-listing/${listing.id}`)}
                         sx={{
                           margin: '0 5px 5px 0',
@@ -466,7 +465,7 @@ function ViewHostedListings({ owner, token }) {
                       </Button>
                       <Button
                         name={listing.id} 
-                        variant="contained" 
+                        variant='contained' 
                         onClick={() => setShowConfirmDeletePopup({
                           'function': () => deleteListing(listing.id),
                           'value': true
@@ -520,8 +519,8 @@ function ViewHostedListings({ owner, token }) {
                   render={
                     <TextField
                       fullWidth
-                      size="small"
-                      placeholder="Select availability range"
+                      size='small'
+                      placeholder='Select availability range'
                       sx={{
                         marginBottom: '5px',
                       }}
@@ -532,7 +531,7 @@ function ViewHostedListings({ owner, token }) {
                 />
                 
                 <Button
-                  variant="outlined"
+                  variant='outlined'
                   onClick={addingRanges}
                   sx={{
                     marginBottom: '10px'
@@ -551,7 +550,7 @@ function ViewHostedListings({ owner, token }) {
                       {(allRanges[activeListing.id] || []).map((range, index) => (
                         <>
                           <p key={index} >
-                            {range[0].format("DD/MM/YYYY")} to {range[1].format("DD/MM/YYYY")}
+                            {range[0].format('DD/MM/YYYY')} to {range[1].format('DD/MM/YYYY')}
                           </p>
                           <Button
                             onClick={() => {
@@ -568,7 +567,7 @@ function ViewHostedListings({ owner, token }) {
                 </div>
 
                 <Button
-                  variant="outlined"
+                  variant='outlined'
                   fullWidth
                   onClick={publishDates}
                 >

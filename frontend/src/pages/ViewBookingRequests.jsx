@@ -1,24 +1,23 @@
-import { useContext, useEffect, useState } from "react";
-import { ErrorContext } from '../context';
-import axios from "axios";
-import { API_BASE_URL } from "../constants";
-import Button from '@mui/material/Button';
-import { useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { ErrorContext } from '../context';
+import { API_BASE_URL } from '../constants';
+import Button from '@mui/material/Button';
 import styles from '../styles/bookingRequest.module.css';
 
 dayjs.extend(customParseFormat);
 
 function ViweBookingRequest({ token, owner }) {
+  const setShowErrorPopup = useContext(ErrorContext);
+  const navigate = useNavigate();
 
   const [bookingRequests, setBookingRequests] = useState([]);
   const [listings, setListings] = useState([]);
-  const setShowErrorPopup = useContext(ErrorContext);
   const [totalDaysBooked, setTotalDaysBooked] = useState(0);
   const [profit, setProfit] = useState(0);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     let profit1 = 0;
@@ -29,7 +28,7 @@ function ViweBookingRequest({ token, owner }) {
 
     console.log(profit1)
     setProfit(profit1);
-  }, [bookingRequests])
+  }, [bookingRequests]);
 
   useEffect(() => {
     let daysBooked = 0;
@@ -41,18 +40,18 @@ function ViweBookingRequest({ token, owner }) {
         const end1 = dayjs(booking.dateRange.end, 'DD-MM-YYYY');
 
         if (!start1.isValid() || !end1.isValid()) {
-          console.warn("Invalid date range:", booking.dateRange);
+          console.warn('Invalid date range:', booking.dateRange);
           return;
         }
 
-        console.log("Formatted start1:", start1.format('YYYY-MM-DD'));
-        console.log("Formatted end1:", end1.format('YYYY-MM-DD'));
+        console.log('Formatted start1:', start1.format('YYYY-MM-DD'));
+        console.log('Formatted end1:', end1.format('YYYY-MM-DD'));
 
         const nights = end1.diff(start1, 'day');
         daysBooked += nights;
       });
 
-    console.log("Total days booked:", daysBooked);
+    console.log('Total days booked:', daysBooked);
     setTotalDaysBooked(daysBooked);
   }, [listings, bookingRequests]);
 
@@ -60,16 +59,14 @@ function ViweBookingRequest({ token, owner }) {
     if (token === 'LOADING' || !token) navigate('/login');
   }, [token]);
 
-
   const getListingInfo = async (id) => {
     try {
       const res = await axios.get(`${API_BASE_URL}listings/${id}`);
       if (res) return res.data.listing;
-    }
-    catch (error) {
+    } catch (error) {
       setShowErrorPopup(error.response.data.error);
     }
-  }
+  };
 
   const getAllListings = async () => {
     let hostedListings = [];
@@ -84,12 +81,11 @@ function ViweBookingRequest({ token, owner }) {
         });
         return hostedListings;
       }
-    }
-    catch (error) {
+    } catch (error) {
       setShowErrorPopup(error.response.data.error);
       return [];
     }
-  }
+  };
 
   useEffect(() => {
     const getFetch = async () => {
@@ -109,12 +105,12 @@ function ViweBookingRequest({ token, owner }) {
           })
         );
         setListings(detailedListings.filter(Boolean));
-      }
-      catch (error) {
-        console.log("ngregnjkgnrek")
+      } catch (error) {
+        console.log('ngregnjkgnrek')
         setShowErrorPopup(error.response.data.error);
       }
-    }
+    };
+
     getFetch();
   }, [owner]);
 
@@ -140,34 +136,32 @@ function ViweBookingRequest({ token, owner }) {
           return match;
         });
 
-        console.log("Filtered Booking Requests:", bookingRequests);
+        console.log('Filtered Booking Requests:', bookingRequests);
         setBookingRequests(bookingRequests);
       }
     } catch (error) {
-      setShowErrorPopup(error.response?.data?.error || "Requests Failed To Show.");
+      setShowErrorPopup(error.response?.data?.error || 'Requests Failed To Show.');
     }
-  }
+  };
 
   const acceptRequest = async (bookingId) => {
-    console.log("accepted");
+    console.log('accepted');
     try {
-      console.log("accepted!!!!!!!!!");
-
+      console.log('accepted!!!!!!!!!');
       const response = await axios.put(
         `${API_BASE_URL}bookings/accept/${bookingId}`, {},
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      if (response) { console.log(response); getBookingRequests(); }
-    }
-    catch (error) {
-      setShowErrorPopup(error.response?.data?.error || "Failed to Accept Bookng Request");
+      if (response) getBookingRequests();
+    } catch (error) {
+      setShowErrorPopup(error.response?.data?.error || 'Failed to Accept Bookng Request');
     }
   }
 
   const declineRequest = async (bookingId) => {
-    console.log("decline");
+    console.log('decline');
     try {
       const response = await axios.put(
         `${API_BASE_URL}bookings/decline/${bookingId}`, {},
@@ -175,14 +169,12 @@ function ViweBookingRequest({ token, owner }) {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      console.log("Decline response:", response);
+      console.log('Decline response:', response);
       getBookingRequests();
+    } catch (error) {
+      setShowErrorPopup(error.response?.data?.error || 'Failed to Decline Bookng Request');
     }
-
-    catch (error) {
-      setShowErrorPopup(error.response?.data?.error || "Failed to Decline Bookng Request");
-    }
-  }
+  };
 
   const pendingRequests = bookingRequests.filter(r => r.status === 'pending');
 
@@ -212,15 +204,15 @@ function ViweBookingRequest({ token, owner }) {
                 </p>
                 <div className={styles.buttonGroup}>
                   <Button
-                    variant="contained"
-                    color="success"
+                    variant='contained'
+                    color='success'
                     onClick={() => acceptRequest(request.id)}
                   >
                     Accept
                   </Button>
                   <Button
-                    variant="contained"
-                    color="error"
+                    variant='contained'
+                    color='error'
                     onClick={() => declineRequest(request.id)}
                   >
                     Decline
