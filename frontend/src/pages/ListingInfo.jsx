@@ -1,14 +1,14 @@
 import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { API_BASE_URL } from '../constants';
 import axios from 'axios';
+import { API_BASE_URL } from '../constants';
+import { ErrorContext } from '../context';
+import Thumbnail from './Thumbnail';
 import UsersBookingForm from './UserBookingForm';
+import { PageBody } from '../styles/mainStyles';
+import styles from '../styles/listingStyles.module.css';
 import { Box, Modal, Tooltip } from '@mui/material';
 import Rating from '@mui/material/Rating';
-import { ErrorContext } from '../context';
-import { PageBody } from '../styles/mainStyles';
-import Thumbnail from './Thumbnail';
-import styles from '../styles/listingStyles.module.css';
 import Button from '@mui/material/Button';
 
 function ListingInfo({ token }) {
@@ -24,7 +24,7 @@ function ListingInfo({ token }) {
   };
 
   const handleOpen = () => {
-    console.log("Opening")
+    console.log('Opening')
     setOpen(true);
   };
 
@@ -34,7 +34,7 @@ function ListingInfo({ token }) {
       if (data) setListingDetails(data);
     };
     fetchListings();
-  }, [listingId])
+  }, [listingId]);
 
   let sum = 0;
   listingDetails?.metadata?.bedrooms?.forEach(element => {
@@ -44,26 +44,25 @@ function ListingInfo({ token }) {
   const filterReviews = () => {
     if (listingDetails) {
       const value = listingDetails.reviews.filter((review) => review.rating === reviewValue);
-      console.log("plk",value)
+      console.log('plk',value)
       setSpecificRatingReviews(value);
     }
-  }
+  };
 
   const getListingInfo = async (listingId) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}listings/${listingId}`)
+        `${API_BASE_URL}listings/${listingId}`);
       console.log(response)
       if (response) {
-        console.log("this is the response",response.data.listing)
+        console.log('this is the response',response.data.listing)
         return response.data.listing;
       }
-    }
-    catch (error) {
+    } catch (error) {
       setShowErrorPopup(error.response.data.error);
 
     }
-  }
+  };
 
   const getBreakdownForStar = (starRating) => {
     if (!listingDetails?.reviews || !starRating) return null;

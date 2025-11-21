@@ -1,10 +1,8 @@
 import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-
 import { Form } from '../styles/mainStyles';
 import { PageBody } from '../styles/mainStyles';
 import { ErrorContext } from '../context';
@@ -24,7 +22,7 @@ function Register({ setToken, setOwner }) {
   };
   
   const registerUser = async () => {
-    if (password !== confirmPassword) return setShowErrorPopup("Confirmation password and password do not match");
+    if (password !== confirmPassword) return setShowErrorPopup('Confirmation password and password do not match');
     try {
       const response = await axios.post(`${API_BASE_URL}user/auth/register`, {email, password, name });
       localStorage.setItem('token', response.data.token);
@@ -43,50 +41,49 @@ function Register({ setToken, setOwner }) {
   return (
     <PageBody>
       <Form>
-        
         <h1>Register</h1>
         <TextField
-          id="register-email-input"
-          label="Email"
-          type="email"
-          variant="outlined"
+          id='register-email-input'
+          label='Email'
+          type='email'
+          variant='outlined'
           value={email}
           onChange={e => setEmail(e.target.value)}
           onKeyDown={handleKeyDown}
         />
         <br />
         <TextField
-          id="register-password-input"
-          label="Password"
-          type="password"
-          variant="outlined"
+          id='register-password-input'
+          label='Password'
+          type='password'
+          variant='outlined'
           value={password}
           onChange={e => setPassword(e.target.value)}
           onKeyDown={handleKeyDown}
         />
         <br />
         <TextField
-          id="register-confirm-password-input"
-          label="Confirm Password"
-          type="password"
-          variant="outlined"
+          id='register-confirm-password-input'
+          label='Confirm Password'
+          type='password'
+          variant='outlined'
           value={confirmPassword}
           onChange={e => setConfirmPassword(e.target.value)}
           onKeyDown={handleKeyDown}
         />
         <br />
         <TextField
-          id="register-name-input"
-          label="Name"
-          type="email"
-          variant="outlined"
+          id='register-name-input'
+          label='Name'
+          type='email'
+          variant='outlined'
           value={name}
           onChange={e => setName(e.target.value)}
           onKeyDown={handleKeyDown}
         />
         <br />
         <Button
-          variant="contained"
+          variant='contained'
           onClick={registerUser}
         >
           Register

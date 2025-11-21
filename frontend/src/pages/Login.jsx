@@ -1,10 +1,8 @@
 import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-
 import { PageBody } from '../styles/mainStyles';
 import { Form } from '../styles/mainStyles';
 import { ErrorContext } from '../context';
@@ -39,27 +37,27 @@ function Login({ setToken, setOwner }) {
       <Form>
         <h1>Login</h1>
         <TextField
-          id="login-email-input"
-          label="Email"
-          type="email"
-          variant="outlined"
+          id='login-email-input'
+          label='Email'
+          type='email'
+          variant='outlined'
           value={email}
           onChange={e => setEmail(e.target.value)}
           onKeyDown={handleKeyDown}
         />
         <br />
         <TextField
-          id="login-password-input"
-          label="Password"
-          type="password"
-          variant="outlined"
+          id='login-password-input'
+          label='Password'
+          type='password'
+          variant='outlined'
           value={password}
           onChange={e => setPassword(e.target.value)}
           onKeyDown={handleKeyDown}
         />
         <br />
         <Button
-          variant="contained"
+          variant='contained'
           onClick={loginUser}
         >
           Login

@@ -6,7 +6,7 @@ function Thumbnail({ thumbnail, listingTitle }) {
   const [youtubeId, setYoutubeId] = useState('');
 
   useEffect(() => {
-    if (thumbnail.startsWith("https://www.youtube.com/")) {
+    if (thumbnail.startsWith('https://www.youtube.com/')) {
       setThumbnailType('youtube');
       setYoutubeId((thumbnail.split('='))[1]);
     }

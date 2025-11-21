@@ -1,20 +1,18 @@
 import { useContext, useEffect, useState } from 'react';
-
-import { Box, Button, InputLabel } from '@mui/material';
-import DatePicker from 'react-multi-date-picker';
-import TextField from '@mui/material/TextField';
-import { ErrorContext } from '../context';
 import axios from 'axios';
-import { API_BASE_URL } from '../constants';
 import { useNavigate } from 'react-router-dom';
+import DatePicker from 'react-multi-date-picker';
+import { ErrorContext } from '../context';
+import { API_BASE_URL } from '../constants';
 import styles from '../styles/listingStyles.module.css';
+import { Box, Button, InputLabel } from '@mui/material';
+import TextField from '@mui/material/TextField';
 
 function UsersBookingForm({price, listingId, token}) {
   const [bookingDates, setBookingDates] = useState();
   const [totalPrice, setTotalPrice] = useState();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   
-  // console.log("now im here@@@")
   const setShowErrorPopup = useContext(ErrorContext); 
   useEffect(() => {
     if (bookingDates && bookingDates.length === 2) {
@@ -33,13 +31,12 @@ function UsersBookingForm({price, listingId, token}) {
     const nights = diffMs / (1000 * 60 * 60 * 24);
 
     return nights;
-  }
+  };
 
   const submitBooking = async () => {
-    // if this sudednnly stops working make it y-m-d
     const dates = {
-      start: bookingDates[0].format("YYYY-MM-DD"),
-      end: bookingDates[1].format("YYYY-MM-DD")
+      start: bookingDates[0].format('YYYY-MM-DD'),
+      end: bookingDates[1].format('YYYY-MM-DD')
     };
 
     const body = {
@@ -56,11 +53,11 @@ function UsersBookingForm({price, listingId, token}) {
         }
       );
 
-      console.log("Booking success:", response.data);
+      console.log('Booking success:', response.data);
 
       navigate('/temporaryConfirmation')
     } catch (error) {
-      setShowErrorPopup(error.response?.data?.error || "Booking failed.");
+      setShowErrorPopup(error.response?.data?.error || 'Booking failed.');
     }
   };
 
@@ -73,7 +70,7 @@ function UsersBookingForm({price, listingId, token}) {
         range 
         value={bookingDates} 
         onChange={setBookingDates} 
-        placeholder="Select booking dates"
+        placeholder='Select booking dates'
         render={
           <TextField
             sx={{
@@ -86,19 +83,17 @@ function UsersBookingForm({price, listingId, token}) {
 
       {bookingDates && bookingDates.length === 2 &&(
         <Box>
-          Booking: {bookingDates[0].format("DD/MM/YYYY")} to {bookingDates[1].format("DD/MM/YYYY")} <br />
+          Booking: {bookingDates[0].format('DD/MM/YYYY')} to {bookingDates[1].format('DD/MM/YYYY')} <br />
           Number Of Nights: {calculateNumOfNights() } nights<br/>
 
           Price: ${totalPrice}<br/>
           <Button
-            variant="outlined"
+            variant='outlined'
             onClick={submitBooking}
           >Book Now</Button>
         </Box>
       )}
     </Box>
-
   )
-
 }
 export default UsersBookingForm;
