@@ -120,7 +120,6 @@ function ViewListing({ token, owner }) {
           }
         }
 
-        // TODO: sort list based on booked listing
         fetchedList.sort((a, b) => a.title.localeCompare(b.title));
         setList(fetchedList);
         setFilteredList([...fetchedList]);
@@ -230,10 +229,8 @@ function ViewListing({ token, owner }) {
     }
 
     // sort listing alphabetically
-    // TODO: sort based on booking status
     listing.sort((a, b) => a.title.localeCompare(b.title));
 
-    // TODO: sort based on individual filter
 
     setFilteredList(listing);
   };

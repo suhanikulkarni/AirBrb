@@ -385,7 +385,6 @@ function ViewHostedListings({ owner, token }) {
                     <p className={styles.subInfo}>
                       ★ 
                       {listing.reviews.length > 0 ? (
-                        // TODO: check if reduce works
                         <> {listing.reviews.reduce((a, b) => a + b.rating, 0) / listing.reviews.length}</>
                       ) : (
                         <>0</>
