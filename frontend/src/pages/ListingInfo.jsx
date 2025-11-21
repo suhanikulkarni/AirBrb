@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { API_BASE_URL } from '../constants';
 import axios from 'axios';
 import UsersBookingForm from './UserBookingForm';
-import { Box, Modal, Tooltip } from '@mui/material';
+import { Box, Modal, Tooltip, Typography } from '@mui/material';
 
 import Rating from '@mui/material/Rating';
 import { ErrorContext } from '../context';
@@ -106,9 +106,14 @@ function ListingInfo({ token }) {
             <p>Number of Beds: {listingDetails?.metadata?.bedroomCount}</p>
             <p>Number of Bathrooms: {listingDetails?.metadata?.bathroomCount}</p>
             <p>Number of Beds: {sum}</p>
+            <p>Avilable dates:</p>
+            {listingDetails.availability.map(av => (
+              <p>{av.start} - {av.end}</p>
+            ))}
           </div>
 
           <Tooltip title={tooltipContent}>
+            <Typography>Ratings: (hover over the starts to see the ratings)</Typography>
             <Rating 
               value={reviewValue}
               onChangeActive={(event, newHover) => {
