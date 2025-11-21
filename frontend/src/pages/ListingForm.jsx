@@ -13,8 +13,6 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { styled } from '@mui/material/styles';
 
-import { Form } from '../styles/mainStyles';
-
 import BedroomForm from './BedroomForm';
 import { fileToDataUrl } from '../helper';
 
