@@ -45,7 +45,7 @@ function UsersBookingForm({price, listingId, token}) {
     };
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `${API_BASE_URL}bookings/new/${listingId}`,
         body,
         {
