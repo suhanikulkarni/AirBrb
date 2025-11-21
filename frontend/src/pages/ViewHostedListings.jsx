@@ -10,7 +10,9 @@ import { ErrorContext } from '../context';
 import { useNavigate } from "react-router-dom";
 
 function ViewHostedListings({ owner, token }) {
+  const navigate = useNavigate();
   const setShowErrorPopup = useContext(ErrorContext); 
+  const open = Boolean(anchorEl);
   
   const [listings, setListings] = useState("LOADING");
   const [bookingRequests, setBookingRequests] = useState([]);
@@ -18,10 +20,8 @@ function ViewHostedListings({ owner, token }) {
   const [activeListing, setActiveListing] = useState(null);
   const [currentRange, setCurrentRange] = useState([]);
   const [allRanges, setAllRanges] = useState({});
-  const navigate = useNavigate();
 
   const deleteListing = async (listingId) => {
-
     let isPublished= await getListingInfo(listingId);
     isPublished = isPublished.published;
 
@@ -37,11 +37,11 @@ function ViewHostedListings({ owner, token }) {
             }
           }
         );
-      }
-      catch (error){
+      } catch (error){
         setShowErrorPopup(error.response.data.error);
       }
     }
+
     try {
       const res = await axios.delete(`${API_BASE_URL}listings/${listingId}`,
         {
@@ -50,30 +50,32 @@ function ViewHostedListings({ owner, token }) {
           }
         }
       );
+
       if (res) {
         setListings(prevListings => prevListings.filter(listing => listing.id !== listingId))
       } 
-    }
-    catch (error){
+    } catch (error){
       setShowErrorPopup(error.response.data.error);
     }
   }
 
   const getAllListings = async () => {
     let hostedListings = [];
+
     try {
       const res = await axios.get(`${API_BASE_URL}listings`);
       if (res) {
         const listingData = res.data.listings;
+
         listingData.forEach(element => {
           if (element.owner === owner) {
             hostedListings.push(element.id)
           }
         });
+
         return hostedListings;
       } 
-    }
-    catch (error){
+    } catch (error){
       setShowErrorPopup(error.response.data.error);
       return [];
     }
@@ -92,10 +94,12 @@ function ViewHostedListings({ owner, token }) {
     const getFetch = async () => {
       try {
         const listingIds = await getAllListings();
+        
         if (!listingIds || listingIds.length === 0) {
           setListings([]);
           return;
         }
+
         const detailedListings = await Promise.all(
           listingIds.map(async (id) => {
             const listing = await getListingInfo(id);
@@ -105,9 +109,9 @@ function ViewHostedListings({ owner, token }) {
             return null;
           })
         );
+        
         setListings(detailedListings.filter(Boolean));
-      }
-      catch (error) {
+      } catch (error) {
         setShowErrorPopup(error.response.data.error);
 
       }
@@ -159,8 +163,7 @@ function ViewHostedListings({ owner, token }) {
         console.log("this si resdata",res);
         navigate('/')
       }
-    }
-    catch (error){
+    } catch (error){
       setShowErrorPopup(error.response.data.error);
 
     } 
@@ -168,10 +171,12 @@ function ViewHostedListings({ owner, token }) {
   const addingRanges = () => {
     // TODO: only allow dates past today's date
     const listingId = activeListing?.id;
+
     if (!currentRange || currentRange.length !== 2) {
       alert("Please select a full date range (start and end date)");
       return;
     }
+
     setAllRanges(prev => {
       const updatedRanges = {
         ...prev,
@@ -192,7 +197,6 @@ function ViewHostedListings({ owner, token }) {
     setActiveListing(null);
     setCurrentRange([]);
   };
-  const open = Boolean(anchorEl);
 
   const getBookingRequests = async () => {
     let bookingRequests = [];
@@ -220,7 +224,6 @@ function ViewHostedListings({ owner, token }) {
   }
 
   const acceptRequest = async (bookingId) => {
-    console.log("accepted");
     try{
       console.log("accepted!!!!!!!!!");
 
@@ -230,12 +233,12 @@ function ViewHostedListings({ owner, token }) {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
+
       if (response) {
         console.log(response);
         getBookingRequests();
       }
-    }
-    catch(error){
+    } catch(error){
       setShowErrorPopup(error.response?.data?.error || "Failed to Accept Bookng Request");
     }
   }
@@ -250,11 +253,10 @@ function ViewHostedListings({ owner, token }) {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
+
       console.log("Decline response:", response);
       getBookingRequests();
-    }
-
-    catch(error){
+    } catch(error){
       setShowErrorPopup(error.response?.data?.error || "Failed to Decline Bookng Request");
     }
   }
