@@ -120,9 +120,10 @@ function ListingForm({ getters, setters }) {
         'sofaBed': ''
       };
 
-      if (getters.listingMetadata.bedrooms.length) {
-        bedroomBedTypes = getters.listingMetadata.bedrooms[i - 1].bedTypes;
+      if (getters.listingMetadata?.bedrooms[i - 1]) {
+        bedroomBedTypes = getters.listingMetadata?.bedrooms[i - 1].bedTypes;
       }
+
       array.push(
         <BedroomForm
           key={i}
