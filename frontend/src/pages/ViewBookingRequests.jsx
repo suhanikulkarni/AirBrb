@@ -1,18 +1,17 @@
-
 import { useContext, useEffect, useState } from "react";
 import { ErrorContext } from '../context';
 import axios from "axios";
 import { API_BASE_URL } from "../constants";
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
 import { useNavigate } from "react-router-dom";
-import { Box, Chip } from "@mui/material";
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import styles from '../styles/listingStyles.module.css';
+import styles from '../styles/bookingRequest.module.css';
+
 dayjs.extend(customParseFormat);
 
-function ViewBookingRequest({ token, owner }) {
+function ViweBookingRequest({ token, owner }) {
 
   const [bookingRequests, setBookingRequests] = useState([]);
   const [listings, setListings] = useState([]);
@@ -24,13 +23,16 @@ function ViewBookingRequest({ token, owner }) {
 
   useEffect(() => {
     let profit1 = 0;
+
     bookingRequests.map(booking => {
       profit1 += booking.totalPrice;
     })
+
+    console.log(profit1)
     setProfit(profit1);
   }, [bookingRequests])
 
-  useEffect(() => {
+useEffect(() => {
     let daysBooked = 0;
 
     bookingRequests
@@ -44,16 +46,21 @@ function ViewBookingRequest({ token, owner }) {
           return;
         }
 
+        console.log("Formatted start1:", start1.format('YYYY-MM-DD'));
+        console.log("Formatted end1:", end1.format('YYYY-MM-DD'));
+
         const nights = end1.diff(start1, 'day');
         daysBooked += nights;
       });
 
+    console.log("Total days booked:", daysBooked);
     setTotalDaysBooked(daysBooked);
   }, [listings, bookingRequests]);
 
   useEffect(() => {
     if (token === 'LOADING' || !token) navigate('/login');
   }, [token]);
+
 
   const getListingInfo = async (id) => {
     try {
@@ -105,11 +112,13 @@ function ViewBookingRequest({ token, owner }) {
         setListings(detailedListings.filter(Boolean));
       }
       catch (error) {
+        console.log("ngregnjkgnrek")
         setShowErrorPopup(error.response.data.error);
       }
     }
     getFetch();
   }, [owner]);
+
 
   useEffect(() => {
     if (listings.length > 0) {
@@ -132,6 +141,7 @@ function ViewBookingRequest({ token, owner }) {
           return match;
         });
 
+        console.log("Filtered Booking Requests:", bookingRequests);
         setBookingRequests(bookingRequests);
       }
     } catch (error) {
@@ -140,21 +150,25 @@ function ViewBookingRequest({ token, owner }) {
   }
 
   const acceptRequest = async (bookingId) => {
+    console.log("accepted");
     try {
+      console.log("accepted!!!!!!!!!");
+
       const response = await axios.put(
         `${API_BASE_URL}bookings/accept/${bookingId}`, {},
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      if (response) { getBookingRequests(); }
+      if (response) { console.log(response); getBookingRequests(); }
     }
     catch (error) {
-      setShowErrorPopup(error.response?.data?.error || "Failed to Accept Booking Request");
+      setShowErrorPopup(error.response?.data?.error || "Failed to Accept Bookng Request");
     }
   }
 
   const declineRequest = async (bookingId) => {
+    console.log("decline");
     try {
       const response = await axios.put(
         `${API_BASE_URL}bookings/decline/${bookingId}`, {},
@@ -162,151 +176,103 @@ function ViewBookingRequest({ token, owner }) {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
+      console.log("Decline response:", response);
       getBookingRequests();
     }
+
     catch (error) {
-      setShowErrorPopup(error.response?.data?.error || "Failed to Decline Booking Request");
+      setShowErrorPopup(error.response?.data?.error || "Failed to Decline Bookng Request");
     }
   }
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'accepted':
-        return 'success';
-      case 'declined':
-        return 'error';
-      case 'pending':
-        return 'warning';
-      default:
-        return 'default';
-    }
-  }
+  const pendingRequests = bookingRequests.filter(r => r.status === 'pending');
 
-  const pendingRequests = bookingRequests.filter(req => req.status === 'pending');
+  const getStatusClass = (status) => {
+    if (status === 'accepted') return styles.statusAccepted;
+    if (status === 'declined') return styles.statusDeclined;
+    return styles.statusPending;
+  };
 
   return (
-    <div className="container">
-      <div className="banner">
-        <div className="bannerContent">
-          <h1 className="title">Booking Dashboard</h1>
-          <p className="subtitle">Manage and track your property bookings</p>
-          
-          <div className="statsContainer">
-            <div className="statBox">
-              <h4>${profit}</h4>
-              <p>Total Profit</p>
-            </div>
-            <div className="statBox">
-              <h4>{totalDaysBooked}</h4>
-              <p>Days Booked</p>
-            </div>
-            <div className="statBox">
-              <h4>{pendingRequests.length}</h4>
-              <p>Pending</p>
-            </div>
+    <div className={styles.container}>
+      <div className={styles.pendingSection}>
+        <h3 className={styles.title}>Booking Requests</h3>
+
+        {pendingRequests.length === 0 ? (
+          <p className={styles.noRequests}>No pending booking requests</p>
+        ) : (
+          <div className={styles.requestsGrid}>
+            {pendingRequests.map((request) => (
+              <div key={request.id} className={styles.requestCard}>
+                <h3 className={styles.requestTitle}>Request ID: {request.id}</h3>
+                <p className={styles.requestInfo}>
+                  <span className={styles.requestInfoLabel}>Start Date:</span> {request.dateRange.start}
+                </p>
+                <p className={styles.requestInfo}>
+                  <span className={styles.requestInfoLabel}>End Date:</span> {request.dateRange.end}
+                </p>
+                <div className={styles.buttonGroup}>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={() => acceptRequest(request.id)}
+                  >
+                    Accept
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => declineRequest(request.id)}
+                  >
+                    Decline
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        )}
       </div>
 
-      <div className="mainContent">
-        <div className="gridLayout">
-          
-          {/* Left Column - Pending Requests */}
-          <div>
-            <div className="sectionHeader">
-              <h2 className="sectionTitle">Action Required</h2>
-              {pendingRequests.length > 0 && (
-                <Chip 
-                  label={`${pendingRequests.length} pending`} 
-                  color="warning" 
-                  sx={{ fontWeight: 600 }}
-                />
-              )}
-            </div>
-
-            {pendingRequests.length === 0 ? (
-              <div className="emptyCard">
-                <h3 className="emptyTitle">✅ All caught up!</h3>
-                <p className="emptyText">No pending requests to review</p>
-              </div>
-            ) : (
-              <div>
-                {pendingRequests.map((request) => (
-                  <div key={request.id} className="requestCard pendingCard">
-                    <h3 className="requestTitle">Request #{request.id}</h3>
-                    
-                    <div className="dateRow">
-                      <CalendarTodayIcon sx={{ fontSize: 16 }} />
-                      <span>{request.dateRange.start} → {request.dateRange.end}</span>
-                    </div>
-
-                    {request.totalPrice && (
-                      <p className="price">${request.totalPrice}</p>
-                    )}
-
-                    <div className="buttonRow">
-                      <Button
-                        fullWidth
-                        variant="contained"
-                        color="success"
-                        onClick={() => acceptRequest(request.id)}
-                      >
-                        Accept
-                      </Button>
-                      <Button
-                        fullWidth
-                        variant="outlined"
-                        color="error"
-                        onClick={() => declineRequest(request.id)}
-                      >
-                        Decline
-                      </Button>
-                    </div>
+      <div className={styles.statsBox}>
+        <h4 className={styles.statsTitle}>Booking Statistics</h4>
+        <div className={styles.statsContainer}>
+          {bookingRequests.length === 0 ? (
+            <p className={styles.noRequests}>No bookings to display</p>
+          ) : (
+            bookingRequests.map((request) => (
+              <div key={request.id} className={styles.statsRequestCard}>
+                <h4 className={styles.statsRequestTitle}>Request ID: {request.id}</h4>
+                <div className={styles.statsRequestInfo}>
+                  <div>
+                    <span className={styles.statsRequestInfoLabel}>Start:</span> {request.dateRange.start}
                   </div>
-                ))}
+                  <div>
+                    <span className={styles.statsRequestInfoLabel}>End:</span> {request.dateRange.end}
+                  </div>
+                  <div>
+                    <span className={styles.statsRequestInfoLabel}>Status:</span>{' '}
+                    <span className={`${styles.statusBadge} ${getStatusClass(request.status)}`}>
+                      {request.status}
+                    </span>
+                  </div>
+                </div>
               </div>
-            )}
+            ))
+          )}
+        </div>
+        <div className={styles.summaryStats}>
+          <div className={`${styles.statCard} ${styles.profitCard}`}>
+            <div className={styles.statLabel}>Total Profit</div>
+            <div className={`${styles.statValue} ${styles.profitValue}`}>
+              ${profit.toFixed(2)}
+            </div>
           </div>
 
-          {/* Right Column - Booking History */}
-          <div>
-            <div className="sectionHeader">
-              <h2 className="sectionTitle">Booking History</h2>
+          <div className={`${styles.statCard} ${styles.daysCard}`}>
+            <div className={styles.statLabel}>Days Booked</div>
+            <div className={`${styles.statValue} ${styles.daysValue}`}>
+              {totalDaysBooked}
             </div>
-
-            {bookingRequests.length === 0 ? (
-              <div className="emptyCard">
-                <h3 className="emptyTitle">📋 No bookings yet</h3>
-                <p className="emptyText">Your booking history will appear here</p>
-              </div>
-            ) : (
-              <div>
-                {bookingRequests.map((request) => (
-                  <div key={request.id} className="historyCard">
-                    <div className="historyHeader">
-                      <div className="historyLeft">
-                        <h6>Request #{request.id}</h6>
-                        <Chip 
-                          label={request.status.toUpperCase()} 
-                          color={getStatusColor(request.status)}
-                          size="small"
-                        />
-                      </div>
-                      {request.totalPrice && (
-                        <h6 className="historyPrice">${request.totalPrice}</h6>
-                      )}
-                    </div>
-
-                    <div className="dateRow">
-                      <CalendarTodayIcon sx={{ fontSize: 14 }} />
-                      <span style={{ fontSize: '0.875rem' }}>
-                        {request.dateRange.start} → {request.dateRange.end}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -314,4 +280,4 @@ function ViewBookingRequest({ token, owner }) {
   )
 }
 
-export default ViewBookingRequest
+export default ViweBookingRequest
