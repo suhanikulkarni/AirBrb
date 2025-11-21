@@ -29,7 +29,6 @@ function EditListing({ token }) {
     const setInfo = async () => {
       const listingInfo = await getListingInfo(listingId);
 
-      console.log('hi', listingId, listingInfo)
       setListingInfo(listingInfo);
       setListingAddress(listingInfo.address);
       setListingMetadata(listingInfo.metadata);
@@ -91,18 +90,6 @@ function EditListing({ token }) {
     }
   }
 
-  useEffect(() => {
-    console.log('Updated address:', listingAddress);
-  }, [listingAddress]);
-
-  useEffect(() => {
-    console.log('Updated metadata:', listingMetadata);
-  }, [listingMetadata]);
-  
-  useEffect(() => {
-    console.log('Updated all info:', listingInfo);
-  }, [listingInfo]);
-
   const handleSave = async () => {
     if (!listingInfo.title || !listingInfo.price) {
       return setShowErrorPopup('Please fill out the whole form');
@@ -144,9 +131,7 @@ function EditListing({ token }) {
       price: parseInt(listingInfo.price, 10),
       thumbnail: thumbnail
     };
-    
-    console.log('Listing data: ',body)
-
+  
     postEditedListing(body, token);
   }
 

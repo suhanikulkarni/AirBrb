@@ -61,7 +61,6 @@ function Filter({ filter, setFilter, filterListing }) {
       </FormControl>
 
       <b>Bedroom Filter</b>
-      {/* TODO: prevent no. from decreasing beyond 0 */}
       <FormControl
         sx={{
           display: 'flex',
@@ -89,7 +88,6 @@ function Filter({ filter, setFilter, filterListing }) {
           />
         </FormControl>
         
-        {/* TODO: prevent no. from decreasing beyond 0 */}
         <FormControl
           sx={{
             width: '100%'
@@ -111,7 +109,6 @@ function Filter({ filter, setFilter, filterListing }) {
       </FormControl>
 
       <b>Price Filter</b>
-      {/* TODO: prevent no. from decreasing beyond 0 */}
       <FormControl
         sx={{
           display: 'flex',
@@ -139,7 +136,6 @@ function Filter({ filter, setFilter, filterListing }) {
           />
         </FormControl>
         
-        {/* TODO: prevent no. from decreasing beyond 0 */}
         <FormControl
           sx={{
             width: '100%'

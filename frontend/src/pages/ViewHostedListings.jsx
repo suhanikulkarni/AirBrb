@@ -27,7 +27,6 @@ function ViewHostedListings({ owner, token }) {
     let isPublished= await getListingInfo(listingId);
     isPublished = isPublished.published;
 
-    console.log('isPublished', isPublished)
     if (isPublished) {
       try {
         await axios.put(
@@ -113,7 +112,6 @@ function ViewHostedListings({ owner, token }) {
         );
         
         setListings(detailedListings.filter(Boolean));
-        console.log('listings', detailedListings.filter(Boolean))
       } catch (error) {
         setShowErrorPopup(error.response.data.error);
 
@@ -130,7 +128,6 @@ function ViewHostedListings({ owner, token }) {
   }, [listings]);
 
   const handleClick = (event, listing) => {
-    console.log('clicked', listing.id);
     setAnchorEl(event.currentTarget);
     setActiveListing(listing);
     setCurrentRange([]);
@@ -164,7 +161,6 @@ function ViewHostedListings({ owner, token }) {
       );
 
       if (res) {
-        console.log('this si resdata', res);
         navigate('/')
       }
     } catch (error) {
@@ -209,13 +205,11 @@ function ViewHostedListings({ owner, token }) {
     });
 
     if (merged) {
-
       setAllRanges(prev => ({
         ...prev,
         [listingId]: updatedRanges
       }));
       setCurrentRange([]);
-      console.log('Range merged - extended existing range');
       return;
     }
 
@@ -225,15 +219,12 @@ function ViewHostedListings({ owner, token }) {
       const existingEnd = range[1].toDate();
       existingEnd.setHours(0, 0, 0, 0);
 
-      if (start < existingStart && end >= existingStart) {
-        return true;
-      }
-      if (start <= existingStart && end >= existingEnd) {
-        return true;
-      }
-      if (start > existingStart && start <= existingEnd && end <= existingEnd) {
-        return true;
-      }
+      if (start < existingStart && end >= existingStart) return true;
+      
+      if (start <= existingStart && end >= existingEnd) return true;
+      
+      if (start > existingStart && start <= existingEnd && end <= existingEnd) return true;
+      
       return false;
     });
 
@@ -250,7 +241,6 @@ function ViewHostedListings({ owner, token }) {
           currentRange
         ]
       };
-      console.log('Updated allRanges:', updatedRanges);
       return updatedRanges;
     });
     setCurrentRange([]);
@@ -274,14 +264,11 @@ function ViewHostedListings({ owner, token }) {
       if (res) {
         const requestData = res.data.bookings;
         const listingIds = listings.map(listing => String(listing.id));
-        //console.log('Listing IDs:', listingIds);
         bookingRequests = requestData.filter(booking => {
           const match = listingIds.includes(String(booking.listingId));
-          //console.log(`Comparing ${booking.listingId} with myListingIds:`, match);
           return match;
         });
 
-        console.log('Filtered Booking Requests:', bookingRequests);
         setBookingRequests(bookingRequests);
       }
     } catch (error) {
@@ -290,9 +277,7 @@ function ViewHostedListings({ owner, token }) {
   };
 
   const acceptRequest = async (bookingId) => {
-    console.log('accepted');
     try {
-      console.log('accepted!!!!!!!!!');
 
       const response = await axios.put(
         `${API_BASE_URL}bookings/accept/${bookingId}`, {},
@@ -301,7 +286,6 @@ function ViewHostedListings({ owner, token }) {
         }
       );
       if (response) {
-        console.log(response);
         getBookingRequests();
       }
     } catch (error) {
@@ -310,7 +294,6 @@ function ViewHostedListings({ owner, token }) {
   };
 
   const declineRequest = async (bookingId) => {
-    console.log('decline');
 
     try {
       const response = await axios.put(
@@ -319,14 +302,12 @@ function ViewHostedListings({ owner, token }) {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      console.log('Decline response:', response);
       getBookingRequests();
     } catch (error) {
       setShowErrorPopup(error.response?.data?.error || 'Failed to Decline Bookng Request');
     }
   };
 
-  console.log('this is all the listings: ', listings)
   return (
     <div>
       {listings === 'LOADING' ? (
@@ -404,7 +385,6 @@ function ViewHostedListings({ owner, token }) {
                     <p className={styles.subInfo}>
                       ★ 
                       {listing.reviews.length > 0 ? (
-                        // TODO: check if reduce works
                         <> {listing.reviews.reduce((a, b) => a + b.rating, 0) / listing.reviews.length}</>
                       ) : (
                         <>0</>
