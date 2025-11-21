@@ -4,16 +4,59 @@ import axios from "axios";
 import { API_BASE_URL } from "../constants";
 import Button from '@mui/material/Button';
 import { useNavigate } from "react-router-dom";
+import { Box, Input, InputLabel } from "@mui/material";
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
-
+dayjs.extend(customParseFormat);
 
 function ViweBookingRequest({ token, owner }) {
 
   const [bookingRequests, setBookingRequests] = useState([]);
   const [listings, setListings] = useState([]);
   const setShowErrorPopup = useContext(ErrorContext);
+  const [totalDaysBooked, setTotalDaysBooked] = useState(0);
+  const [profit, setProfit] = useState(0);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let profit1 = 0;
+    // only if acceptef
+
+    bookingRequests.map(booking => {
+      profit1 += booking.totalPrice;
+    })
+
+    console.log(profit1)
+    setProfit(profit1);
+  }, [bookingRequests])
+
+useEffect(() => {
+    let daysBooked = 0;
+
+    bookingRequests
+      .filter(booking => booking.status === 'accepted')
+      .forEach(booking => {
+        // Parse dates with the correct format: DD-MM-YYYY
+        const start1 = dayjs(booking.dateRange.start, 'DD-MM-YYYY');
+        const end1 = dayjs(booking.dateRange.end, 'DD-MM-YYYY');
+
+        if (!start1.isValid() || !end1.isValid()) {
+          console.warn("Invalid date range:", booking.dateRange);
+          return;
+        }
+
+        console.log("Formatted start1:", start1.format('YYYY-MM-DD'));
+        console.log("Formatted end1:", end1.format('YYYY-MM-DD'));
+
+        const nights = end1.diff(start1, 'day');
+        daysBooked += nights;
+      });
+
+    console.log("Total days booked:", daysBooked);
+    setTotalDaysBooked(daysBooked);
+  }, [listings, bookingRequests]);
 
   useEffect(() => {
     if (token === 'LOADING' || !token) navigate('/login');
@@ -49,7 +92,6 @@ function ViweBookingRequest({ token, owner }) {
       return [];
     }
   }
-
 
   useEffect(() => {
     const getFetch = async () => {
@@ -174,6 +216,23 @@ function ViweBookingRequest({ token, owner }) {
           </>
         ))
       )}
+
+      <Box>
+        <InputLabel>Suhani</InputLabel>
+
+        {bookingRequests.map((request) => (
+          <>
+            <h4>Request Id: {request.id}</h4>
+            <p>Start Date: {request.dateRange.start}</p>
+            <p>End Date: {request.dateRange.end}</p>
+            <p>Status: {request.status}</p>
+          </>
+        ))}
+
+        <InputLabel>Profit Made: ${profit}</InputLabel>
+        <InputLabel>Days booked: {totalDaysBooked}</InputLabel>
+
+      </Box>
     </div>
   )
 
