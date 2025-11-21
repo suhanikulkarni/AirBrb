@@ -24,6 +24,7 @@ function ViewListing({ token, owner }) {
   const setShowErrorPopup = useContext(ErrorContext);
 
   const [list, setList] = useState("LOADING");
+
   const [filteredList, setFilteredList] = useState([]);
   const [sortOrder, setSortOrder] = useState('ascending');
   const [filter, setFilter] = useState({
@@ -274,6 +275,7 @@ function ViewListing({ token, owner }) {
   }
 
   return (
+    <>
     <PageBody>
       <Modal
         open={open}
@@ -417,14 +419,13 @@ function ViewListing({ token, owner }) {
           onClick={clearFilter}
         >Clear Filter</Button>
         <br />
+        
 
         <Button
           variant="contained"
           onClick={filterListing}
         >Search</Button>
       </Box>
-      <br />
-
       <ToggleButtonGroup
         value={sortOrder}
         exclusive
@@ -511,6 +512,7 @@ function ViewListing({ token, owner }) {
         </>
       )}
     </PageBody>
+    </>
   );
 }
 

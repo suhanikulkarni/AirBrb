@@ -395,8 +395,8 @@ function ViewHostedListings({ owner, token }) {
               Add Availability
             </Button>
 
-            <div >
-              <strong>Current Availability:</strong>
+                <div >
+                  <strong>Current Availability:</strong>
 
               {(allRanges[activeListing.id] || []).length === 0 ? (
                 <p>No ranges added yet.</p>
