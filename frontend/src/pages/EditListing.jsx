@@ -94,3 +94,76 @@ function EditListing({ token }) {
     }
   }
 
+  useEffect(() => {
+    console.log("Updated address:", listingAddress);
+  }, [listingAddress]);
+
+  useEffect(() => {
+    console.log("Updated metadata:", listingMetadata);
+  }, [listingMetadata]);
+  
+  useEffect(() => {
+    console.log("Updated all info:", listingInfo);
+  }, [listingInfo]);
+
+  const handleSave = async () => {
+    if (!listingInfo.title || !listingInfo.price) {
+      // TODO: usability -> instead of popup -> highlight empty field with error
+      return setShowErrorPopup("Please fill out the whole form");
+    }
+
+    if (!listingAddress.country||!listingAddress.postcode||!listingAddress.state||!listingAddress.streetAddress||! listingAddress.suburb) {
+      return setShowErrorPopup("Please enter all the address information");
+    }
+
+    if (!listingMetadata.bathroomCount||!listingMetadata.propertyType||!listingMetadata.bedroomCount) {
+      return setShowErrorPopup("Please enter all the information about the property");
+    }
+
+    const bedNum = Number(listingMetadata.bedroomCount);
+    
+    if (bedNum > 0 && listingMetadata.bedrooms.length != bedNum) {
+      return setShowErrorPopup("Please enter the bedroom information");
+    }
+    
+    const priceNum = Number(listingInfo.price);
+    const bathNum = Number(listingMetadata.bathroomCount);
+    
+    if (![priceNum, bathNum, bedNum].every(Number.isFinite)) {
+      return setShowErrorPopup("Please insert a number");
+    }
+    
+    let thumbnail = listingInfo.thumbnail;
+
+    if (thumbnail && thumbnailType === "youtube" && !thumbnail.startsWith("https://www.youtube.com/")) {
+      return setShowErrorPopup("Invalid YouTube link");
+    };
+    
+    if (!thumbnail) thumbnail = DEFAULT_IMAGE;
+
+    const body = {
+      ...listingInfo,
+      address: listingAddress,
+      metadata: listingMetadata,
+      price: parseInt(listingInfo.price, 10),
+      thumbnail: thumbnail
+    }
+    
+    console.log("Listing data: ",body)
+
+    postEditedListing(body, token);
+  }
+
+  return (
+    <PageBody>
+      <h1>Edit Listing</h1>
+      <ListingForm getters={getters} setters={setters} />
+      <Button 
+        variant="contained"
+        onClick={handleSave}
+      >Save</Button>
+    </PageBody>
+  )
+}
+
+export default EditListing
