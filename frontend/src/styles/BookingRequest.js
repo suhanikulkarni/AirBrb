@@ -1,0 +1,173 @@
+// ViewBookingRequest.module.css
+const styles = `
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.banner {
+  background: #1976d2;
+  color: white;
+  padding: 32px 24px;
+  margin-bottom: 24px;
+}
+
+.bannerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  opacity: 0.9;
+  margin-bottom: 24px;
+}
+
+.statsContainer {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.statBox h4 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.statBox p {
+  opacity: 0.9;
+  margin: 4px 0 0 0;
+}
+
+.mainContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 32px;
+}
+
+.gridLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  .gridLayout {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.emptyCard {
+  background: white;
+  padding: 48px;
+  text-align: center;
+  border-radius: 8px;
+}
+
+.emptyTitle {
+  font-size: 1.25rem;
+  color: #666;
+  margin: 0 0 8px 0;
+}
+
+.emptyText {
+  color: #999;
+  margin: 0;
+}
+
+.requestCard {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.pendingCard {
+  border: 2px solid #ff9800;
+}
+
+.requestTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.dateRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.price {
+  font-size: 1.25rem;
+  color: #1976d2;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.historyCard {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+}
+
+.historyCard:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateX(4px);
+}
+
+.historyHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.historyLeft h6 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.historyPrice {
+  font-size: 1.25rem;
+  color: #1976d2;
+  margin: 0;
+}
+`;
+
+// Add styles to document
+if (typeof document !== 'undefined') {
+  const styleSheet = document.createElement("style");
+  styleSheet.textContent = styles;
+  document.head.appendChild(styleSheet);
+}
