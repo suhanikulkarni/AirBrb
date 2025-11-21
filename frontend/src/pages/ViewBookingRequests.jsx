@@ -188,7 +188,53 @@ useEffect(() => {
     }
   }
 
-  
+  return (
+    <div>
+      <h3>Booking Requests</h3>
+      {bookingRequests.length === 0 ? (
+        <p>No booking requests </p>
+      ) : (
+        bookingRequests.map((request) => (
+          <>
+            {request.status === "pending" && (
+              <div key={request.id}>
+                <h3>Request Id: {request.id}</h3>
+                <p>Start Date: {request.dateRange.start}</p>
+                <p>End Date: {request.dateRange.end}</p>
+                <Button
+                  onClick={() => { acceptRequest(request.id) }}
+                >Accept
+                </Button>
+
+                <Button
+                  onClick={() => { declineRequest(request.id) }}
+                >Decline
+                </Button>
+
+              </div>
+            )}
+          </>
+        ))
+      )}
+
+      <Box>
+        <InputLabel>Suhani</InputLabel>
+
+        {bookingRequests.map((request) => (
+          <>
+            <h4>Request Id: {request.id}</h4>
+            <p>Start Date: {request.dateRange.start}</p>
+            <p>End Date: {request.dateRange.end}</p>
+            <p>Status: {request.status}</p>
+          </>
+        ))}
+
+        <InputLabel>Profit Made: ${profit}</InputLabel>
+        <InputLabel>Days booked: {totalDaysBooked}</InputLabel>
+
+      </Box>
+    </div>
+  )
 }
 
 export default ViweBookingRequest
