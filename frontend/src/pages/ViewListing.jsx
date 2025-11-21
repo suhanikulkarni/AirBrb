@@ -1,14 +1,11 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
 import { API_BASE_URL } from '../constants';
 import { ErrorContext } from '../context';
 import Thumbnail from './Thumbnail';
-
 import styles from '../styles/listingStyles.module.css';
 import { PageBody } from '../styles/mainStyles';
-
 import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -169,7 +166,7 @@ function ViewListing({ token, owner }) {
     } catch (error) {
       setShowErrorPopup(error.response.data.error);
     }
-  }
+  };
 
   const getListingInfo = async (listingId) => {
     try {
@@ -178,7 +175,7 @@ function ViewListing({ token, owner }) {
     } catch (error) {
       setShowErrorPopup(error.response.data.error);
     }
-  }
+  };
 
   const filterListing = () => {
     let listing = [...list];
@@ -249,7 +246,7 @@ function ViewListing({ token, owner }) {
   const orderList = () => {
     if (sortOrder === 'descending') return filteredList.toReversed();
     return filteredList;
-  }
+  };
 
   return (
     <>
