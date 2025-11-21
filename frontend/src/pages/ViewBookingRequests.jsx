@@ -235,8 +235,6 @@ useEffect(() => {
       </Box>
     </div>
   )
-
-
 }
 
 export default ViweBookingRequest

@@ -18,7 +18,10 @@ export const NavBar = styled.header(() => ({
   backgroundColor: '#f3f3f3ff',
   color: '#303030ff',
   fontFamily: 'Calibri',
-  boxShadow: '0 0 8px #bbbbbbff'
+  boxShadow: '0 0 8px #bbbbbbff',
+  position: 'sticky',
+  top: '0',
+  zIndex: '1000'
 }));
 
 export const PageBody = styled.section(() => ({
@@ -42,9 +45,5 @@ export const Form = styled.div(() => ({
   display: 'flex',
   flexDirection: 'column',
   maxWidth: '800px',
-  minWidth: '400px',
+  minWidth: '350px',
 }));
-
-// export const BigButton = styled(Button)(() => ({
-//   fontSize: '2em',
-// }));

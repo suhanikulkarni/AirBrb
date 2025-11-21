@@ -12,11 +12,12 @@ import Dashboard from './pages/Dashboard';
 import CreateListing from './pages/CreateListing';
 import EditListing from './pages/EditListing';
 import ViewListing from './pages/ViewListing';
-import { ErrorContext } from './context';
+import { ConfirmationContext, ErrorContext } from './context';
 import ErrorPopup from './pages/ErrorPopup';
 import { API_BASE_URL } from './constants';
 import ListingInfo from './pages/ListingInfo';
 import TemporaryConfirmation from './pages/TemporaryConnfirmation';
+import ConfirmDeletePopup from './pages/ConfirmDeletePopup';
 import ViweBookingRequest from './pages/ViewBookingRequests';
 
 function App() {
@@ -24,17 +25,13 @@ function App() {
   const [owner, setOwner] = useState('');
 
   const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [showConfirmDeletePopup, setShowConfirmDeletePopup] = useState(false);
 
   const navigate = useNavigate('/dashboard');
 
   useEffect(() => {
-    const lsToken = localStorage.getItem('token');
-    setToken(lsToken);
-
-    const owner1 = localStorage.getItem('owner');
-    setOwner(owner1);
-
-
+    setToken(localStorage.getItem('token'));
+    setOwner(localStorage.getItem('owner'));
   }, []);
 
   const logoutUser = async () => {
@@ -49,26 +46,24 @@ function App() {
 
   return (
     <ErrorContext.Provider value={setShowErrorPopup}>
-      <Page>
-        <NavBar>
-          {token ? (
-            <>
-              <NavLeft>
-                <Button
-                  onClick={() => navigate('/')}
-                >Home</Button>
-              </NavLeft>
-              {" "}
-              <NavRight>
-                <Button
-                  onClick={() => navigate('/dashboard')}
-                >Your Listings</Button>
+      <ConfirmationContext.Provider value={setShowConfirmDeletePopup}>
+        <Page>
+          <NavBar>
+            {token ? (
+              <>
+                <NavLeft>
+                  <Button
+                    variant='outlined'
+                    onClick={() => navigate('/')}
+                  >Home</Button>
+                </NavLeft>
                 {" "}
-                <Button
-                  variant="contained"
-                  onClick={() => logoutUser()}
-                >Logout</Button>
-              </NavRight>
+                <NavRight>
+                  <Button
+                    variant="contained"
+                    onClick={() => logoutUser()}
+                  >Logout</Button>
+                </NavRight>
             </>
           ) : (
             <>
@@ -88,24 +83,29 @@ function App() {
           )}
         </NavBar>
         <ErrorPopup showErrorPopup={showErrorPopup} closeErrorPopup={() => setShowErrorPopup(false)} />
-        <Routes>
-          {token !== 'LOADING' && (
-            <>
-              <Route path="/" element={<ViewListing token = {token} owner = {owner} />} />
-              <Route path="/login" element={<Login setToken={setToken} setOwner={setOwner}/>} />
-              <Route path="/viewListings/:listingId" element={<ListingInfo token={token}/>} />
-              <Route path="/temporaryConfirmation" element={<TemporaryConfirmation token={token}/>} />
-              <Route path="/:id/viewBooking" element={<ViweBookingRequest token={token} owner={owner}/>} />
-              <Route path="/register" element={<Register setToken={setToken} setOwner={setOwner} />} />
-              <Route path="/dashboard">
-                <Route index element={<Dashboard token={token} owner={owner} />} />
-                <Route path="create-listing" element={<CreateListing token={token} />} />
-                <Route path="edit-listing/:listingId" element={<EditListing token={token} />} />
-              </Route>
-            </>
-          )}
-        </Routes>
-      </Page>
+        <ConfirmDeletePopup
+          showConfirmDeletePopup={showConfirmDeletePopup}
+          closeConfirmDeletePopup={() => setShowConfirmDeletePopup(false)}
+        />
+          <Routes>
+            {token !== 'LOADING' && (
+              <>
+                <Route path="/" element={<ViewListing token = {token} owner = {owner} />} />
+                <Route path="/login" element={<Login setToken={setToken} setOwner={setOwner}/>} />
+                <Route path="/viewListings/:listingId" element={<ListingInfo token={token}/>} />
+                <Route path="/temporaryConfirmation" element={<TemporaryConfirmation token={token}/>} />
+                <Route path="/:id/viewBooking" element={<ViweBookingRequest token={token} owner={owner}/>} />
+                <Route path="/register" element={<Register setToken={setToken} setOwner={setOwner} />} />
+                <Route path="/dashboard">
+                  <Route index element={<Dashboard token={token} owner={owner} />} />
+                  <Route path="create-listing" element={<CreateListing token={token} />} />
+                  <Route path="edit-listing/:listingId" element={<EditListing token={token} />} />
+                </Route>
+              </>
+            )}
+          </Routes>
+        </Page>
+      </ConfirmationContext.Provider>
     </ErrorContext.Provider>
   );
 }
