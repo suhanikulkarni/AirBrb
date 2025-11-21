@@ -189,4 +189,184 @@ function ListingForm({ getters, setters }) {
           required
         />
 
+        <TextField
+          id="listing-state-input"
+          label="State"
+          type="text"
+          onChange={handleAddressInfo}
+          name="state"
+          value={getters.listingAddress.state}
+          required
+        />
+        <br /><br />
+
+        <TextField
+          id="listing-country-input"
+          label="Country"
+          type="text"
+          onChange={handleAddressInfo}
+          name="country"
+          value={getters.listingAddress.country}
+          required
+        />
+
+        <TextField
+          id="listing-postcode-input"
+          label="Postcode"
+          type="text"
+          onChange={handleAddressInfo}
+          name="postcode"
+          value={getters.listingAddress.postcode}
+          required
+        />
+      </Box>
+      <br />
+
+      <h2>Listing Thumbnail</h2>
+      <ToggleButtonGroup
+        value={getters.thumbnailType}
+        exclusive
+        onChange={(e, thumbnailType) => {
+          if (thumbnailType !== null) {
+            clearThumbnail();
+            setters.setThumbnailType(thumbnailType);
+          }; 
+        }}
+        aria-label="thumbnail type"
+      >
+        <ToggleButton value="image" aria-label="image thumbnail">
+          <p>Image</p>
+        </ToggleButton>
+        <ToggleButton value="youtube" aria-label="youtube thumbnail">
+          <p>Youtube</p>
+        </ToggleButton>
+      </ToggleButtonGroup>
+      <br />
       
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
+        {getters.thumbnailType === 'image' && 
+          <>
+            <p>
+              {thumbnailImageName === '' ? (
+                <>No image uploaded</>
+              ) : (
+                <>
+                  {thumbnailImageName}
+                  <Button 
+                    onClick={clearThumbnail}
+                  >✖</Button>
+                </>
+              )}
+            </p>
+            <Button
+              component="label"
+              role={undefined}
+              variant="contained"
+              tabIndex={-1}  
+            >
+              Upload file
+              <VisuallyHiddenInput
+                type="file"
+                onChange={e => {handleThumbnailImage(e.target.files[0])}}
+                name="thumbnail"
+                multiple
+              />
+            </Button>
+          </>
+        }
+        {getters.thumbnailType === 'youtube' &&
+          <>
+            <TextField
+              id="youtube-thumbnail-input"
+              label="YouTube URL"
+              type="text"
+              onChange={e => {handleThumbnailYoutube(e.target.value)}}
+              name="thumbnail"
+            />
+          </>
+        }
+      </Box>
+      <br />
+
+      <h2>Listing Details</h2>
+      <FormControl fullWidth>
+        <InputLabel id="demo-simple-select-label">Property Type</InputLabel>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          name="propertyType"
+          value={getters.listingMetadata.propertyType}
+          label="Property Type"
+          onChange={handleMetadataInfo}
+        >
+          <MenuItem value={"apartment"}>Apartment</MenuItem>
+          <MenuItem value={"house"}>House</MenuItem>
+          <MenuItem value={"guesthouse"}>Guesthouse</MenuItem>
+          <MenuItem value={"hotelroom"}>Hotel Room</MenuItem>
+          <MenuItem value={"cabin"}>Cabin</MenuItem>
+          <MenuItem value={"other"}>Other</MenuItem>
+        </Select>
+      </FormControl>
+      <br />
+
+      <TextField
+        type="text"
+        label="Amenities"
+        multiline
+        rows={3}
+        name="amenities"
+        onChange={handleMetadataInfo}
+        value={getters.listingMetadata.amenities}
+      />
+      <br />
+
+      {/* TODO: prevent no. from decreasing beyond 0 */}
+      <TextField
+        id="bathroom-count-input"
+        label="Number of Bathrooms"
+        type="number"
+        onChange={handleMetadataInfo}
+        name="bathroomCount"
+        value={getters.listingMetadata.bathroomCount}
+        slotProps={{ input: { min: 0 } }}
+        required
+      />
+      <br />
+
+      <h3>Bedrooms</h3>
+      <TextField
+        label="Number of Bedrooms"
+        type="number"
+        onChange={handleMetadataInfo}
+        name="bedroomCount"
+        value={getters.listingMetadata.bedroomCount}
+        slotProps={{ input: { min: 0 } }}
+      />
+      <br />
+
+      <Box
+        sx={{
+          borderRadius: 3,
+          bgcolor: '#f3f3f3ff',
+          padding: '15px'
+        }}
+      >          
+        <Box
+          sx={{
+            margin: '0 10px 15px 10px'
+          }}
+        >
+          {renderBedroomForm()}
+        </Box>
+      </Box>
+      <br />
+    </Form>
+  )
+}
+
+export default ListingForm;
