@@ -31,7 +31,7 @@ function Filter({ filter, setFilter, filterListing }) {
       'reviewFilter': '',
       'dateFilter': ''
     });
-
+    
     filterListing();
   };
 

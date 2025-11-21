@@ -152,7 +152,7 @@ function ViweBookingRequest({ token, owner }) {
 
   const declineRequest = async (bookingId) => {
     try {
-      const response = await axios.put(
+      await axios.put(
         `${API_BASE_URL}bookings/decline/${bookingId}`, {},
         {
           headers: { Authorization: `Bearer ${token}` }
