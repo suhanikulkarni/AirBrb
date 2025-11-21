@@ -324,7 +324,11 @@ function ViewListing ( {token, owner}) {
                           <h3 className={styles.title}>{listing.title}</h3>
                           <p className={styles.subInfo}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
                           <p className={styles.subInfo}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>
-                          <p className={styles.subInfo}>{listing.availability[0].start} ~ {listing.availability[0].end}</p>
+                          <p className={styles.subInfo}>
+                            {listing.availability[0].start.replaceAll('-', '/')}
+                            {' - '}
+                            {listing.availability[0].end.replaceAll('-', '/')}
+                            </p>
                           <p className={styles.price}>${listing.price} per night</p>
                         </div>
                         {booking && (
