@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { styles } from '../styles/ListingStyles';
+import styles from '../styles/listingStyles.module.css';
 
 function Thumbnail({ thumbnail, listingTitle }) {
   const [thumbnailType, setThumbnailType] = useState('image');
@@ -15,10 +15,14 @@ function Thumbnail({ thumbnail, listingTitle }) {
   return (
     <>
       {thumbnailType === 'image' &&
-        <img src={thumbnail} alt={listingTitle} style={styles.thumbnail} />
+        <img src={thumbnail} alt={`${listingTitle} thumbnail image`} className={styles.thumbnail} />
       }
       {thumbnailType === 'youtube' &&
-        <iframe width="100%" height="200" src={`https://www.youtube.com/embed/${youtubeId}`} />
+        <iframe
+          className={styles.thumbnail}
+          src={`https://www.youtube.com/embed/${youtubeId}`}
+          alt={`${listingTitle} thumbnail video`}
+        />
       }
     </>
   )

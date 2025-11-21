@@ -13,8 +13,6 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { styled } from '@mui/material/styles';
 
-import { Form } from '../styles/mainStyles';
-
 import BedroomForm from './BedroomForm';
 import { fileToDataUrl } from '../helper';
 
@@ -114,12 +112,23 @@ function ListingForm({ getters, setters }) {
     const array = [];
 
     for (let i = 1; i <= getters.listingMetadata.bedroomCount; i++) {
+      let bedroomBedTypes = {
+        'singleBed': '',
+        'doubleBed': '',
+        'queenBed': '',
+        'kingBed': '',
+        'sofaBed': ''
+      };
+
+      if (getters.listingMetadata.bedrooms.length) {
+        bedroomBedTypes = getters.listingMetadata.bedrooms[i - 1].bedTypes;
+      }
       array.push(
         <BedroomForm
           key={i}
           bedroomNumber={i}
           updateBedroomMetadata={updateBedroomMetadata}
-          bedroomMetadata={getters.listingMetadata.bedrooms[i - 1].bedTypes}
+          bedroomMetadata={bedroomBedTypes}
         />
       )
     }
@@ -136,13 +145,13 @@ function ListingForm({ getters, setters }) {
   };
 
   return (
-    <Form>
+    <>
       <TextField 
         id="listing-title-input" 
         label="Property Name"
         type="text"
-        onChange={handleInfo}
         name="title"
+        onChange={handleInfo}
         value={getters.listingInfo.title}
         required
       />
@@ -161,65 +170,110 @@ function ListingForm({ getters, setters }) {
       <br />
 
       <h2>Listing Address</h2>
-      <Box
+      <FormControl
         sx={{
           borderRadius: 3,
           bgcolor: '#f3f3f3ff',
           padding: '15px'
         }}
       >
-        <TextField
-          id="listing-street-address-input"
-          label="Street Address"
-          type="text"
-          onChange={handleAddressInfo}
-          name="streetAddress"
-          value={getters.listingAddress.streetAddress}
-          required
-        />
-        <br /><br />
+        <FormControl
+          sx={{
+            marginBottom: '10px',
+          }}
+        >
+          <TextField
+            id="listing-street-address-input"
+            label="Street Address"
+            type="text"
+            onChange={handleAddressInfo}
+            name="streetAddress"
+            value={getters.listingAddress.streetAddress}
+            required
+          />          
+        </FormControl>
 
-        <TextField
-          id="listing-suburb-input"
-          label="Suburb"
-          type="text"
-          onChange={handleAddressInfo}
-          name="suburb"
-          value={getters.listingAddress.suburb}
-          required
-        />
+        <FormControl
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            marginBottom: '10px'
+          }}
+        >
+          <FormControl
+            sx={{
+              marginRight: '5px',
+              width: '100%'
+            }}
+          >
+            <TextField
+              id="listing-suburb-input"
+              label="Suburb"
+              type="text"
+              onChange={handleAddressInfo}
+              name="suburb"
+              value={getters.listingAddress.suburb}
+              required
+            />
+          </FormControl>
 
-        <TextField
-          id="listing-state-input"
-          label="State"
-          type="text"
-          onChange={handleAddressInfo}
-          name="state"
-          value={getters.listingAddress.state}
-          required
-        />
-        <br /><br />
+          <FormControl
+            sx={{
+              width: '100%'
+            }}
+          >
+            <TextField
+              id="listing-state-input"
+              label="State"
+              type="text"
+              onChange={handleAddressInfo}
+              name="state"
+              value={getters.listingAddress.state}
+              required
+            />
+          </FormControl>
+        </FormControl>
 
-        <TextField
-          id="listing-country-input"
-          label="Country"
-          type="text"
-          onChange={handleAddressInfo}
-          name="country"
-          value={getters.listingAddress.country}
-          required
-        />
+        <FormControl
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+          }}
+        >
+          <FormControl
+            sx={{
+              marginRight: '5px',
+              width: '100%'
+            }}
+          >
+            <TextField
+              id="listing-country-input"
+              label="Country"
+              type="text"
+              onChange={handleAddressInfo}
+              name="country"
+              value={getters.listingAddress.country}
+              required
+            />
+          </FormControl>
 
-        <TextField
-          id="listing-postcode-input"
-          label="Postcode"
-          type="text"
-          onChange={handleAddressInfo}
-          name="postcode"
-          value={getters.listingAddress.postcode}
-          required
-        />
-      </Box>
+          <FormControl
+            sx={{
+              width: '100%'
+            }}
+          >
+            <TextField
+              id="listing-postcode-input"
+              label="Postcode"
+              type="text"
+              onChange={handleAddressInfo}
+              name="postcode"
+              value={getters.listingAddress.postcode}
+              required
+            />
+          </FormControl>
+        </FormControl>
+      </FormControl>
       <br />
 
       <h2>Listing Thumbnail</h2>
@@ -233,6 +287,7 @@ function ListingForm({ getters, setters }) {
           }; 
         }}
         aria-label="thumbnail type"
+        size='small'
       >
         <ToggleButton value="image" aria-label="image thumbnail">
           <p>Image</p>
@@ -241,7 +296,6 @@ function ListingForm({ getters, setters }) {
           <p>Youtube</p>
         </ToggleButton>
       </ToggleButtonGroup>
-      <br />
       
       <Box
         sx={{
@@ -250,8 +304,19 @@ function ListingForm({ getters, setters }) {
         }}
       >
         {getters.thumbnailType === 'image' && 
-          <>
-            <p>
+          <Box
+            sx={{
+              borderRadius: 3,
+              bgcolor: '#f3f3f3ff',
+              padding: '15px',
+              marginTop: '10px'
+            }}
+          >
+            <Box
+              sx={{
+                marginBottom: '10px'
+              }}
+            >
               {thumbnailImageName === '' ? (
                 <>No image uploaded</>
               ) : (
@@ -262,7 +327,7 @@ function ListingForm({ getters, setters }) {
                   >✖</Button>
                 </>
               )}
-            </p>
+            </Box>
             <Button
               component="label"
               role={undefined}
@@ -277,10 +342,11 @@ function ListingForm({ getters, setters }) {
                 multiple
               />
             </Button>
-          </>
+          </Box>
         }
         {getters.thumbnailType === 'youtube' &&
           <>
+            <br />
             <TextField
               id="youtube-thumbnail-input"
               label="YouTube URL"
@@ -295,13 +361,12 @@ function ListingForm({ getters, setters }) {
 
       <h2>Listing Details</h2>
       <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Property Type</InputLabel>
+        <InputLabel id="demo-simple-select-label">Property Type *</InputLabel>
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
           name="propertyType"
           value={getters.listingMetadata.propertyType}
-          label="Property Type"
           onChange={handleMetadataInfo}
         >
           <MenuItem value={"apartment"}>Apartment</MenuItem>
@@ -335,6 +400,7 @@ function ListingForm({ getters, setters }) {
         value={getters.listingMetadata.bathroomCount}
         slotProps={{ input: { min: 0 } }}
         required
+        onWheel={(e) => e.target.blur()}
       />
       <br />
 
@@ -346,26 +412,30 @@ function ListingForm({ getters, setters }) {
         name="bedroomCount"
         value={getters.listingMetadata.bedroomCount}
         slotProps={{ input: { min: 0 } }}
+        required
+        onWheel={(e) => e.target.blur()}
       />
       <br />
 
-      <Box
-        sx={{
-          borderRadius: 3,
-          bgcolor: '#f3f3f3ff',
-          padding: '15px'
-        }}
-      >          
+      {getters.listingMetadata.bedroomCount > 0 &&
         <Box
           sx={{
-            margin: '0 10px 15px 10px'
+            borderRadius: 3,
+            bgcolor: '#f3f3f3ff',
+            padding: '15px'
           }}
-        >
-          {renderBedroomForm()}
+        >          
+          <Box
+            sx={{
+              margin: '0 10px 15px 10px'
+            }}
+          >
+            {renderBedroomForm()}
+          </Box>
         </Box>
-      </Box>
+      }
       <br />
-    </Form>
+    </>
   )
 }
 

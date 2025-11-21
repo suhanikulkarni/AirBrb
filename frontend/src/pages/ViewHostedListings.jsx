@@ -2,33 +2,35 @@ import axios from "axios";
 import { API_BASE_URL } from "../constants";
 import { useContext, useEffect, useState } from "react";
 import Popover from '@mui/material/Popover';
-import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import DatePicker from "react-multi-date-picker";
 import { Box } from '@mui/material';
-import { ErrorContext } from '../context';
+import { ErrorContext, ConfirmationContext } from '../context';
 import { useNavigate } from "react-router-dom";
+import Thumbnail from "./Thumbnail";
+import styles from '../styles/listingStyles.module.css';
 
 function ViewHostedListings({ owner, token }) {
-  const setShowErrorPopup = useContext(ErrorContext);
-
+  const setShowErrorPopup = useContext(ErrorContext); 
+  const setShowConfirmDeletePopup = useContext(ConfirmationContext);
+  const navigate = useNavigate();
+  
   const [listings, setListings] = useState("LOADING");
   const [bookingRequests, setBookingRequests] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [activeListing, setActiveListing] = useState(null);
   const [currentRange, setCurrentRange] = useState([]);
   const [allRanges, setAllRanges] = useState({});
-  const navigate = useNavigate();
 
   const deleteListing = async (listingId) => {
-
-    let isPublished = await getListingInfo(listingId);
+    let isPublished= await getListingInfo(listingId);
     isPublished = isPublished.published;
 
     console.log("isPublished", isPublished)
     if (isPublished) {
       try {
-        const res = await axios.put(
+        await axios.put(
           `${API_BASE_URL}listings/unpublish/${listingId}`,
           {},
           {
@@ -37,11 +39,11 @@ function ViewHostedListings({ owner, token }) {
             }
           }
         );
-      }
-      catch (error) {
+      } catch (error) {
         setShowErrorPopup(error.response.data.error);
       }
     }
+
     try {
       const res = await axios.delete(`${API_BASE_URL}listings/${listingId}`,
         {
@@ -50,30 +52,32 @@ function ViewHostedListings({ owner, token }) {
           }
         }
       );
+
       if (res) {
         setListings(prevListings => prevListings.filter(listing => listing.id !== listingId))
-      }
-    }
-    catch (error) {
+      } 
+    } catch (error) {
       setShowErrorPopup(error.response.data.error);
     }
   }
 
   const getAllListings = async () => {
     let hostedListings = [];
+
     try {
       const res = await axios.get(`${API_BASE_URL}listings`);
       if (res) {
         const listingData = res.data.listings;
+
         listingData.forEach(element => {
           if (element.owner === owner) {
             hostedListings.push(element.id)
           }
         });
+
         return hostedListings;
-      }
-    }
-    catch (error) {
+      } 
+    } catch (error) {
       setShowErrorPopup(error.response.data.error);
       return [];
     }
@@ -92,10 +96,12 @@ function ViewHostedListings({ owner, token }) {
     const getFetch = async () => {
       try {
         const listingIds = await getAllListings();
+        
         if (!listingIds || listingIds.length === 0) {
           setListings([]);
           return;
         }
+
         const detailedListings = await Promise.all(
           listingIds.map(async (id) => {
             const listing = await getListingInfo(id);
@@ -105,13 +111,15 @@ function ViewHostedListings({ owner, token }) {
             return null;
           })
         );
+        
         setListings(detailedListings.filter(Boolean));
-      }
-      catch (error) {
+        console.log('listings', detailedListings.filter(Boolean))
+      } catch (error) {
         setShowErrorPopup(error.response.data.error);
 
       }
-    }
+    } 
+
     getFetch();
   }, [owner]);
 
@@ -159,8 +167,7 @@ function ViewHostedListings({ owner, token }) {
         console.log("this si resdata", res);
         navigate('/')
       }
-    }
-    catch (error) {
+    } catch (error) {
       setShowErrorPopup(error.response.data.error);
 
     }
@@ -168,6 +175,7 @@ function ViewHostedListings({ owner, token }) {
   const addingRanges = () => {
     // TODO: only allow dates past today's date
     const listingId = activeListing?.id;
+
     if (!currentRange || currentRange.length !== 2) {
       alert("Please select a full date range (start and end date)");
       return;
@@ -254,6 +262,7 @@ function ViewHostedListings({ owner, token }) {
     setActiveListing(null);
     setCurrentRange([]);
   };
+  
   const open = Boolean(anchorEl);
 
   const getBookingRequests = async () => {
@@ -296,8 +305,7 @@ function ViewHostedListings({ owner, token }) {
         console.log(response);
         getBookingRequests();
       }
-    }
-    catch (error) {
+    } catch (error) {
       setShowErrorPopup(error.response?.data?.error || "Failed to Accept Bookng Request");
     }
   }
@@ -314,9 +322,7 @@ function ViewHostedListings({ owner, token }) {
       );
       console.log("Decline response:", response);
       getBookingRequests();
-    }
-
-    catch (error) {
+    } catch (error) {
       setShowErrorPopup(error.response?.data?.error || "Failed to Decline Bookng Request");
     }
   }
@@ -324,119 +330,247 @@ function ViewHostedListings({ owner, token }) {
   console.log("this is all the listings: ", listings)
   return (
     <div>
-      <h2>Hosted Listings</h2>
-      {listings === 'LOADING' ? (
+      {listings === "LOADING" ? (
         <p>Loading...</p>
       ) : (
         <>
+          <Box
+            sx={{
+              borderRadius: 3,
+              bgcolor: '#f3f3f3ff',
+              padding: '15px',
+              marginBottom: '15px'
+            }}
+          >
+            <h3>Booking Requests</h3>
+            {bookingRequests.length ? (
+              <p>No booking requests</p>
+            ) : (
+              bookingRequests.map((request) => (
+                <>
+                  {request.status === "pending" && (
+                    <div key={request.id}>
+                      <h3>Request Id: {request.id}</h3>
+                      <p>Start Date: {request.dateRange.start}</p>
+                      <p>End Date: {request.dateRange.end}</p>
+                      <Button
+                        onClick = {() => {acceptRequest(request.id)}}
+                      >Accept
+                      </Button>
+
+                      <Button
+                        onClick = {() => {declineRequest(request.id)}}
+                      >Decline
+                      </Button>
+
+                    </div>
+                  )}
+                </>
+              ))
+            )}
+          </Box>
+
           {listings.length === 0 ? (
             <p>No hosted listings found</p>
           ) : (
-            listings.map((listing) => (
-              <div key={listing.id} >
-                <h3>{listing.title}</h3>
-                <p>${listing.price}</p>
-                <p>Number of Bedrooms: {listing.metadata?.bedroomCount}</p>
-    
-                {listing?.availability.map(av => (
-                  <p>Avilable dates: {av.start} - {av.end}</p>
-                ))}
-    
-                <Button
-                  onClick={() => navigate(`/${listing.id}/viewBooking`)}
-                  variant="contained"
-                >Booking Information</Button>
-                <Button
-                  aria-describedby={listing.id}
-                  variant="contained"
-                  onClick={(e) => handleClick(e, listing)}
+            <Box
+              sx={{
+                border: '1px solid #e0e0e0ff',
+                padding: '15px',
+                borderRadius: '15px'
+              }}
+            >
+              {listings.map((listing) => (
+                <Box
+                  key={listing.id} 
+                  sx={{
+                    padding: '15px',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    borderBottom: '1px solid #e0e0e0ff',
+                  }}
                 >
-                  Manage Availability
-                </Button>
-                <Button
-                  name={listing.id}
-                  variant="contained"
-                  onClick={() => deleteListing(listing.id)}>
-    
-                  Delete Listing
-                </Button>
-              </div>
-            ))
+                  <Thumbnail thumbnail={listing.thumbnail} listingTitle={listing.title} />
+                  <Box
+                    key={listing.id} 
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      margin: '10px',
+                    }}
+                  >
+                    <h3 className={styles.title}>{listing.title}</h3>
+                    <p className={styles.price}>${listing.price} per night</p>
+                    <p className={styles.subInfo}>
+                      ★ 
+                      {listing.reviews.length > 0 ? (
+                        // check if reduce works
+                        <> {listing.reviews.reduce((a, b) => a + b.rating, 0) / listing.reviews.length}</>
+                      ) : (
+                        <>0</>
+                      )}
+                      {` (${listing.reviews.length})`}
+                    </p>
+                    <p className={styles.subInfo}>Property Type: {listing.metadata?.bedroomCount}</p>
+                    <p className={styles.subInfo}>
+                      Number of Beds: 
+                      {listing.metadata.bedrooms.length > 0 ? (
+                        <> {listing.metadata?.bedrooms.reduce((a, b) => a + b.bedCount, 0)}</>
+                      ) : (
+                        <> 0</>
+                      )}
+                    </p>
+                    <p className={styles.subInfo}>Number of Bathrooms: {listing.metadata?.bathroomCount}</p>
+                    
+                    {listing?.availability.map(av => (
+                      <p>Available dates: {av.start} - {av.end}</p>
+                    ))}
+
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        marginTop: '10px'
+                      }}
+                    >
+                      <Button
+                        onClick={() => navigate(`/${listing.id}/viewBooking`)}
+                        variant="outlined"
+                        sx={{
+                          marginRight: '5px'
+                        }}
+                      >Booking Information</Button>
+                      <Button 
+                        aria-describedby={listing.id} 
+                        variant="outlined" 
+                        onClick={(e) => handleClick(e, listing)}
+                        sx={{
+                          marginRight: '5px'
+                        }}
+                      >
+                        Manage Availability
+                      </Button>
+                      <Button
+                        variant="outlined" 
+                        onClick={() => navigate(`edit-listing/${listing.id}`)}
+                        sx={{
+                          marginRight: '5px'
+                        }}
+                      >
+                        Edit Listing
+                      </Button>
+                      <Button
+                        name={listing.id} 
+                        variant="contained" 
+                        onClick={() => setShowConfirmDeletePopup({
+                          'function': () => deleteListing(listing.id),
+                          'value': true
+                        })}
+                        color='error'
+                      >
+                        Delete Listing
+                      </Button>
+                    </Box>
+                  </Box>
+                </Box>
+              ))}
+            </Box>
           )}
+
+          <Popover
+            id={activeListing?.id}
+            open={open}
+            anchorEl={anchorEl}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+          >
+            {activeListing && (
+              <Box
+                sx={{
+                  padding: '10px',
+                  fontFamily: 'Calibri, sans-serif',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minWidth: '350px',
+                  height: '430px',
+                }}
+              >
+                <h3>Set Availability for: {activeListing.title}</h3>
+
+                <DatePicker 
+                  range 
+                  value={currentRange} 
+                  onChange={setCurrentRange}
+                  render={
+                    <TextField
+                      fullWidth
+                      size="small"
+                      placeholder="Select availability range"
+                      sx={{
+                        marginBottom: '5px',
+                      }}
+                    />
+                  }
+                  calendarPosition={'bottom-center'}
+                  fixMainPosition={true}
+                />
+                
+                <Button
+                  variant="outlined"
+                  onClick={addingRanges}
+                  sx={{
+                    marginBottom: '10px'
+                  }}
+                >
+                  Add Availability
+                </Button>
+
+                <div>
+                  <b>Current Availability:</b>
+
+                  {(allRanges[activeListing.id] || []).length === 0 ? (
+                    <p>No ranges added yet.</p>
+                  ) : (
+                    <div>
+                      {(allRanges[activeListing.id] || []).map((range, index) => (
+                        <>
+                          <p key={index} >
+                            {range[0].format("DD/MM/YYYY")} to {range[1].format("DD/MM/YYYY")}
+                          </p>
+                          <Button
+                            onClick={() => {
+                              const newRanges = { ...allRanges };
+                              newRanges[activeListing.id] = [...allRanges[activeListing.id]];
+                              newRanges[activeListing.id].splice(index, 1);
+                              setAllRanges(newRanges);
+                            }
+                            }> Delete Date</Button>
+                        </>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={publishDates}
+                >
+                  Publish Listing
+                </Button>
+              </Box>
+            )}
+          </Popover>
         </>
       )}
-      <Popover
-        id={activeListing?.id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-      >
-        {activeListing && (
-          <Box>
-            <Typography variant="h6" gutterBottom>
-              Set Availability for: {activeListing.title}
-            </Typography>
-
-            <DatePicker
-              range
-              value={currentRange}
-              onChange={setCurrentRange}
-              placeholder="Select availability date range"
-            />
-
-            <Button
-              variant="outlined"
-              onClick={addingRanges}
-              fullWidth
-
-            >
-              Add Availability
-            </Button>
-
-                <div >
-                  <strong>Current Availability:</strong>
-
-              {(allRanges[activeListing.id] || []).length === 0 ? (
-                <p>No ranges added yet.</p>
-              ) : (
-                <div>
-                  {(allRanges[activeListing.id] || []).map((range, index) => (
-                    <>
-                      <p key={index} >
-                        {range[0].format("DD/MM/YYYY")} to {range[1].format("DD/MM/YYYY")}
-                      </p>
-                      <Button
-                        onClick={() => {
-                          const newRanges = { ...allRanges };
-                          newRanges[activeListing.id] = [...allRanges[activeListing.id]];
-                          newRanges[activeListing.id].splice(index, 1);
-                          setAllRanges(newRanges);
-                        }
-                        }> Delete Date</Button>
-                    </>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <Button
-              variant="contained"
-              fullWidth
-              onClick={publishDates}
-            >
-              Publish Listing
-            </Button>
-          </Box>
-        )}
-      </Popover>
     </div>
   );
 }
