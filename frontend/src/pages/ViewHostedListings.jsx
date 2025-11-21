@@ -164,13 +164,13 @@ function ViewHostedListings({ owner, token }) {
       );
 
       if (res) {
-        console.log("this si resdata",res);
+        console.log("this si resdata", res);
         navigate('/')
       }
     } catch (error) {
       setShowErrorPopup(error.response.data.error);
 
-    } 
+    }
   }
   const addingRanges = () => {
     // TODO: only allow dates past today's date
@@ -178,6 +178,68 @@ function ViewHostedListings({ owner, token }) {
 
     if (!currentRange || currentRange.length !== 2) {
       alert("Please select a full date range (start and end date)");
+      return;
+    }
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const start = currentRange[0].toDate();
+    start.setHours(0, 0, 0, 0);
+    const end = currentRange[1].toDate();
+    end.setHours(0, 0, 0, 0);
+
+    if (start <= today) {
+      return;
+    }
+
+    const existingRanges = allRanges[listingId] || [];
+    let merged = false;
+
+    const updatedRanges = existingRanges.map(range => {
+      const existingStart = range[0].toDate();
+      existingStart.setHours(0, 0, 0, 0);
+
+      const existingEnd = range[1].toDate();
+      existingEnd.setHours(0, 0, 0, 0);
+
+      if (start >= existingStart && start <= existingEnd && end > existingEnd) {
+        merged = true;
+        return [range[0], currentRange[1]];
+      }
+
+      return range;
+    });
+
+    if (merged) {
+
+      setAllRanges(prev => ({
+        ...prev,
+        [listingId]: updatedRanges
+      }));
+      setCurrentRange([]);
+      console.log("Range merged - extended existing range");
+      return;
+    }
+
+    const hasInvalidOverlap = existingRanges.some(range => {
+      const existingStart = range[0].toDate();
+      existingStart.setHours(0, 0, 0, 0);
+      const existingEnd = range[1].toDate();
+      existingEnd.setHours(0, 0, 0, 0);
+
+      if (start < existingStart && end >= existingStart) {
+        return true;
+      }
+      if (start <= existingStart && end >= existingEnd) {
+        return true;
+      }
+      if (start > existingStart && start <= existingEnd && end <= existingEnd) {
+        return true;
+      }
+      return false;
+    });
+
+    if (hasInvalidOverlap) {
+      setShowErrorPopup("This date range has an invalid overlap with existing availability");
       return;
     }
 
@@ -192,7 +254,6 @@ function ViewHostedListings({ owner, token }) {
       console.log("Updated allRanges:", updatedRanges);
       return updatedRanges;
     });
-    
     setCurrentRange([]);
   };
 
@@ -210,7 +271,7 @@ function ViewHostedListings({ owner, token }) {
       const res = await axios.get(`${API_BASE_URL}bookings`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       if (res) {
         const requestData = res.data.bookings;
         const listingIds = listings.map(listing => String(listing.id));
@@ -266,6 +327,7 @@ function ViewHostedListings({ owner, token }) {
     }
   }
 
+  console.log("this is all the listings: ", listings)
   return (
     <div>
       {listings === "LOADING" ? (
@@ -344,7 +406,7 @@ function ViewHostedListings({ owner, token }) {
                       ★ 
                       {listing.reviews.length > 0 ? (
                         // check if reduce works
-                        <>{listing.reviews.reduce((a, b) => a + b.rating, 0) / listing.reviews.length}</>
+                        <> {listing.reviews.reduce((a, b) => a + b.rating, 0) / listing.reviews.length}</>
                       ) : (
                         <>0</>
                       )}
@@ -360,6 +422,11 @@ function ViewHostedListings({ owner, token }) {
                       )}
                     </p>
                     <p className={styles.subInfo}>Number of Bathrooms: {listing.metadata?.bathroomCount}</p>
+                    
+                    {listing?.availability.map(av => (
+                      <p>Available dates: {av.start} - {av.end}</p>
+                    ))}
+
                     <Box
                       sx={{
                         display: 'flex',
@@ -367,6 +434,13 @@ function ViewHostedListings({ owner, token }) {
                         marginTop: '10px'
                       }}
                     >
+                      <Button
+                        onClick={() => navigate(`/${listing.id}/viewBooking`)}
+                        variant="outlined"
+                        sx={{
+                          marginRight: '5px'
+                        }}
+                      >Booking Information</Button>
                       <Button 
                         aria-describedby={listing.id} 
                         variant="outlined" 
@@ -459,17 +533,27 @@ function ViewHostedListings({ owner, token }) {
                   Add Availability
                 </Button>
 
-                <div >
-                  <strong>Current Availability:</strong>
+                <div>
+                  <b>Current Availability:</b>
 
                   {(allRanges[activeListing.id] || []).length === 0 ? (
                     <p>No ranges added yet.</p>
                   ) : (
                     <div>
                       {(allRanges[activeListing.id] || []).map((range, index) => (
-                        <p key={index} >
-                          {range[0].format("DD/MM/YYYY")} to {range[1].format("DD/MM/YYYY")}
-                        </p>
+                        <>
+                          <p key={index} >
+                            {range[0].format("DD/MM/YYYY")} to {range[1].format("DD/MM/YYYY")}
+                          </p>
+                          <Button
+                            onClick={() => {
+                              const newRanges = { ...allRanges };
+                              newRanges[activeListing.id] = [...allRanges[activeListing.id]];
+                              newRanges[activeListing.id].splice(index, 1);
+                              setAllRanges(newRanges);
+                            }
+                            }> Delete Date</Button>
+                        </>
                       ))}
                     </div>
                   )}
