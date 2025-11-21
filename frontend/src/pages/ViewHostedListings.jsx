@@ -424,21 +424,23 @@ function ViewHostedListings({ owner, token }) {
                     <p className={styles.subInfo}>Number of Bathrooms: {listing.metadata?.bathroomCount}</p>
                     
                     {listing?.availability.map(av => (
-                      <p>Available dates: {av.start} - {av.end}</p>
+                      <p className={styles.subInfo}>Available dates: {av.start} - {av.end}</p>
                     ))}
 
                     <Box
                       sx={{
                         display: 'flex',
                         flexDirection: 'row',
-                        marginTop: '10px'
+                        marginTop: '10px',
+                        flexWrap: 'wrap'
                       }}
                     >
                       <Button
                         onClick={() => navigate(`/${listing.id}/viewBooking`)}
                         variant="outlined"
                         sx={{
-                          marginRight: '5px'
+                          margin: '0 5px 5px 0',
+                          flexGrow: '1'
                         }}
                       >Booking Information</Button>
                       <Button 
@@ -446,7 +448,8 @@ function ViewHostedListings({ owner, token }) {
                         variant="outlined" 
                         onClick={(e) => handleClick(e, listing)}
                         sx={{
-                          marginRight: '5px'
+                          margin: '0 5px 5px 0',
+                          flexGrow: '1'
                         }}
                       >
                         Manage Availability
@@ -455,7 +458,8 @@ function ViewHostedListings({ owner, token }) {
                         variant="outlined" 
                         onClick={() => navigate(`edit-listing/${listing.id}`)}
                         sx={{
-                          marginRight: '5px'
+                          margin: '0 5px 5px 0',
+                          flexGrow: '1'
                         }}
                       >
                         Edit Listing
@@ -467,6 +471,10 @@ function ViewHostedListings({ owner, token }) {
                           'function': () => deleteListing(listing.id),
                           'value': true
                         })}
+                        sx={{
+                          margin: '0 5px 5px 0',
+                          flexGrow: '1'
+                        }}
                         color='error'
                       >
                         Delete Listing
@@ -534,7 +542,7 @@ function ViewHostedListings({ owner, token }) {
                 </Button>
 
                 <div>
-                  <b>Current Availability:</b>
+                  <b>Added Availability:</b>
 
                   {(allRanges[activeListing.id] || []).length === 0 ? (
                     <p>No ranges added yet.</p>
