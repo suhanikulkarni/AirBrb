@@ -405,7 +405,7 @@ function ViewHostedListings({ owner, token }) {
                     <p className={styles.subInfo}>
                       ★ 
                       {listing.reviews.length > 0 ? (
-                        // check if reduce works
+                        // TODO: check if reduce works
                         <> {listing.reviews.reduce((a, b) => a + b.rating, 0) / listing.reviews.length}</>
                       ) : (
                         <>0</>
@@ -416,7 +416,7 @@ function ViewHostedListings({ owner, token }) {
                     <p className={styles.subInfo}>
                       Number of Beds: 
                       {listing.metadata.bedrooms.length > 0 ? (
-                        <> {listing.metadata?.bedrooms.reduce((a, b) => a + b.bedCount, 0)}</>
+                        <> {listing.metadata?.bedrooms.reduce((a, b) => a + Number(b.bedCount), 0)}</>
                       ) : (
                         <> 0</>
                       )}
