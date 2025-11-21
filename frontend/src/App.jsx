@@ -69,29 +69,29 @@ function App() {
                     onClick={() => logoutUser()}
                   >Logout</Button>
                 </NavRight>
-            </>
-          ) : (
-            <>
-              <NavLeft>
-                <Button
-                  onClick={() => navigate('/viewListings')}
-                >Listing</Button>
-              </NavLeft>
-              {" "}
-              <NavRight>
-                <Button
-                  variant="contained"
-                  onClick={() => navigate('/login')}
-                >Login</Button>
-              </NavRight>
-            </>
-          )}
-        </NavBar>
-        <ErrorPopup showErrorPopup={showErrorPopup} closeErrorPopup={() => setShowErrorPopup(false)} />
-        <ConfirmDeletePopup
-          showConfirmDeletePopup={showConfirmDeletePopup}
-          closeConfirmDeletePopup={() => setShowConfirmDeletePopup(false)}
-        />
+              </>
+            ) : (
+              <>
+                <NavLeft>
+                  <Button
+                    onClick={() => navigate('/viewListings')}
+                  >Listing</Button>
+                </NavLeft>
+                {" "}
+                <NavRight>
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate('/login')}
+                  >Login</Button>
+                </NavRight>
+              </>
+            )}
+          </NavBar>
+          <ErrorPopup showErrorPopup={showErrorPopup} closeErrorPopup={() => setShowErrorPopup(false)} />
+          <ConfirmDeletePopup
+            showConfirmDeletePopup={showConfirmDeletePopup}
+            closeConfirmDeletePopup={() => setShowConfirmDeletePopup(false)}
+          />
           <Routes>
             {token !== 'LOADING' && (
               <>
