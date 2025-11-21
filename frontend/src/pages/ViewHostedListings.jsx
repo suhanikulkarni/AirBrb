@@ -325,39 +325,45 @@ function ViewHostedListings({ owner, token }) {
   return (
     <div>
       <h2>Hosted Listings</h2>
-      {listings.length === 0 ? (
-        <p>No hosted listings found</p>
+      {listings === 'LOADING' ? (
+        <p>Loading...</p>
       ) : (
-        listings.map((listing) => (
-          <div key={listing.id} >
-            <h3>{listing.title}</h3>
-            <p>${listing.price}</p>
-            <p>Number of Bedrooms: {listing.metadata?.bedroomCount}</p>
-
-            {listing?.availability.map(av => (
-              <p>Avilable dates: {av.start} - {av.end}</p>
-            ))}
-
-            <Button
-              onClick={() => navigate(`/${listing.id}/viewBooking`)}
-              variant="contained"
-            >Booking Information</Button>
-            <Button
-              aria-describedby={listing.id}
-              variant="contained"
-              onClick={(e) => handleClick(e, listing)}
-            >
-              Manage Availability
-            </Button>
-            <Button
-              name={listing.id}
-              variant="contained"
-              onClick={() => deleteListing(listing.id)}>
-
-              Delete Listing
-            </Button>
-          </div>
-        ))
+        <>
+          {listings.length === 0 ? (
+            <p>No hosted listings found</p>
+          ) : (
+            listings.map((listing) => (
+              <div key={listing.id} >
+                <h3>{listing.title}</h3>
+                <p>${listing.price}</p>
+                <p>Number of Bedrooms: {listing.metadata?.bedroomCount}</p>
+    
+                {listing?.availability.map(av => (
+                  <p>Avilable dates: {av.start} - {av.end}</p>
+                ))}
+    
+                <Button
+                  onClick={() => navigate(`/${listing.id}/viewBooking`)}
+                  variant="contained"
+                >Booking Information</Button>
+                <Button
+                  aria-describedby={listing.id}
+                  variant="contained"
+                  onClick={(e) => handleClick(e, listing)}
+                >
+                  Manage Availability
+                </Button>
+                <Button
+                  name={listing.id}
+                  variant="contained"
+                  onClick={() => deleteListing(listing.id)}>
+    
+                  Delete Listing
+                </Button>
+              </div>
+            ))
+          )}
+        </>
       )}
       <Popover
         id={activeListing?.id}
