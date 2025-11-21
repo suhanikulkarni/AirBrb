@@ -10,7 +10,7 @@ import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Button from '@mui/material/Button';
-import { Box, Modal, Rating } from '@mui/material';
+import { Box, Modal, Rating, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -39,7 +39,7 @@ function ViewListing ( {token, owner}) {
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState("");
   const [acceptedBookings, setAcceptedBookings] = useState([]);
-
+  const [allBookings, setAllBookings] = useState([])
   const [open, setOpen] = useState(false);
   const [selectedListingId, setSelectedListingId] = useState(null);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
@@ -96,13 +96,18 @@ function ViewListing ( {token, owner}) {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (response.data?.bookings) {
-        const accepted = response.data.bookings.filter(
-          booking => booking.status === 'accepted' && booking.owner === owner
+        const userBookings = response.data.bookings.filter(
+          booking => booking.owner === owner
+        );
+        setAllBookings(userBookings);
+        const accepted = userBookings.filter(
+          booking => booking.status === 'accepted'
         );
         setAcceptedBookings(accepted);
       }
+      
     } catch (error) {
       setShowErrorPopup(error.response.data.error);
 
@@ -422,7 +427,11 @@ function ViewListing ( {token, owner}) {
           ) : (
             <div style={styles.grid} >
               {orderList().map((listing, index) => {
-                const booking = acceptedBookings.find(
+                const acceptedBooking = acceptedBookings.find(
+                  b => Number(b.listingId) === Number(listing.id)
+                );
+                
+                const userBooking = allBookings.find(
                   b => Number(b.listingId) === Number(listing.id)
                 );
                 
@@ -443,8 +452,28 @@ function ViewListing ( {token, owner}) {
                       <p style={styles.address}>{`${listing.reviews.length} reviews`}</p>
                       <p style={styles.price}>${listing.price}</p>
                     </div>
-                    {booking && (
-                      <Button variant="contained"onClick={() => handleOpen(listing.id, booking.id)}>
+                    
+                    {userBooking && (
+                      <Typography 
+                        variant="body1" 
+                        style={{ 
+                          marginTop: '8px', 
+                          fontWeight: 'bold',
+                          color: userBooking.status === 'accepted' ? 'green' : 
+                                 userBooking.status === 'pending' ? 'orange':
+                                 userBooking.status === 'declined' ? 'red' : 'pink'
+                        }}
+                      >
+                        Booking Status: {userBooking.status.charAt(0).toUpperCase() + userBooking.status.slice(1)}
+                      </Typography>
+                    )}
+                    
+                    {acceptedBooking && (
+                      <Button 
+                        variant="contained"
+                        onClick={() => handleOpen(listing.id, acceptedBooking.id)}
+                        style={{ marginTop: '8px' }}
+                      >
                         Leave a Review
                       </Button>
                     )}
