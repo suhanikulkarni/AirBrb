@@ -18,7 +18,7 @@ import Select from '@mui/material/Select';
 
 import DatePicker from "react-multi-date-picker";
 
-function ViewListing ( {token, owner}) {
+function ViewListing({ token, owner }) {
   const navigate = useNavigate();
   const setShowErrorPopup = useContext(ErrorContext);
 
@@ -61,6 +61,7 @@ function ViewListing ( {token, owner}) {
   };
 
 
+
   const uploadReview = async () => {
     console.log("Uploading review:", reviewComment, reviewRating);
     const review = {
@@ -70,8 +71,8 @@ function ViewListing ( {token, owner}) {
     const body = { review }
     try {
       const response = await axios.put(
-        `${API_BASE_URL}listings/${selectedListingId}/review/${selectedBookingId}`, 
-        body, 
+        `${API_BASE_URL}listings/${selectedListingId}/review/${selectedBookingId}`,
+        body,
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -89,7 +90,7 @@ function ViewListing ( {token, owner}) {
 
   const fetchAcceptedBookings = async () => {
     if (!token) return;
-    
+
     try {
       const response = await axios.get(`${API_BASE_URL}bookings`, {
         headers: {
@@ -107,7 +108,7 @@ function ViewListing ( {token, owner}) {
         );
         setAcceptedBookings(accepted);
       }
-      
+
     } catch (error) {
       setShowErrorPopup(error.response.data.error);
 
@@ -127,16 +128,40 @@ function ViewListing ( {token, owner}) {
             fetchedList.push({ ...listing, ...listingInfo });
           }
         }
-        
-        // TODO: sort list based on booked listing
+
         setList(fetchedList);
         setFilteredList([...fetchedList]);
-      }      
+      }
     }
 
     fetchListings();
-    fetchAcceptedBookings();
-  }, [reviewComment, reviewRating]);
+    if (token) {
+      fetchAcceptedBookings();
+    } else {
+      setAllBookings([]);
+      setAcceptedBookings([]);
+    }
+  }, [reviewComment, reviewRating, token]);
+
+  // Sort listings when bookings are loaded
+  useEffect(() => {
+    if (list.length > 0) {
+      const sortedList = [...list].sort((a, b) => {
+        const aHasBooking = allBookings.some(booking => Number(booking.listingId) === Number(a.id));
+        const bHasBooking = allBookings.some(booking => Number(booking.listingId) === Number(b.id));
+
+        console.log(`Listing ${a.id} (${a.title}): has booking = ${aHasBooking}`);
+        console.log(`Listing ${b.id} (${b.title}): has booking = ${bHasBooking}`);
+
+        if (aHasBooking && !bHasBooking) return -1;
+        if (!aHasBooking && bHasBooking) return 1;
+
+        return a.title.localeCompare(b.title);
+      });
+
+      setFilteredList(sortedList);
+    }
+  }, [allBookings, list]);
 
   const getListings = async () => {
     try {
@@ -157,7 +182,7 @@ function ViewListing ( {token, owner}) {
   }
 
   const handleFilter = (e) => {
-    const {name, value} = e.target;
+    const { name, value } = e.target;
 
     setFilter((prevData) => ({
       ...prevData,
@@ -193,7 +218,7 @@ function ViewListing ( {token, owner}) {
     if (filter.reviewFilter !== '') {
       listing = listing.filter(l => {
         if (!l.reviews.length) return false;
-        
+
         const average = l.reviews.reduce((a, b) => a + b.rating) / l.reviews.length;
         if (average >= filter.reviewFilter) return true;
 
@@ -208,10 +233,10 @@ function ViewListing ( {token, owner}) {
 
       const filterStartEpoch = new Date(filterStart).getTime() / 1000;
       const filterEndEpoch = new Date(filterEnd).getTime() / 1000;
-      
+
       const listingStartParts = listingAvailability.start.split('-');
       const listingEndParts = listingAvailability.end.split('-');
-      
+
       const listingStartEpoch = new Date(listingStartParts[2], listingStartParts[1] - 1, listingStartParts[0]).getTime() / 1000;
       const listingEndEpoch = new Date(listingEndParts[2], listingEndParts[1] - 1, listingEndParts[0]).getTime() / 1000;
 
@@ -219,11 +244,6 @@ function ViewListing ( {token, owner}) {
       if (filterEndEpoch > listingEndEpoch) return false;
       return true;
     });
-
-    // sort listing alphabetically
-    listing.sort((a, b) => a.title.localeCompare(b.title));
-
-    // TODO: sort based on individual filter
 
     setFilteredList(listing);
   };
@@ -252,9 +272,9 @@ function ViewListing ( {token, owner}) {
 
   return (
     <PageBody>
-      <Modal 
-        open={open} 
-        onClose={handleClose} 
+      <Modal
+        open={open}
+        onClose={handleClose}
         style={{
           position: "absolute",
           border: "2px solid #000",
@@ -276,8 +296,8 @@ function ViewListing ( {token, owner}) {
             value={reviewComment}
             onChange={(e) => setReviewComment(e.target.value)}
           />
-          <Button 
-            onClick={uploadReview} 
+          <Button
+            onClick={uploadReview}
             variant='contained'
           >
             Submit Review
@@ -382,9 +402,9 @@ function ViewListing ( {token, owner}) {
             <br />
 
             <h2>Date Filter</h2>
-            <DatePicker 
-              range 
-              value={filter.dateFilter} 
+            <DatePicker
+              range
+              value={filter.dateFilter}
               onChange={(e, dateRange) => {
                 setFilter((prevData) => ({
                   ...prevData,
@@ -410,7 +430,7 @@ function ViewListing ( {token, owner}) {
             value={sortOrder}
             exclusive
             onChange={(e, newSortOrder) => {
-              if (newSortOrder !== null) setSortOrder(newSortOrder); 
+              if (newSortOrder !== null) setSortOrder(newSortOrder);
             }}
             aria-label="list order"
           >
@@ -430,14 +450,14 @@ function ViewListing ( {token, owner}) {
                 const acceptedBooking = acceptedBookings.find(
                   b => Number(b.listingId) === Number(listing.id)
                 );
-                
+
                 const userBooking = allBookings.find(
                   b => Number(b.listingId) === Number(listing.id)
                 );
-                
+
                 return (
                   <div key={index} style={styles.card}>
-                    <div  onClick={() => navigate(`/viewListings/${listing.id}`)}>
+                    <div onClick={() => navigate(`/viewListings/${listing.id}`)}>
                       <img src={listing.thumbnail} alt={listing.title} style={styles.thumbnail} />
                       <h4 style={styles.address}>
                         {`
@@ -448,28 +468,28 @@ function ViewListing ( {token, owner}) {
                       </h4>
                       <h3 style={styles.title}>{listing.title}</h3>
                       <p style={styles.address}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
-                      <p style={styles.address}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>                    
+                      <p style={styles.address}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>
                       <p style={styles.address}>{`${listing.reviews.length} reviews`}</p>
                       <p style={styles.price}>${listing.price}</p>
                     </div>
-                    
+
                     {userBooking && (
-                      <Typography 
-                        variant="body1" 
-                        style={{ 
-                          marginTop: '8px', 
+                      <Typography
+                        variant="body1"
+                        style={{
+                          marginTop: '8px',
                           fontWeight: 'bold',
-                          color: userBooking.status === 'accepted' ? 'green' : 
-                                 userBooking.status === 'pending' ? 'orange':
-                                 userBooking.status === 'declined' ? 'red' : 'pink'
+                          color: userBooking.status === 'accepted' ? 'green' :
+                            userBooking.status === 'pending' ? 'orange' :
+                              userBooking.status === 'declined' ? 'red' : 'pink'
                         }}
                       >
                         Booking Status: {userBooking.status.charAt(0).toUpperCase() + userBooking.status.slice(1)}
                       </Typography>
                     )}
-                    
+
                     {acceptedBooking && (
-                      <Button 
+                      <Button
                         variant="contained"
                         onClick={() => handleOpen(listing.id, acceptedBooking.id)}
                         style={{ marginTop: '8px' }}
