@@ -26,7 +26,6 @@ function ViweBookingRequest({ token, owner }) {
       profit1 += booking.totalPrice;
     })
 
-    console.log(profit1)
     setProfit(profit1);
   }, [bookingRequests]);
 
@@ -40,18 +39,13 @@ function ViweBookingRequest({ token, owner }) {
         const end1 = dayjs(booking.dateRange.end, 'DD-MM-YYYY');
 
         if (!start1.isValid() || !end1.isValid()) {
-          console.warn('Invalid date range:', booking.dateRange);
           return;
         }
-
-        console.log('Formatted start1:', start1.format('YYYY-MM-DD'));
-        console.log('Formatted end1:', end1.format('YYYY-MM-DD'));
 
         const nights = end1.diff(start1, 'day');
         daysBooked += nights;
       });
 
-    console.log('Total days booked:', daysBooked);
     setTotalDaysBooked(daysBooked);
   }, [listings, bookingRequests]);
 
@@ -106,7 +100,6 @@ function ViweBookingRequest({ token, owner }) {
         );
         setListings(detailedListings.filter(Boolean));
       } catch (error) {
-        console.log('ngregnjkgnrek')
         setShowErrorPopup(error.response.data.error);
       }
     };
@@ -136,7 +129,6 @@ function ViweBookingRequest({ token, owner }) {
           return match;
         });
 
-        console.log('Filtered Booking Requests:', bookingRequests);
         setBookingRequests(bookingRequests);
       }
     } catch (error) {
@@ -145,9 +137,7 @@ function ViweBookingRequest({ token, owner }) {
   };
 
   const acceptRequest = async (bookingId) => {
-    console.log('accepted');
     try {
-      console.log('accepted!!!!!!!!!');
       const response = await axios.put(
         `${API_BASE_URL}bookings/accept/${bookingId}`, {},
         {
@@ -161,7 +151,6 @@ function ViweBookingRequest({ token, owner }) {
   }
 
   const declineRequest = async (bookingId) => {
-    console.log('decline');
     try {
       const response = await axios.put(
         `${API_BASE_URL}bookings/decline/${bookingId}`, {},
@@ -169,7 +158,7 @@ function ViweBookingRequest({ token, owner }) {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      console.log('Decline response:', response);
+      
       getBookingRequests();
     } catch (error) {
       setShowErrorPopup(error.response?.data?.error || 'Failed to Decline Bookng Request');

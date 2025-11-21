@@ -68,7 +68,6 @@ function ListingForm({ getters, setters }) {
 
   const handleMetadataInfo = (e) => {
     const {name, value} = e.target;
-    console.log('name and vakue', name, value)
 
     setters.setListingMetadata((prevData) => ({
       ...prevData,
@@ -389,7 +388,6 @@ function ListingForm({ getters, setters }) {
       />
       <br />
 
-      {/* TODO: prevent no. from decreasing beyond 0 */}
       <TextField
         id='bathroom-count-input'
         label='Number of Bathrooms'

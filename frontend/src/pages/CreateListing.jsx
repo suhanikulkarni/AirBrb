@@ -69,18 +69,6 @@ function CreateListing({ token }) {
     }
   }
 
-  useEffect(() => {
-    console.log('Updated address:', listingAddress);
-  }, [listingAddress]);
-
-  useEffect(() => {
-    console.log('Updated metadata:', listingMetadata);
-  }, [listingMetadata]);
-  
-  useEffect(() => {
-    console.log('Updated all info:', listingInfo);
-  }, [listingInfo]);
-
   const handleSubmission = async () => {
     if (!listingInfo.title || !listingInfo.price) {
       return setShowErrorPopup('Please fill out the whole form');
@@ -122,8 +110,6 @@ function CreateListing({ token }) {
       price: parseInt(listingInfo.price, 10),
       thumbnail: thumbnail
     };
-
-    console.log('Listing data: ',body)
 
     postListing(body, token);
   }

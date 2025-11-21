@@ -24,7 +24,6 @@ function ListingInfo({ token }) {
   };
 
   const handleOpen = () => {
-    console.log('Opening')
     setOpen(true);
   };
 
@@ -44,7 +43,6 @@ function ListingInfo({ token }) {
   const filterReviews = () => {
     if (listingDetails) {
       const value = listingDetails.reviews.filter((review) => review.rating === reviewValue);
-      console.log('plk',value)
       setSpecificRatingReviews(value);
     }
   };
@@ -53,9 +51,7 @@ function ListingInfo({ token }) {
     try {
       const response = await axios.get(
         `${API_BASE_URL}listings/${listingId}`);
-      console.log(response)
       if (response) {
-        console.log('this is the response',response.data.listing)
         return response.data.listing;
       }
     } catch (error) {
