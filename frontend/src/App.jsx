@@ -74,7 +74,7 @@ function App() {
               <>
                 <NavLeft>
                   <Button
-                    onClick={() => navigate('/viewListings')}
+                    onClick={() => navigate('/')}
                   >Listing</Button>
                 </NavLeft>
                 {' '}
