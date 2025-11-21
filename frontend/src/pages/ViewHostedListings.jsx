@@ -506,7 +506,7 @@ function ViewHostedListings({ owner, token }) {
                       }}
                     />
                   }
-                  calendarPosition={'bottom-center'}
+                  calendarPosition={'bottom-left'}
                   fixMainPosition={true}
                 />
                 
