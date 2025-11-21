@@ -2,11 +2,12 @@ import { useContext, useEffect, useState } from 'react';
 
 import { Box, Button, InputLabel } from '@mui/material';
 import DatePicker from 'react-multi-date-picker';
-
+import TextField from '@mui/material/TextField';
 import { ErrorContext } from '../context';
 import axios from 'axios';
 import { API_BASE_URL } from '../constants';
 import { useNavigate } from 'react-router-dom';
+import styles from '../styles/listingStyles.module.css';
 
 function UsersBookingForm({price, listingId, token}) {
   const [bookingDates, setBookingDates] = useState();
@@ -66,13 +67,21 @@ function UsersBookingForm({price, listingId, token}) {
 
   return (
     <Box>
-      <h4>Booking Information</h4>
+      <h3 className={styles.title}>Booking</h3>
       <InputLabel>Select Booking Dates</InputLabel>
       <DatePicker 
         range 
         value={bookingDates} 
         onChange={setBookingDates} 
         placeholder="Select booking dates"
+        render={
+          <TextField
+            sx={{
+              width: '400px'
+            }}
+            placeholder='Select from available dates'
+          />
+        }
       />
 
       {bookingDates && bookingDates.length === 2 &&(
