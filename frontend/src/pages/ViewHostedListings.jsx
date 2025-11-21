@@ -177,6 +177,16 @@ function ViewHostedListings({ owner, token }) {
       alert("Please select a full date range (start and end date)");
       return;
     }
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const start = currentRange[0].toDate();
+    start.setHours(0, 0, 0, 0);
+
+    if (start <= today) {
+      setShowErrorPopup("Please enter a date in the future");
+      return;
+    }
+
     setAllRanges(prev => {
       const updatedRanges = {
         ...prev,
@@ -223,6 +233,7 @@ function ViewHostedListings({ owner, token }) {
       setShowErrorPopup(error.response?.data?.error || "Requests Failed To Show.");
     }
   }
+  console.log("this is all the listings: ", listings)
   return (
     <div>
       <h2>Hosted Listings</h2>
@@ -234,6 +245,11 @@ function ViewHostedListings({ owner, token }) {
             <h3>{listing.title}</h3>
             <p>${listing.price}</p>
             <p>Number of Bedrooms: {listing.metadata?.bedroomCount}</p>
+
+            {listing?.availability.map(av => (
+              <p>Avilable dates: {av.start} - {av.end}</p>
+            ))}
+
             <Button
               onClick={() => navigate(`/${listing.id}/viewBooking`)}
               variant="contained"
@@ -299,9 +315,19 @@ function ViewHostedListings({ owner, token }) {
               ) : (
                 <div>
                   {(allRanges[activeListing.id] || []).map((range, index) => (
-                    <p key={index} >
-                      {range[0].format("DD/MM/YYYY")} to {range[1].format("DD/MM/YYYY")}
-                    </p>
+                    <>
+                      <p key={index} >
+                        {range[0].format("DD/MM/YYYY")} to {range[1].format("DD/MM/YYYY")}
+                      </p>
+                      <Button
+                        onClick={() => {
+                          const newRanges = { ...allRanges };
+                          newRanges[activeListing.id] = [...allRanges[activeListing.id]];
+                          newRanges[activeListing.id].splice(index, 1);
+                          setAllRanges(newRanges);
+                        }
+                        }> Delete Date</Button>
+                    </>
                   ))}
                 </div>
               )}
