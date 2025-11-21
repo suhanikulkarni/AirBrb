@@ -1,14 +1,11 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
 import { API_BASE_URL } from '../constants';
 import { ErrorContext } from '../context';
 import Thumbnail from './Thumbnail';
-
 import styles from '../styles/listingStyles.module.css';
 import { PageBody } from '../styles/mainStyles';
-
 import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -169,7 +166,7 @@ function ViewListing({ token, owner }) {
     } catch (error) {
       setShowErrorPopup(error.response.data.error);
     }
-  }
+  };
 
   const getListingInfo = async (listingId) => {
     try {
@@ -178,18 +175,9 @@ function ViewListing({ token, owner }) {
     } catch (error) {
       setShowErrorPopup(error.response.data.error);
     }
-  }
+  };
 
-  const handleFilter = (e) => {
-    const { name, value } = e.target;
-
-    setFilter((prevData) => ({
-      ...prevData,
-      [name]: value
-    }));
-  }
-
-  const filterListing = (e) => {
+  const filterListing = () => {
     let listing = [...list];
 
     // search filter
@@ -258,144 +246,144 @@ function ViewListing({ token, owner }) {
   const orderList = () => {
     if (sortOrder === 'descending') return filteredList.toReversed();
     return filteredList;
-  }
+  };
 
   return (
     <>
-    <PageBody>
-      <Modal
-        open={reviewOpen}
-        onClose={handleClose}
-        style={{
-          position: 'absolute',
-          border: '2px solid #000',
-          backgroundColor: 'pink',
-          height: 200,
-          width: 240,
-          margin: 'auto',
-          padding: '2%',
-          color: 'white',
-        }}
-      >
-        <div>
-          <div>Review</div>
-          <Rating
-            value={reviewRating}
-            onChange={(event, newValue) => setReviewRating(newValue)}
-          />
-          <TextField
-            value={reviewComment}
-            onChange={(e) => setReviewComment(e.target.value)}
-          />
-          <Button
-            onClick={uploadReview}
-            variant='contained'
-          >
-            Submit Review
-          </Button>
-        </div>
-      </Modal>
+      <PageBody>
+        <Modal
+          open={reviewOpen}
+          onClose={handleClose}
+          style={{
+            position: 'absolute',
+            border: '2px solid #000',
+            backgroundColor: 'pink',
+            height: 200,
+            width: 240,
+            margin: 'auto',
+            padding: '2%',
+            color: 'white',
+          }}
+        >
+          <div>
+            <div>Review</div>
+            <Rating
+              value={reviewRating}
+              onChange={(event, newValue) => setReviewRating(newValue)}
+            />
+            <TextField
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+            />
+            <Button
+              onClick={uploadReview}
+              variant='contained'
+            >
+              Submit Review
+            </Button>
+          </div>
+        </Modal>
 
-      <Filter filter={filter} setFilter={setFilter} filterListing={filterListing}/>
-      <br />
+        <Filter filter={filter} setFilter={setFilter} filterListing={filterListing}/>
+        <br />
 
-      <ToggleButtonGroup
-        value={sortOrder}
-        exclusive
-        onChange={(e, newSortOrder) => {
-          if (newSortOrder !== null) setSortOrder(newSortOrder);
-        }}
-        aria-label='listing order'
-        size='small'
-      >
-        <ToggleButton value='ascending' aria-label='ascending order'>
-          <p>Ascending</p>
-        </ToggleButton>
-        <ToggleButton value='descending' aria-label='descending order'>
-          <p>Descending</p>
-        </ToggleButton>
-      </ToggleButtonGroup>
-      <br />
+        <ToggleButtonGroup
+          value={sortOrder}
+          exclusive
+          onChange={(e, newSortOrder) => {
+            if (newSortOrder !== null) setSortOrder(newSortOrder);
+          }}
+          aria-label='listing order'
+          size='small'
+        >
+          <ToggleButton value='ascending' aria-label='ascending order'>
+            <p>Ascending</p>
+          </ToggleButton>
+          <ToggleButton value='descending' aria-label='descending order'>
+            <p>Descending</p>
+          </ToggleButton>
+        </ToggleButtonGroup>
+        <br />
 
 
-      {list === 'LOADING' ? (
-        <p>LOADING...</p>
-      ) : (
-        <>
-          {list.length === 0 ? (
-            <div>No listings available</div>
-          ) : (
-            <>
-              {!filteredList.length ? (
-                <p>No listings found</p>
-              ) : (
-                <div className={styles.grid}>
-                  {orderList().map((listing, index) => {
-                    const booking = acceptedBookings.find(
-                      b => Number(b.listingId) === Number(listing.id)
-                    );
+        {list === 'LOADING' ? (
+          <p>LOADING...</p>
+        ) : (
+          <>
+            {list.length === 0 ? (
+              <div>No listings available</div>
+            ) : (
+              <>
+                {!filteredList.length ? (
+                  <p>No listings found</p>
+                ) : (
+                  <div className={styles.grid}>
+                    {orderList().map((listing, index) => {
+                      const booking = acceptedBookings.find(
+                        b => Number(b.listingId) === Number(listing.id)
+                      );
 
-                    return (
-                      <div key={index} className={styles.card}>
-                        <div key={listing.id} onClick={() => navigate(`/viewListings/${listing.id}`)}>
-                          <Thumbnail thumbnail={listing.thumbnail} listingTitle={listing.title} />
-                          <p className={styles.reviews}>
-                            ★ 
-                            {listing.reviews.length > 0 ? (
-                              <>{listing.reviews.reduce((a, b) => a + b.rating, 0) / listing.reviews.length}</>
-                            ) : (
-                              <>0</>
-                            )}
-                            {` (${listing.reviews.length})`}
-                          </p>
-                          <h4 className={styles.address}>
-                            {`
-                              ${listing.address?.suburb},
-                              ${listing.address?.state},
-                              ${listing.address?.country}
-                            `}
-                          </h4>
-                          <h3 className={styles.title}>{listing.title}</h3>
-                          <p className={styles.subInfo}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
-                          <p className={styles.subInfo}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>
-                          <p className={styles.subInfo}>
-                            {listing.availability[0].start.replaceAll('-', '/')}
-                            {' - '}
-                            {listing.availability[0].end.replaceAll('-', '/')}
+                      return (
+                        <div key={index} className={styles.card}>
+                          <div key={listing.id} onClick={() => navigate(`/viewListings/${listing.id}`)}>
+                            <Thumbnail thumbnail={listing.thumbnail} listingTitle={listing.title} />
+                            <p className={styles.reviews}>
+                              ★ 
+                              {listing.reviews.length > 0 ? (
+                                <>{listing.reviews.reduce((a, b) => a + b.rating, 0) / listing.reviews.length}</>
+                              ) : (
+                                <>0</>
+                              )}
+                              {` (${listing.reviews.length})`}
                             </p>
-                          <p className={styles.price}>${listing.price} per night</p>
+                            <h4 className={styles.address}>
+                              {`
+                                ${listing.address?.suburb},
+                                ${listing.address?.state},
+                                ${listing.address?.country}
+                              `}
+                            </h4>
+                            <h3 className={styles.title}>{listing.title}</h3>
+                            <p className={styles.subInfo}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
+                            <p className={styles.subInfo}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>
+                            <p className={styles.subInfo}>
+                              {listing.availability[0].start.replaceAll('-', '/')}
+                              {' - '}
+                              {listing.availability[0].end.replaceAll('-', '/')}
+                            </p>
+                            <p className={styles.price}>${listing.price} per night</p>
+                          </div>
+
+                          {booking && (
+                            <Typography
+                              variant="body1"
+                              style={{
+                                marginTop: '8px',
+                                fontWeight: 'bold',
+                                color: booking.status === 'accepted' ? 'green' :
+                                  booking.status === 'pending' ? 'orange' :
+                                    booking.status === 'declined' ? 'red' : 'pink'
+                              }}
+                            >
+                              Booking Status: {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                            </Typography>
+                          )}
+
+                          {booking && (
+                            <Button variant="contained" onClick={() => handleOpen(listing.id, booking.id)}>
+                              Leave a Review
+                            </Button>
+                          )}
                         </div>
-
-                        {booking && (
-                          <Typography
-                            variant="body1"
-                            style={{
-                              marginTop: '8px',
-                              fontWeight: 'bold',
-                              color: booking.status === 'accepted' ? 'green' :
-                                booking.status === 'pending' ? 'orange' :
-                                  booking.status === 'declined' ? 'red' : 'pink'
-                            }}
-                          >
-                            Booking Status: {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-                          </Typography>
-                        )}
-
-                        {booking && (
-                          <Button variant="contained" onClick={() => handleOpen(listing.id, booking.id)}>
-                            Leave a Review
-                          </Button>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </>
-          )}
-        </>
-      )}
-    </PageBody>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            )}
+          </>
+        )}
+      </PageBody>
     </>
   );
 }

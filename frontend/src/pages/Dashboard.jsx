@@ -1,10 +1,7 @@
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import Button from '@mui/material/Button';
-
 import { PageBody } from '../styles/mainStyles';
-
 import ViewHostedListings from './ViewHostedListings';
 
 function Dashboard({ token, owner }) {

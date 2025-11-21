@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
-
 import { Box } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import FormControl from '@mui/material/FormControl';
 
 function BedroomForm({ bedroomNumber, updateBedroomMetadata, bedroomMetadata }) {
   const [bedroomInfo, setBedroomInfo] = useState({
@@ -34,9 +32,8 @@ function BedroomForm({ bedroomNumber, updateBedroomMetadata, bedroomMetadata }) 
       bedTypes: updatedBeds,
       bedCount: totalBeds
     });
-  }
-    
-  // TODO: set bed info into listing info
+  };
+  
   return (
     <>
       <h4>Bedroom {bedroomNumber}</h4>
@@ -49,47 +46,47 @@ function BedroomForm({ bedroomNumber, updateBedroomMetadata, bedroomMetadata }) 
         }}
       >
         <TextField
-          label="Single Beds"
-          type="number"
+          label='Single Beds'
+          type='number'
           value={bedroomInfo.singleBed}
           onChange={handleBedroomBedInfo}
-          name="singleBed"
+          name='singleBed'
           slotProps={{ input: { min: 0 } }}
         />
 
         <TextField
-          label="Double Beds"
-          type="number"
+          label='Double Beds'
+          type='number'
           value={bedroomInfo.doubleBed}
           onChange={handleBedroomBedInfo}
-          name="doubleBed"
+          name='doubleBed'
           slotProps={{ input: { min: 0 } }}
         />
 
         <TextField
-          label="Queen Beds"
-          type="number"
+          label='Queen Beds'
+          type='number'
           value={bedroomInfo.queenBed}
           onChange={handleBedroomBedInfo}
-          name="queenBed"
+          name='queenBed'
           slotProps={{ input: { min: 0 } }}
         />
 
         <TextField
-          label="King Beds"
-          type="number"
+          label='King Beds'
+          type='number'
           value={bedroomInfo.kingBed}
           onChange={handleBedroomBedInfo}
-          name="kingBed"
+          name='kingBed'
           slotProps={{ input: { min: 0 } }}
         />
 
         <TextField
-          label="Sofa Beds"
-          type="number"
+          label='Sofa Beds'
+          type='number'
           value={bedroomInfo.sofaBed}
           onChange={handleBedroomBedInfo}
-          name="sofaBed"
+          name='sofaBed'
           slotProps={{ input: { min: 0 } }}
         />
       </Box>

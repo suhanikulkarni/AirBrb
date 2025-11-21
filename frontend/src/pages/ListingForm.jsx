@@ -34,13 +34,11 @@ function ListingForm({ getters, setters }) {
   useEffect(() => {
     const thumbnail = getters.listingInfo.thumbnail;
 
-    if (!thumbnail) {
-      return;
-    }
+    if (!thumbnail) return;
 
-    if (thumbnail.startsWith("https://www.youtube.com/")) {
+    if (thumbnail.startsWith('https://www.youtube.com/')) {
       setters.setThumbnailType('youtube');
-    } else if (thumbnail.startsWith("data:image/")) {
+    } else if (thumbnail.startsWith('data:image/')) {
       setters.setThumbnailType('image');
       setThumbnailImageName('previous_thumbnail');
     }
@@ -58,7 +56,7 @@ function ListingForm({ getters, setters }) {
       ...prevData,
       [name]: value
     }));
-  }
+  };
 
   const handleAddressInfo = (e) => {
     const {name, value} = e.target;
@@ -66,11 +64,11 @@ function ListingForm({ getters, setters }) {
       ...prevData,
       [name]: value
     }));
-  }
+  };
 
   const handleMetadataInfo = (e) => {
     const {name, value} = e.target;
-    console.log("name and vakue", name, value)
+    console.log('name and vakue', name, value)
 
     setters.setListingMetadata((prevData) => ({
       ...prevData,
@@ -80,7 +78,7 @@ function ListingForm({ getters, setters }) {
     if (name === 'bedroomCount') {
       renderBedroomForm();
     }
-  }
+  };
 
   const handleThumbnailImage = async (file) => {
     setThumbnailImageName(file.name);
@@ -90,7 +88,7 @@ function ListingForm({ getters, setters }) {
       ...prevData,
       'thumbnail': dataUrl
     }))
-  }
+  };
 
   const clearThumbnail = () => {
     setThumbnailImageName('');
@@ -99,14 +97,14 @@ function ListingForm({ getters, setters }) {
       ...prevData,
       'thumbnail': ''
     }))
-  }
+  };
 
   const handleThumbnailYoutube = (youtubeLink) => {
     setters.setListingInfo((prevData) => ({
       ...prevData,
       'thumbnail': youtubeLink
     }))
-  }
+  };
 
   const renderBedroomForm = () => {
     const array = [];
@@ -135,7 +133,7 @@ function ListingForm({ getters, setters }) {
     }
 
     return array;
-  }
+  };
 
   const updateBedroomMetadata = (bedroomNumber, bedroomInfo) => {
     setters.setListingMetadata(prev => {
@@ -148,22 +146,22 @@ function ListingForm({ getters, setters }) {
   return (
     <>
       <TextField 
-        id="listing-title-input" 
-        label="Property Name"
-        type="text"
-        name="title"
+        id='listing-title-input' 
+        label='Property Name'
+        type='text'
+        name='title'
         onChange={handleInfo}
         value={getters.listingInfo.title}
         required
       />
       <br />
 
-      <InputLabel htmlFor="listing-amount-input">Amount *</InputLabel>
+      <InputLabel htmlFor='listing-amount-input'>Amount *</InputLabel>
       <OutlinedInput
-        id="listing-price-input"
-        startAdornment={<InputAdornment position="start">$</InputAdornment>}
-        label="Amount"
-        name="price"
+        id='listing-price-input'
+        startAdornment={<InputAdornment position='start'>$</InputAdornment>}
+        label='Amount'
+        name='price'
         onChange={handleInfo}
         value={getters.listingInfo.price}
         required
@@ -184,11 +182,11 @@ function ListingForm({ getters, setters }) {
           }}
         >
           <TextField
-            id="listing-street-address-input"
-            label="Street Address"
-            type="text"
+            id='listing-street-address-input'
+            label='Street Address'
+            type='text'
             onChange={handleAddressInfo}
-            name="streetAddress"
+            name='streetAddress'
             value={getters.listingAddress.streetAddress}
             required
           />          
@@ -208,11 +206,11 @@ function ListingForm({ getters, setters }) {
             }}
           >
             <TextField
-              id="listing-suburb-input"
-              label="Suburb"
-              type="text"
+              id='listing-suburb-input'
+              label='Suburb'
+              type='text'
               onChange={handleAddressInfo}
-              name="suburb"
+              name='suburb'
               value={getters.listingAddress.suburb}
               required
             />
@@ -224,11 +222,11 @@ function ListingForm({ getters, setters }) {
             }}
           >
             <TextField
-              id="listing-state-input"
-              label="State"
-              type="text"
+              id='listing-state-input'
+              label='State'
+              type='text'
               onChange={handleAddressInfo}
-              name="state"
+              name='state'
               value={getters.listingAddress.state}
               required
             />
@@ -248,11 +246,11 @@ function ListingForm({ getters, setters }) {
             }}
           >
             <TextField
-              id="listing-country-input"
-              label="Country"
-              type="text"
+              id='listing-country-input'
+              label='Country'
+              type='text'
               onChange={handleAddressInfo}
-              name="country"
+              name='country'
               value={getters.listingAddress.country}
               required
             />
@@ -264,11 +262,11 @@ function ListingForm({ getters, setters }) {
             }}
           >
             <TextField
-              id="listing-postcode-input"
-              label="Postcode"
-              type="text"
+              id='listing-postcode-input'
+              label='Postcode'
+              type='text'
               onChange={handleAddressInfo}
-              name="postcode"
+              name='postcode'
               value={getters.listingAddress.postcode}
               required
             />
@@ -287,13 +285,13 @@ function ListingForm({ getters, setters }) {
             setters.setThumbnailType(thumbnailType);
           }; 
         }}
-        aria-label="thumbnail type"
+        aria-label='thumbnail type'
         size='small'
       >
-        <ToggleButton value="image" aria-label="image thumbnail">
+        <ToggleButton value='image' aria-label='image thumbnail'>
           <p>Image</p>
         </ToggleButton>
-        <ToggleButton value="youtube" aria-label="youtube thumbnail">
+        <ToggleButton value='youtube' aria-label='youtube thumbnail'>
           <p>Youtube</p>
         </ToggleButton>
       </ToggleButtonGroup>
@@ -330,16 +328,16 @@ function ListingForm({ getters, setters }) {
               )}
             </Box>
             <Button
-              component="label"
+              component='label'
               role={undefined}
-              variant="contained"
+              variant='contained'
               tabIndex={-1}  
             >
               Upload file
               <VisuallyHiddenInput
-                type="file"
+                type='file'
                 onChange={e => {handleThumbnailImage(e.target.files[0])}}
-                name="thumbnail"
+                name='thumbnail'
                 multiple
               />
             </Button>
@@ -349,11 +347,11 @@ function ListingForm({ getters, setters }) {
           <>
             <br />
             <TextField
-              id="youtube-thumbnail-input"
-              label="YouTube URL"
-              type="text"
+              id='youtube-thumbnail-input'
+              label='YouTube URL'
+              type='text'
               onChange={e => {handleThumbnailYoutube(e.target.value)}}
-              name="thumbnail"
+              name='thumbnail'
             />
           </>
         }
@@ -362,30 +360,30 @@ function ListingForm({ getters, setters }) {
 
       <h2>Listing Details</h2>
       <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Property Type *</InputLabel>
+        <InputLabel id='demo-simple-select-label'>Property Type *</InputLabel>
         <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          name="propertyType"
+          labelId='demo-simple-select-label'
+          id='demo-simple-select'
+          name='propertyType'
           value={getters.listingMetadata.propertyType}
           onChange={handleMetadataInfo}
         >
-          <MenuItem value={"apartment"}>Apartment</MenuItem>
-          <MenuItem value={"house"}>House</MenuItem>
-          <MenuItem value={"guesthouse"}>Guesthouse</MenuItem>
-          <MenuItem value={"hotelroom"}>Hotel Room</MenuItem>
-          <MenuItem value={"cabin"}>Cabin</MenuItem>
-          <MenuItem value={"other"}>Other</MenuItem>
+          <MenuItem value={'apartment'}>Apartment</MenuItem>
+          <MenuItem value={'house'}>House</MenuItem>
+          <MenuItem value={'guesthouse'}>Guesthouse</MenuItem>
+          <MenuItem value={'hotelroom'}>Hotel Room</MenuItem>
+          <MenuItem value={'cabin'}>Cabin</MenuItem>
+          <MenuItem value={'other'}>Other</MenuItem>
         </Select>
       </FormControl>
       <br />
 
       <TextField
-        type="text"
-        label="Amenities"
+        type='text'
+        label='Amenities'
         multiline
         rows={3}
-        name="amenities"
+        name='amenities'
         onChange={handleMetadataInfo}
         value={getters.listingMetadata.amenities}
       />
@@ -393,11 +391,11 @@ function ListingForm({ getters, setters }) {
 
       {/* TODO: prevent no. from decreasing beyond 0 */}
       <TextField
-        id="bathroom-count-input"
-        label="Number of Bathrooms"
-        type="number"
+        id='bathroom-count-input'
+        label='Number of Bathrooms'
+        type='number'
         onChange={handleMetadataInfo}
-        name="bathroomCount"
+        name='bathroomCount'
         value={getters.listingMetadata.bathroomCount}
         slotProps={{ input: { min: 0 } }}
         required
@@ -407,10 +405,10 @@ function ListingForm({ getters, setters }) {
 
       <h3>Bedrooms</h3>
       <TextField
-        label="Number of Bedrooms"
-        type="number"
+        label='Number of Bedrooms'
+        type='number'
         onChange={handleMetadataInfo}
-        name="bedroomCount"
+        name='bedroomCount'
         value={getters.listingMetadata.bedroomCount}
         slotProps={{ input: { min: 0 } }}
         required

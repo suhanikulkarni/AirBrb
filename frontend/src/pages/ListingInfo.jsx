@@ -1,12 +1,15 @@
 import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { API_BASE_URL } from '../constants';
 import axios from 'axios';
-import UsersBookingForm from './UserBookingForm';
-import { Box, Modal, Tooltip, Typography } from '@mui/material';
-
-import Rating from '@mui/material/Rating';
+import { API_BASE_URL } from '../constants';
 import { ErrorContext } from '../context';
+import Thumbnail from './Thumbnail';
+import UsersBookingForm from './UserBookingForm';
+import { PageBody } from '../styles/mainStyles';
+import styles from '../styles/listingStyles.module.css';
+import { Box, Modal, Tooltip } from '@mui/material';
+import Rating from '@mui/material/Rating';
+import Button from '@mui/material/Button';
 
 function ListingInfo({ token }) {
   const { listingId } = useParams();
@@ -21,7 +24,7 @@ function ListingInfo({ token }) {
   };
 
   const handleOpen = () => {
-    console.log("Opening")
+    console.log('Opening')
     setOpen(true);
   };
 
@@ -31,7 +34,7 @@ function ListingInfo({ token }) {
       if (data) setListingDetails(data);
     };
     fetchListings();
-  }, [listingId])
+  }, [listingId]);
 
   let sum = 0;
   listingDetails?.metadata?.bedrooms?.forEach(element => {
@@ -41,26 +44,25 @@ function ListingInfo({ token }) {
   const filterReviews = () => {
     if (listingDetails) {
       const value = listingDetails.reviews.filter((review) => review.rating === reviewValue);
-      console.log("plk",value)
+      console.log('plk',value)
       setSpecificRatingReviews(value);
     }
-  }
+  };
 
   const getListingInfo = async (listingId) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}listings/${listingId}`)
+        `${API_BASE_URL}listings/${listingId}`);
       console.log(response)
       if (response) {
-        console.log("this is the response",response.data.listing)
+        console.log('this is the response',response.data.listing)
         return response.data.listing;
       }
-    }
-    catch (error) {
+    } catch (error) {
       setShowErrorPopup(error.response.data.error);
 
     }
-  }
+  };
 
   const getBreakdownForStar = (starRating) => {
     if (!listingDetails?.reviews || !starRating) return null;
@@ -85,52 +87,61 @@ function ListingInfo({ token }) {
   ) : '';
 
   return (
-    <>
+    <PageBody>
       {listingDetails && (
         <>
           <div>
             <h2>Listing Info</h2>
-            <p>Title: {listingDetails?.title}</p>
-            <p>
-          Address: 
-              {listingDetails?.address?.streetAddress}, 
-              {listingDetails?.address?.suburb}, 
-              {listingDetails?.address?.postcode}, 
-              {listingDetails?.address?.state}, 
-              {listingDetails?.address?.country}
+            <Thumbnail thumbnail={listingDetails?.thumbnail} listingTitle={listingDetails?.title} />
+            <br /><br />
+
+            <h3 className={styles.title}>Title: {listingDetails?.title}</h3>
+            <p className={styles.subInfo}>
+              {`Address: 
+              ${listingDetails?.address?.streetAddress}, 
+              ${listingDetails?.address?.suburb}, 
+              ${listingDetails?.address?.postcode}, 
+              ${listingDetails?.address?.state}, 
+              ${listingDetails?.address?.country}`}
             </p>
-          
-            <p>Amenities: {listingDetails?.metadata?.amenities}</p>
-            <p>Price: ${listingDetails?.price} per night</p>
-            <p>Property Type: {listingDetails?.metadata?.propertyType}</p>
-            <p>Number of Beds: {listingDetails?.metadata?.bedroomCount}</p>
-            <p>Number of Bathrooms: {listingDetails?.metadata?.bathroomCount}</p>
-            <p>Number of Beds: {sum}</p>
-            <p>Avilable dates:</p>
+            <br />
+            
+            <p className={styles.subInfo}>Price: ${listingDetails?.price} per night</p>
+            <p className={styles.subInfo}>Amenities: {listingDetails?.metadata?.amenities}</p>
+            <p className={styles.subInfo}>Property Type: {listingDetails?.metadata?.propertyType}</p>
+            <br />
+
+            <p className={styles.subInfo}>Number of Beds: {listingDetails?.metadata?.bedroomCount}</p>
+            <p className={styles.subInfo}>Number of Bathrooms: {listingDetails?.metadata?.bathroomCount}</p>
+            <p className={styles.subInfo}>Number of Beds: {sum}</p>
+            <br />
+            
+            <p className={styles.subInfo}>Available dates:</p>
             {listingDetails.availability.map(av => (
-              <p>{av.start} - {av.end}</p>
+              <p key={`${av.start}-${av.end}`} className={styles.subInfo}>{av.start} - {av.end}</p>
             ))}
           </div>
+          <br />
 
           <Tooltip title={tooltipContent}>
-            <Typography>Ratings: (hover over the starts to see the ratings)</Typography>
+            <p className={styles.subInfo}>Ratings (hover over the starts to see the ratings):</p>
             <Rating 
               value={reviewValue}
               onChangeActive={(event, newHover) => {
                 setReviewValue(newHover);
               }}
               onClick={(event, newValue) => {
-                handleOpen()
+                handleOpen();
                 if (newValue) {
                   setReviewValue(newValue);
-                
                 }
               }}
             />
           </Tooltip>
         </>
       )}
-
+      
+      <br />
       {listingDetails && token && token !== 'LOADING' && (
         <UsersBookingForm 
           price={listingDetails.price} 
@@ -150,9 +161,10 @@ function ListingInfo({ token }) {
           transform: 'translate(-50%, -50%)',
           width: 400,
           bgcolor: 'background.paper',
-          border: '2px solid #000',
+          borderRadius: '10px',
           boxShadow: 24,
           p: 4,
+          fontFamily: 'Calibri, sans-serif'
         }}>
           <h2>Reviews with {reviewValue} stars</h2>
 
@@ -170,10 +182,10 @@ function ListingInfo({ token }) {
             <p>No reviews with {reviewValue} stars yet.</p>
           )}
 
-          <button onClick={handleClose}>Close</button>
+          <Button variant='contained' onClick={handleClose}>Close</Button>
         </Box>
       </Modal>
-    </>
+    </PageBody>
   );
 }
 
