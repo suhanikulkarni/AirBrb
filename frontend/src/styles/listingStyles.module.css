@@ -9,12 +9,11 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
 }
 
 .card {
-  max-width: 800px;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 16px;
@@ -35,18 +34,32 @@
 }
 
 .title {
-  margin: 12px 0 6px;
-  font-size: 1.1rem;
+  margin: 0 0 6px 0;
+  font-size: 20px;
   color: #333;
 }
 
 .address {
-  margin: 4px 0;
+  margin: 5px 0 0 0;
   color: #555;
 }
 
 .price {
-  margin: 4px 0;
+  margin: 8px 0;
   font-weight: bold;
   color: #007BFF;
+  font-size: 20px;
+}
+
+.reviews {
+  float: right;
+  margin: 5px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.subInfo {
+  color: #555;
+  margin: 0 0 3px 0 ;
+  font-size: 18px;
 }

@@ -130,6 +130,7 @@ function ViewListing ( {token, owner}) {
         fetchedList.sort((a, b) => a.title.localeCompare(b.title));
         setList(fetchedList);
         setFilteredList([...fetchedList]);
+        console.log(fetchedList)
       }      
     }
 
@@ -304,6 +305,15 @@ function ViewListing ( {token, owner}) {
                       <div key={index} className={styles.card}>
                         <div onClick={() => navigate(`/viewListings/${listing.id}`)}>
                           <Thumbnail thumbnail={listing.thumbnail} listingTitle={listing.title} />
+                          <p className={styles.reviews}>
+                            ★ 
+                            {listing.reviews.length > 0 ? (
+                              <>`${listing.reviews.reduce((a, b) => a + b.rating) / listing.reviews.length}`</>
+                            ) : (
+                              <>0</>
+                            )}
+                            {` (${listing.reviews.length})`}
+                          </p>
                           <h4 className={styles.address}>
                             {`
                               ${listing.address?.suburb},
@@ -312,15 +322,10 @@ function ViewListing ( {token, owner}) {
                             `}
                           </h4>
                           <h3 className={styles.title}>{listing.title}</h3>
-                          <p className={styles.address}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
-                          <p className={styles.address}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>                    
-                          <p className={styles.address}>
-                            {listing.reviews.length > 0 && (
-                              <>`★ ${listing.reviews.reduce((a, b) => a + b.rating) / listing.reviews.length} `</>
-                            )}
-                            {`(${listing.reviews.length} reviews)`}
-                          </p>
-                          <p className={styles.price}>${listing.price}</p>
+                          <p className={styles.subInfo}>{`${listing.metadata?.bedrooms.length} Bedrooms`}</p>
+                          <p className={styles.subInfo}>{`${listing.metadata?.bathroomCount} Bathrooms`}</p>
+                          <p className={styles.subInfo}>{listing.availability[0].start} ~ {listing.availability[0].end}</p>
+                          <p className={styles.price}>${listing.price} per night</p>
                         </div>
                         {booking && (
                           <Button variant='contained'onClick={() => handleOpen(listing.id, booking.id)}>
