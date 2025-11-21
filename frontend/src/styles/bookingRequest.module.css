@@ -1,0 +1,43 @@
+.container {
+  padding: 20px;
+  background: #f5f5f5;
+}
+
+.requestCard {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 15px;
+}
+
+.requestTitle {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin: 0 0 10px 0;
+}
+
+.requestInfo {
+  color: #666;
+  margin: 5px 0;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.statsBox {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-top: 30px;
+}
+
+.statItem {
+  margin: 10px 0;
+  font-weight: 500;
+  color: #444;
+}

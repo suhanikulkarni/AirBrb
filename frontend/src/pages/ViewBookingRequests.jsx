@@ -3,10 +3,11 @@ import { ErrorContext } from '../context';
 import axios from "axios";
 import { API_BASE_URL } from "../constants";
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
 import { useNavigate } from "react-router-dom";
-import { Box, Input, InputLabel } from "@mui/material";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import styles from '../styles/bookingRequest.module.css';
 
 dayjs.extend(customParseFormat);
 
@@ -22,7 +23,6 @@ function ViweBookingRequest({ token, owner }) {
 
   useEffect(() => {
     let profit1 = 0;
-    // only if acceptef
 
     bookingRequests.map(booking => {
       profit1 += booking.totalPrice;
@@ -38,7 +38,6 @@ useEffect(() => {
     bookingRequests
       .filter(booking => booking.status === 'accepted')
       .forEach(booking => {
-        // Parse dates with the correct format: DD-MM-YYYY
         const start1 = dayjs(booking.dateRange.start, 'DD-MM-YYYY');
         const end1 = dayjs(booking.dateRange.end, 'DD-MM-YYYY');
 
@@ -137,10 +136,8 @@ useEffect(() => {
       if (res) {
         const requestData = res.data.bookings;
         const listingIds = listings.map(listing => String(listing.id));
-        //console.log("Listing IDs:", listingIds);
         bookingRequests = requestData.filter(booking => {
           const match = listingIds.includes(String(booking.listingId));
-          //console.log(`Comparing ${booking.listingId} with myListingIds:`, match);
           return match;
         });
 
@@ -188,51 +185,97 @@ useEffect(() => {
     }
   }
 
+  const pendingRequests = bookingRequests.filter(r => r.status === 'pending');
+
+  const getStatusClass = (status) => {
+    if (status === 'accepted') return styles.statusAccepted;
+    if (status === 'declined') return styles.statusDeclined;
+    return styles.statusPending;
+  };
+
   return (
-    <div>
-      <h3>Booking Requests</h3>
-      {bookingRequests.length === 0 ? (
-        <p>No booking requests </p>
-      ) : (
-        bookingRequests.map((request) => (
-          <>
-            {request.status === "pending" && (
-              <div key={request.id}>
-                <h3>Request Id: {request.id}</h3>
-                <p>Start Date: {request.dateRange.start}</p>
-                <p>End Date: {request.dateRange.end}</p>
-                <Button
-                  onClick={() => { acceptRequest(request.id) }}
-                >Accept
-                </Button>
+    <div className={styles.container}>
+      <div className={styles.pendingSection}>
+        <h3 className={styles.title}>Booking Requests</h3>
 
-                <Button
-                  onClick={() => { declineRequest(request.id) }}
-                >Decline
-                </Button>
-
+        {pendingRequests.length === 0 ? (
+          <p className={styles.noRequests}>No pending booking requests</p>
+        ) : (
+          <div className={styles.requestsGrid}>
+            {pendingRequests.map((request) => (
+              <div key={request.id} className={styles.requestCard}>
+                <h3 className={styles.requestTitle}>Request ID: {request.id}</h3>
+                <p className={styles.requestInfo}>
+                  <span className={styles.requestInfoLabel}>Start Date:</span> {request.dateRange.start}
+                </p>
+                <p className={styles.requestInfo}>
+                  <span className={styles.requestInfoLabel}>End Date:</span> {request.dateRange.end}
+                </p>
+                <div className={styles.buttonGroup}>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={() => acceptRequest(request.id)}
+                  >
+                    Accept
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => declineRequest(request.id)}
+                  >
+                    Decline
+                  </Button>
+                </div>
               </div>
-            )}
-          </>
-        ))
-      )}
+            ))}
+          </div>
+        )}
+      </div>
 
-      <Box>
-        <InputLabel>Suhani</InputLabel>
+      <div className={styles.statsBox}>
+        <h4 className={styles.statsTitle}>Booking Statistics</h4>
+        <div className={styles.statsContainer}>
+          {bookingRequests.length === 0 ? (
+            <p className={styles.noRequests}>No bookings to display</p>
+          ) : (
+            bookingRequests.map((request) => (
+              <div key={request.id} className={styles.statsRequestCard}>
+                <h4 className={styles.statsRequestTitle}>Request ID: {request.id}</h4>
+                <div className={styles.statsRequestInfo}>
+                  <div>
+                    <span className={styles.statsRequestInfoLabel}>Start:</span> {request.dateRange.start}
+                  </div>
+                  <div>
+                    <span className={styles.statsRequestInfoLabel}>End:</span> {request.dateRange.end}
+                  </div>
+                  <div>
+                    <span className={styles.statsRequestInfoLabel}>Status:</span>{' '}
+                    <span className={`${styles.statusBadge} ${getStatusClass(request.status)}`}>
+                      {request.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+        <div className={styles.summaryStats}>
+          <div className={`${styles.statCard} ${styles.profitCard}`}>
+            <div className={styles.statLabel}>Total Profit</div>
+            <div className={`${styles.statValue} ${styles.profitValue}`}>
+              ${profit.toFixed(2)}
+            </div>
+          </div>
 
-        {bookingRequests.map((request) => (
-          <>
-            <h4>Request Id: {request.id}</h4>
-            <p>Start Date: {request.dateRange.start}</p>
-            <p>End Date: {request.dateRange.end}</p>
-            <p>Status: {request.status}</p>
-          </>
-        ))}
-
-        <InputLabel>Profit Made: ${profit}</InputLabel>
-        <InputLabel>Days booked: {totalDaysBooked}</InputLabel>
-
-      </Box>
+          <div className={`${styles.statCard} ${styles.daysCard}`}>
+            <div className={styles.statLabel}>Days Booked</div>
+            <div className={`${styles.statValue} ${styles.daysValue}`}>
+              {totalDaysBooked}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
