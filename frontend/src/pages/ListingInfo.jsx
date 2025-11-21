@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { API_BASE_URL } from '../constants';
 import axios from 'axios';
 import UsersBookingForm from './UserBookingForm';
-import { Box, Modal, Tooltip, Typography } from '@mui/material';
+import { Box, Modal, Tooltip } from '@mui/material';
 import Rating from '@mui/material/Rating';
 import { ErrorContext } from '../context';
 import { PageBody } from '../styles/mainStyles';
@@ -119,7 +119,7 @@ function ListingInfo({ token }) {
             
             <p className={styles.subInfo}>Available dates:</p>
             {listingDetails.availability.map(av => (
-              <p className={styles.subInfo}>{av.start} - {av.end}</p>
+              <p key={`${av.start}-${av.end}`} className={styles.subInfo}>{av.start} - {av.end}</p>
             ))}
           </div>
           <br />

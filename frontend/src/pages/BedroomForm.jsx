@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
-
 import { Box } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import FormControl from '@mui/material/FormControl';
 
 function BedroomForm({ bedroomNumber, updateBedroomMetadata, bedroomMetadata }) {
   const [bedroomInfo, setBedroomInfo] = useState({

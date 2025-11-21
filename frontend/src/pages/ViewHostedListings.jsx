@@ -424,7 +424,7 @@ function ViewHostedListings({ owner, token }) {
                     <p className={styles.subInfo}>Number of Bathrooms: {listing.metadata?.bathroomCount}</p>
                     
                     {listing?.availability.map(av => (
-                      <p className={styles.subInfo}>Available dates: {av.start} - {av.end}</p>
+                      <p key={`${av.start}-${av.end}`} className={styles.subInfo}>Available dates: {av.start} - {av.end}</p>
                     ))}
 
                     <Box

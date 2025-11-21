@@ -3,7 +3,6 @@ import { ErrorContext } from '../context';
 import axios from "axios";
 import { API_BASE_URL } from "../constants";
 import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
 import { useNavigate } from "react-router-dom";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -32,7 +31,7 @@ function ViweBookingRequest({ token, owner }) {
     setProfit(profit1);
   }, [bookingRequests])
 
-useEffect(() => {
+  useEffect(() => {
     let daysBooked = 0;
 
     bookingRequests
