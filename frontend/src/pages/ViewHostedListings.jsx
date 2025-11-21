@@ -322,7 +322,117 @@ function ViewHostedListings({ owner, token }) {
   }
 
   console.log("this is all the listings: ", listings)
-  
+  return (
+    <div>
+      <h2>Hosted Listings</h2>
+      {listings.length === 0 ? (
+        <p>No hosted listings found</p>
+      ) : (
+        listings.map((listing) => (
+          <div key={listing.id} >
+            <h3>{listing.title}</h3>
+            <p>${listing.price}</p>
+            <p>Number of Bedrooms: {listing.metadata?.bedroomCount}</p>
+
+            {listing?.availability.map(av => (
+              <p>Avilable dates: {av.start} - {av.end}</p>
+            ))}
+
+            <Button
+              onClick={() => navigate(`/${listing.id}/viewBooking`)}
+              variant="contained"
+            >Booking Information</Button>
+            <Button
+              aria-describedby={listing.id}
+              variant="contained"
+              onClick={(e) => handleClick(e, listing)}
+            >
+              Manage Availability
+            </Button>
+            <Button
+              name={listing.id}
+              variant="contained"
+              onClick={() => deleteListing(listing.id)}>
+
+              Delete Listing
+            </Button>
+          </div>
+        ))
+      )}
+      <Popover
+        id={activeListing?.id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+      >
+        {activeListing && (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Set Availability for: {activeListing.title}
+            </Typography>
+
+            <DatePicker
+              range
+              value={currentRange}
+              onChange={setCurrentRange}
+              placeholder="Select availability date range"
+            />
+
+            <Button
+              variant="outlined"
+              onClick={addingRanges}
+              fullWidth
+
+            >
+              Add Availability
+            </Button>
+
+            <div >
+              <strong>Current Availability:</strong>
+
+              {(allRanges[activeListing.id] || []).length === 0 ? (
+                <p>No ranges added yet.</p>
+              ) : (
+                <div>
+                  {(allRanges[activeListing.id] || []).map((range, index) => (
+                    <>
+                      <p key={index} >
+                        {range[0].format("DD/MM/YYYY")} to {range[1].format("DD/MM/YYYY")}
+                      </p>
+                      <Button
+                        onClick={() => {
+                          const newRanges = { ...allRanges };
+                          newRanges[activeListing.id] = [...allRanges[activeListing.id]];
+                          newRanges[activeListing.id].splice(index, 1);
+                          setAllRanges(newRanges);
+                        }
+                        }> Delete Date</Button>
+                    </>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={publishDates}
+            >
+              Publish Listing
+            </Button>
+          </Box>
+        )}
+      </Popover>
+    </div>
+  );
 }
 
 export default ViewHostedListings;
